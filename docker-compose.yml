@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  core-engine:
+    build: .
+    container_name: core-engine
+    expose:
+      - "80"
+    environment:
+      - VIRTUAL_HOST=core-engine.test
+    volumes:
+      - .:/var/www/
+    tty: true  
+    
