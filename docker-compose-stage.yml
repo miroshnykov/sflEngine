@@ -1,0 +1,4 @@
+version: "3.6"
+services:
+  core-engine:
+    image: actionmediamtl/sfl-core-engine:release-$RELEASECORE
