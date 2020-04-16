@@ -8,7 +8,7 @@ let config
 
 config = {
     env: process.env.NODE_ENV || env || `production`,
-    port: 8088,
+    port: 8089,
     redis: {
         host: '',
         port: 6379
