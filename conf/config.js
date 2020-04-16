@@ -13,6 +13,13 @@ config = {
         host: '',
         port: 6379
     },
+    log: {
+        name: `core-engine`,
+        streams: [{
+            level: `INFO`,
+            stream: process.stdout
+        }]
+    },
     host: '',
     mysql: {
         host: '',
