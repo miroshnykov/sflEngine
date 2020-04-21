@@ -11,8 +11,8 @@ RUN apt-get install --yes nodejs
 
 WORKDIR /home/app
 COPY . .
-# RUN npm install
+RUN npm install
 # RUN npm run build
-EXPOSE 8088
-# CMD [ "node", "server.js" ]
+EXPOSE 8089
+CMD [ "npm", "start" ]
 
