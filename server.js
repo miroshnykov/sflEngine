@@ -6,8 +6,8 @@ const numCores = config.cores || require(`os`).cpus().length
 // const {v4} = require('uuid')
 // const axios = require('axios')
 const cors = require('cors')
-const {getDataCache} = require('./redis')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
+const {signup} = require(`./lib/traffic`)
 const app = express()
 
 
@@ -30,10 +30,7 @@ if (cluster.isMaster) {
         res.send('OK')
     })
 
-    app.get('/signup', async (req, res, next) => {
-        let conditions = await getConditions()
-        res.send(conditions)
-    })
+    app.get('/signup', signup)
 
     app.use(require('./middlewares/not-found'));
 
@@ -45,6 +42,3 @@ if (cluster.isMaster) {
     )
 }
 
-const getConditions = async () => {
-    return await getDataCache(`targeting`)
-}
