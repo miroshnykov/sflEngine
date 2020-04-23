@@ -9,10 +9,13 @@ let config
 config = {
     env: process.env.NODE_ENV || env || `production`,
     port: 8089,
-    maxmind:{
-        path : '/var/lib/GeoIP/GeoIP2-City.mmdb'
+    maxmind: {
+        path: '/var/lib/GeoIP/GeoIP2-City.mmdb'
     },
-    dimensionsNames:[
+    redirectFlowRotator: {
+        url: 'http://flow-rotator-us-east-1-titan-108.infra.systems/signup'
+    },
+    dimensionsNames: [
         'country',
         'platformAndroid',
         'platformIos',
