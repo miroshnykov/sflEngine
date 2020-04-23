@@ -13,7 +13,7 @@ config = {
         path : '/var/lib/GeoIP/GeoIP2-City.mmdb'
     },
     dimensionsNames:[
-        'countryCode',
+        'country',
         'platformAndroid',
         'platformIos',
         'platformWindows',
