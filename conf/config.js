@@ -9,9 +9,27 @@ let config
 config = {
     env: process.env.NODE_ENV || env || `production`,
     port: 8089,
+    maxmind:{
+        path : '/var/lib/GeoIP/GeoIP2-City.mmdb'
+    },
+    dimensionsNames:[
+        'country',
+        'platformAndroid',
+        'platformIos',
+        'platformWindows',
+        'sourceTypeSweepstakes',
+        'sourceTypeVod'
+    ],
     redis: {
         host: '',
         port: 6379
+    },
+    log: {
+        name: `core-engine`,
+        streams: [{
+            level: `INFO`,
+            stream: process.stdout
+        }]
     },
     host: '',
     mysql: {
