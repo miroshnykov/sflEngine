@@ -23,9 +23,15 @@ config = {
         'sourceTypeSweepstakes',
         'sourceTypeVod'
     ],
-    redis: {
-        host: '',
+    intervalUpdate: 300000,//5min
+    redisLocal: {
+        host: 'localhost',
         port: 6379
+    },
+    cacheEngine: {
+        host: 'https://sfl-cach.surge.systems/',
+        path: 'getTargeting',
+        port: 8089
     },
     log: {
         name: `core-engine`,

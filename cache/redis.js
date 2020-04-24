@@ -1,10 +1,10 @@
 const config = require('plain-config')()
 
 const asyncRedis = require('async-redis')
-const redisClient = asyncRedis.createClient(config.redis.port, 'localhost')
+const redisClient = asyncRedis.createClient(config.redisLocal.port, config.redisLocal.host)
 
 redisClient.on('connect', () => {
-    console.log(`\x1b[36m  Redis connected to host localhost port ${config.redis.port} \x1b[0m`)
+    console.log(`\x1b[36m  Redis connected to host localhost port ${config.redisLocal.port} \x1b[0m`)
 })
 
 redisClient.on('error', (err) => {

@@ -1,14 +1,13 @@
 
 const {getDataCache} = require('./redis')
 
-const targetingConditions = async (req) => {
+const targetingConditions = async () => {
 
     try {
-        return await getDataCache(`targeting`)
+        return await getDataCache(`targetingLocal`)
     } catch (e) {
         console.log(e)
     }
-
 }
 
 module.exports = {
