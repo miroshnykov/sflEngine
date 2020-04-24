@@ -13,7 +13,7 @@ config = {
         path: '/var/lib/GeoIP/GeoIP2-City.mmdb'
     },
     redirectFlowRotator: {
-        url: 'http://flow-rotator-us-east-1-titan-108.infra.systems/signup'
+        url: 'http://flow-rotator-eu-west-1-titan-107.infra.systems/signup'
     },
     dimensionsNames: [
         'country',
