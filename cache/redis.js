@@ -55,6 +55,7 @@ const getDataCache = async (key) => {
 
     } catch (err) {
         console.log(`\n*** Something happened, getDataCache err:`, err)
+        return []
     }
 }
 

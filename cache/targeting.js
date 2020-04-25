@@ -7,6 +7,7 @@ const targetingConditions = async () => {
         return await getDataCache(`targetingLocal`)
     } catch (e) {
         console.log(e)
+        return []
     }
 }
 
