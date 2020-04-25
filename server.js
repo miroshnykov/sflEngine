@@ -26,9 +26,15 @@ if (cluster.isMaster) {
 
     setInterval(async () => {
         console.time('targeting')
-        await setTargetingToLocalRedis()
+        let response = await setTargetingToLocalRedis()
+        if (response){
+            console.log(`update local redis successfully`)
+        } else {
+            console.log(`redis not updated `)
+        }
+
         console.timeEnd('targeting')
-        console.log(`update local redis successfully`)
+
     }, config.intervalUpdate)
 
 } else {

@@ -1,4 +1,5 @@
 const config = require('plain-config')()
+const {catchHandler} = require('../middlewares/catchErr')
 
 const asyncRedis = require('async-redis')
 const redisClient = asyncRedis.createClient(config.redisLocal.port, config.redisLocal.host)
@@ -23,8 +24,8 @@ const setDataCache = async (key, data) => {
         await setRedis(key, JSON.stringify(data))
         console.log(`*** Redis SET { ${key} } \n`)
 
-    } catch (err) {
-        console.log(`\n*** Something happened, setDataCache, err:`, err)
+    } catch (e) {
+        catchHandler(e, 'setDataCache')
     }
 }
 
@@ -34,8 +35,8 @@ const delDataCache = async (key) => {
         await deleteRedis(key)
         console.log(`*** Redis DEL { ${key} } \n`)
 
-    } catch (err) {
-        console.log(`\n*** Something happened, delDataCache, err:`, err)
+    } catch (e) {
+        catchHandler(e, 'delDataCache')
     }
 }
 
@@ -53,8 +54,8 @@ const getDataCache = async (key) => {
 
         return affiliates
 
-    } catch (err) {
-        console.log(`\n*** Something happened, getDataCache err:`, err)
+    } catch (e) {
+        catchHandler(e, 'getDataCache')
         return []
     }
 }
