@@ -9,13 +9,10 @@ const setTargetingToLocalRedis = async () => {
         if (targeting.length > 0) {
             await setDataCache('targetingLocal', targeting)
             return true
-        } else {
-            return
         }
 
     } catch (e) {
         catchHandler(e, 'setTargetingToLocalRedis')
-        return
     }
 }
 
