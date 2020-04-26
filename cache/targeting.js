@@ -1,4 +1,4 @@
-
+const {catchHandler} = require('../middlewares/catchErr')
 const {getDataCache} = require('./redis')
 
 const targetingConditions = async () => {
@@ -6,7 +6,7 @@ const targetingConditions = async () => {
     try {
         return await getDataCache(`targetingLocal`)
     } catch (e) {
-        console.log(e)
+        catchHandler(e, 'targetingConditions')
         return []
     }
 }
