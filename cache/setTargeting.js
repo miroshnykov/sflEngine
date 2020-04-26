@@ -5,8 +5,14 @@ const {catchHandler} = require('../middlewares/catchErr')
 const setTargetingToLocalRedis = async () => {
 
     try {
-        await setDataCache('targetingLocal', await getTargeting(`targeting`))
-        return true
+        let targeting = await getTargeting(`targeting`)
+        if (targeting.length > 0) {
+            await setDataCache('targetingLocal', targeting)
+            return true
+        } else {
+            return
+        }
+
     } catch (e) {
         catchHandler(e, 'setTargetingToLocalRedis')
         return
