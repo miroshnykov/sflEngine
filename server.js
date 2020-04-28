@@ -8,7 +8,7 @@ const numCores = config.cores || require(`os`).cpus().length
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup} = require(`./lib/traffic`)
-const {setTargetingToLocalRedis} = require('./cache/setTargeting')
+const {setTargetingToLocalRedis} = require('./cache/local/setTargeting')
 const app = express()
 
 

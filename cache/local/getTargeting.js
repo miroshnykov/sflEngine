@@ -1,5 +1,5 @@
-const {catchHandler} = require('../middlewares/catchErr')
-const {getDataCache} = require('./redis')
+const {catchHandler} = require('../../middlewares/catchErr')
+const {getDataCache} = require('../redis')
 
 const targetingConditions = async () => {
 
