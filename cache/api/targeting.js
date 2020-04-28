@@ -7,7 +7,7 @@ const sflCoreCacheRequest = axios.create({
     baseURL: config.cacheEngine.host,
 })
 
-const getTargeting = async () => {
+const getTargetingApi = async () => {
     try {
         console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getTargeting`)
         const {data} = await sflCoreCacheRequest.get(`getTargeting`)
@@ -20,5 +20,5 @@ const getTargeting = async () => {
 }
 
 module.exports = {
-    getTargeting
+    getTargetingApi
 }

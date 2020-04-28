@@ -8,7 +8,7 @@ const numCores = config.cores || require(`os`).cpus().length
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup} = require(`./lib/traffic`)
-const {setTargetingToLocalRedis} = require('./cache/local/setTargeting')
+const {setTargetingLocal} = require('./cache/local/targeting')
 const app = express()
 
 
@@ -26,7 +26,7 @@ if (cluster.isMaster) {
 
     setInterval(async () => {
         console.time('targeting')
-        let response = await setTargetingToLocalRedis()
+        let response = await setTargetingLocal()
         if (response) {
             logger.info(`update local redis successfully`)
         } else {
@@ -40,7 +40,7 @@ if (cluster.isMaster) {
 } else {
     app.use(cors())
 
-    app.get('/signup', signup)
+    app.use('/signup', signup)
 
     app.use(require('./middlewares/not-found'));
 

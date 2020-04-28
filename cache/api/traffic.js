@@ -7,13 +7,13 @@ const sflCoreCacheRequest = axios.create({
     baseURL: config.cacheEngine.host,
 })
 
-const getBudgetCampaign = async (campaignId) => {
+const getBudgetStatusByCampaign = async (campaignId) => {
     try {
-        console.log(`*** call endpoint to get DATA ${config.cacheEngine.host} getCampaignBudget?campaignId=${campaignId}`)
-        const {data} = await sflCoreCacheRequest.get(`getCampaignBudget?campaignId=${campaignId}`)
+        console.log(`*** call endpoint to get DATA ${config.cacheEngine.host} getBudgetStatusByCampaign?campaignId=${campaignId}`)
+        const {data} = await sflCoreCacheRequest.get(`getBudgetStatusByCampaign?campaignId=${campaignId}`)
         return data
     } catch (e) {
-        catchHandler(e, 'getBudgetCampaign')
+        catchHandler(e, 'getBudgetStatusByCampaign')
         return []
     }
 
@@ -43,6 +43,6 @@ const addClick = async (campaignId, clickCount) => {
 }
 
 module.exports = {
-    getBudgetCampaign,
+    getBudgetStatusByCampaign,
     addClick
 }
