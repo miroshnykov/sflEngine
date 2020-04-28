@@ -1,6 +1,6 @@
 const config = require('plain-config')()
 const axios = require('axios')
-const {catchHandler} = require('../middlewares/catchErr')
+const {catchHandler} = require('../../middlewares/catchErr')
 
 console.log(` call to coreCache host:${config.cacheEngine.host} to get targeting every 5 min`)
 const sflCoreCacheRequest = axios.create({

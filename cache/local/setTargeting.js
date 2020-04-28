@@ -1,6 +1,6 @@
-const {setDataCache} = require('./redis')
-const {getTargeting} = require('./getTargeting')
-const {catchHandler} = require('../middlewares/catchErr')
+const {setDataCache} = require('../redis')
+const {getTargeting} = require('../api/getTargeting')
+const {catchHandler} = require('../../middlewares/catchErr')
 
 const setTargetingToLocalRedis = async () => {
 
