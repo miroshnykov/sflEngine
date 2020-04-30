@@ -23,7 +23,7 @@ config = {
         'sourceTypeSweepstakes',
         'sourceTypeVod'
     ],
-    intervalUpdate: 300000,//5min
+    intervalUpdate: 60000,//1min
     redisLocal: {
         host: 'localhost',
         port: 6379
