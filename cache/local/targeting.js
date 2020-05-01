@@ -15,15 +15,13 @@ const getTargetingLocal = async () => {
 const setTargetingLocal = async () => {
 
     try {
-        let targeting = await getTargetingApi()
-        if (targeting.length > 0) {
-            console.log(` count targeting: ${targeting.length}`)
-            await setDataCache('targetingLocal', targeting)
-            return true
-        }
+        let targeting = await getTargetingApi() || []
+        await setDataCache('targetingLocal', targeting)
+        return targeting
 
     } catch (e) {
         catchHandler(e, 'setTargetingLocal')
+        return []
     }
 }
 
