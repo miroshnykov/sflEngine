@@ -15,6 +15,13 @@ config = {
     redirectFlowRotator: {
         url: 'http://flow-rotator-eu-west-1-titan-107.infra.systems/signup'
     },
+    dynamodb: {
+        region: "us-west-2",
+        endpoint: 'dynamodb.us-west-2.amazonaws.com',
+        tableName: 'prod-flow-rotator-lid',
+        accessKeyId: '',
+        secretAccessKey: ''
+    },
     dimensionsNames: [
         'country',
         'platformAndroid',
