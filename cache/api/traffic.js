@@ -19,6 +19,18 @@ const getBudgetStatusByCampaign = async (campaignId) => {
 
 }
 
+const getConditionUnderLimit = async () => {
+    try {
+        console.log(`*** call endpoint to get DATA ${config.cacheEngine.host} getConditionUnderLimit`)
+        const {data} = await sflCoreCacheRequest.get(`getConditionUnderLimit`)
+        return data
+    } catch (e) {
+        catchHandler(e, 'getConditionUnderLimit')
+        return []
+    }
+
+}
+
 const addClick = async (campaignId, clickCount) => {
     try {
         console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getTargeting`)
@@ -44,5 +56,6 @@ const addClick = async (campaignId, clickCount) => {
 
 module.exports = {
     getBudgetStatusByCampaign,
-    addClick
+    addClick,
+    getConditionUnderLimit
 }
