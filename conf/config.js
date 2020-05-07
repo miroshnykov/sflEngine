@@ -22,6 +22,9 @@ config = {
         accessKeyId: '',
         secretAccessKey: ''
     },
+    affiliateApi: {
+        host: 'http://affiliate-api.ad-center.com'
+    },
     dimensionsNames: [
         'country',
         'platformAndroid',
