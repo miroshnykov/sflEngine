@@ -31,12 +31,13 @@ const getConditionUnderLimit = async () => {
 
 }
 
-const addClick = async (campaignId, clickCount) => {
+const addClick = async (campaignId, clickCount, cpc) => {
     try {
         console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getTargeting`)
         let obj = {}
         obj.campaignId = campaignId
         obj.clickCount = clickCount
+        obj.cpc = cpc
 
         let params = {
             method: 'POST',
