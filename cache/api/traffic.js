@@ -21,7 +21,7 @@ const getBudgetStatusByCampaign = async (campaignId) => {
 
 const getConditionUnderLimit = async () => {
     try {
-        console.log(`*** call endpoint to get DATA ${config.cacheEngine.host} getConditionUnderLimit`)
+        // console.log(`*** call endpoint to get DATA ${config.cacheEngine.host} getConditionUnderLimit`)
         const {data} = await sflCoreCacheRequest.get(`getConditionUnderLimit`)
         return data
     } catch (e) {
@@ -33,7 +33,6 @@ const getConditionUnderLimit = async () => {
 
 const addClick = async (campaignId, clickCount, cpc) => {
     try {
-        console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getTargeting`)
         let obj = {}
         obj.campaignId = campaignId
         obj.clickCount = clickCount
@@ -46,7 +45,7 @@ const addClick = async (campaignId, clickCount, cpc) => {
 
         }
 
-        console.log(`\n **** sendClick  before send, data: ${JSON.stringify(params)}`)
+        console.log(`\n      ***** sendClick  before send, data: ${JSON.stringify(params)}`)
         const {data} = await sflCoreCacheRequest(params)
         return data
     } catch (e) {

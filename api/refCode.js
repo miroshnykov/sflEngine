@@ -7,7 +7,7 @@ const refCodeRequest = axios.create({
 
 const getRefCodeInfo = async (refCode) => {
 
-    console.log(`*** Get refcode:${refCode} from API`)
+    // console.log(`*** Get refcode:${refCode} from API`)
     try {
         let {data} = await refCodeRequest.get( `/api/getRefCodeInfo?ref_code=${refCode}`)
         return data

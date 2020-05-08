@@ -13,7 +13,7 @@ config = {
         path: '/home/conf/GeoIP/GeoIP2-City.mmdb'
     },
     redirectFlowRotator: {
-        url: 'https://titan.infra.systems/signup'
+        url: 'https://titan.infra.systems'
     },
     dynamodb: {
         region: "us-west-2",
