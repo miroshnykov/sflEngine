@@ -14,7 +14,7 @@ const sendToAggr = async (stats) => {
 
         let obj = {}
         obj.key = Base64.encode(JSON.stringify(stats))
-        obj.event = stats[0].event_type
+        obj.event = stats.event_type
         obj.time = timer.getTime()
         obj.count = 1
 

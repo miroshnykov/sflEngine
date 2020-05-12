@@ -66,7 +66,12 @@ if (cluster.isMaster) {
         for (const index in logBuffer) {
             if (index < t - 2) {
                 if (logBuffer[index].length === 0) return
-                sendToAggr(logBuffer[index])
+
+                for (const j in logBuffer[index]){
+                    sendToAggr(logBuffer[index][j])
+                }
+
+
                 delete logBuffer[index]
             }
         }
