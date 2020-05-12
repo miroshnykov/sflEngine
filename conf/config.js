@@ -25,6 +25,9 @@ config = {
     affiliateApi: {
         host: 'http://affiliate-api.ad-center.com'
     },
+    aggragatorApi: {
+        host: 'https://aggregator1.surge.systems/'
+    },
     dimensionsNames: [
         'country',
         'platformAndroid',
@@ -34,6 +37,7 @@ config = {
         'sourceTypeVod'
     ],
     intervalUpdate: 60000,//1min
+    intervalSendAggragator: 10000,//10sec
     redisLocal: {
         host: 'localhost',
         port: 6379

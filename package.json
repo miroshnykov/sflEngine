@@ -18,6 +18,7 @@
     "dynamodb-doc": "^1.0.0",
     "express": "^4.17.1",
     "http-errors": "^1.7.3",
+    "js-base64": "^2.5.2",
     "mmdb-reader": "^1.2.0",
     "os": "^0.1.1",
     "plain-config": "^0.1.3",
