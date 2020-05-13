@@ -5,12 +5,20 @@ const cluster = require(`cluster`)
 const numCores = config.cores || require(`os`).cpus().length
 // const {v4} = require('uuid')
 // const axios = require('axios')
+const {sendToAggr} = require('./api/aggregator')
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
 const app = express()
+let logBuffer = {}
 
+const addToBuffer = (buffer, t, msg) => {
+    if (!buffer[t]) {
+        buffer[t] = [];
+    }
+    buffer[t][buffer[t].length] = msg;
+}
 
 if (cluster.isMaster) {
     logger.info(`Master pid:${process.pid} is running`);
@@ -22,6 +30,16 @@ if (cluster.isMaster) {
 
     cluster.on(`exit`, (worker, code, signal) => {
         logger.info(`worker  ${worker.process.pid} died `)
+    })
+
+    cluster.on('message', (worker, msg) => {
+
+        let timer = new Date();
+        let t = Math.round(timer.getTime() / 1000);
+        if (msg.type === "click") {
+            addToBuffer(logBuffer, t, msg.stats);
+        }
+
     })
 
     setInterval(async () => {
@@ -37,6 +55,28 @@ if (cluster.isMaster) {
 
     }, config.intervalUpdate)
 
+    setInterval(async () => {
+
+        let timer = new Date();
+        let t = Math.round(timer.getTime() / 1000);
+
+        if (Object.keys(logBuffer).length >= 5){
+            console.log('Buffer count:', Object.keys(logBuffer).length)
+        }
+        for (const index in logBuffer) {
+            if (index < t - 4) {
+                if (logBuffer[index].length === 0) return
+
+                for (const j in logBuffer[index]){
+                    sendToAggr(logBuffer[index][j])
+                }
+                delete logBuffer[index]
+            }
+        }
+
+
+    }, config.intervalSendAggragator)
+
 } else {
     app.use(cors())
 
@@ -51,4 +91,5 @@ if (cluster.isMaster) {
         }
     )
 }
+
 
