@@ -1,6 +1,7 @@
 const config = require('plain-config')()
 const axios = require('axios')
 const Base64 = require('js-base64').Base64
+const {catchHandler} = require('../middlewares/catchErr')
 
 const timer = new Date()
 
@@ -30,6 +31,7 @@ const sendToAggr = async (stats) => {
 
     } catch (e) {
         console.log('*** Not able to send to aggr  ')
+        catchHandler(e, 'sendToAggr')
     }
 }
 
