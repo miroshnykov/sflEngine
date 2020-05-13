@@ -13,7 +13,7 @@ const sendToAggr = async (stats) => {
 
     try {
 
-        console.log(`config.aggragatorApi:${config.aggragatorApi.host}`)
+        console.log(`config.aggragatorApi:`, config.aggragatorApi)
         let obj = {}
         obj.key = Base64.encode(JSON.stringify(stats))
         obj.event = stats.event_type
