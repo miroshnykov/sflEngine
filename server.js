@@ -60,18 +60,16 @@ if (cluster.isMaster) {
         let timer = new Date();
         let t = Math.round(timer.getTime() / 1000);
 
-        if (Object.keys(logBuffer).length >= 1){
+        if (Object.keys(logBuffer).length >= 5){
             console.log('Buffer count:', Object.keys(logBuffer).length)
         }
         for (const index in logBuffer) {
-            if (index < t - 2) {
+            if (index < t - 4) {
                 if (logBuffer[index].length === 0) return
 
                 for (const j in logBuffer[index]){
                     sendToAggr(logBuffer[index][j])
                 }
-
-
                 delete logBuffer[index]
             }
         }
