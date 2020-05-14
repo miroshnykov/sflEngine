@@ -80,6 +80,8 @@ if (cluster.isMaster) {
 } else {
     app.use(cors())
 
+    app.set('trust proxy', true)
+
     app.use('/signup', signup)
 
     app.use(require('./middlewares/not-found'));
