@@ -78,11 +78,13 @@ if (cluster.isMaster) {
 
     }, config.intervalSendAggragator)
 
-    setInterval( () =>{
+    setInterval(() => {
+        if (config.env === 'development') return
         metrics.sendMetricsSystem()
     }, config.influxdb.intervalSystem)
 
-    setInterval( () =>{
+    setInterval(() => {
+        if (config.env === 'development') return
         metrics.sendMetricsDisk()
     }, config.influxdb.intervalDisk)
 
