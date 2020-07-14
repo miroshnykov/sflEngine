@@ -12,6 +12,7 @@ const {signup} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
 const app = express()
 let logBuffer = {}
+const metrics = require('./metrics')
 
 const addToBuffer = (buffer, t, msg) => {
     if (!buffer[t]) {
@@ -76,6 +77,15 @@ if (cluster.isMaster) {
 
 
     }, config.intervalSendAggragator)
+
+    setInterval( () =>{
+        metrics.sendMetricsSystem()
+    }, config.influxdb.intervalSystem)
+
+    setInterval( () =>{
+        metrics.sendMetricsDisk()
+    }, config.influxdb.intervalDisk)
+
 
 } else {
     app.use(cors())
