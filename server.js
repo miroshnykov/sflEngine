@@ -58,6 +58,11 @@ if (cluster.isMaster) {
 
     setInterval(async () => {
 
+        metrics.setStartMetric({
+            route: 'aggregator',
+            method: 'GET'
+        })
+
         let timer = new Date();
         let t = Math.round(timer.getTime() / 1000);
 
@@ -70,6 +75,7 @@ if (cluster.isMaster) {
 
                 for (const j in logBuffer[index]){
                     sendToAggr(logBuffer[index][j])
+                    metrics.sendMetricsRequest(200)
                 }
                 delete logBuffer[index]
             }
