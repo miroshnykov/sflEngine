@@ -16,6 +16,7 @@ const hostname = os.hostname()
 let num_cpu = cpu.num();//return CPU's nums
 
 exports.sendMetricsRequest = function (code) {
+    console.log(`sendMetricsRequest code ${code}, project: ${project}`)
     clientInfluxdb.write(project + '_request')
         .tag({
             project: project,
