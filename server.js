@@ -44,15 +44,21 @@ if (cluster.isMaster) {
     })
 
     setInterval(async () => {
-        console.time('targeting')
+        // console.time('targeting')
         let response = await setTargetingLocal()
         if (response.length > 0) {
-            logger.info(`update local redis successfully`)
+            // logger.info(`update local redis successfully`)
         } else {
+
+            metrics.setStartMetric({
+                route: 'targetingEmpty',
+                method: 'GET'
+            })
             logger.info(`redis not updated \x1b[33m { empty or some errors to get data  from core-cache-engine }\x1b[0m `)
+            metrics.sendMetricsRequest(200)
         }
 
-        console.timeEnd('targeting')
+        // console.timeEnd('targeting')
 
     }, config.intervalUpdate)
 

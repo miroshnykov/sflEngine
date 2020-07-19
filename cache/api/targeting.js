@@ -9,7 +9,7 @@ const sflCoreCacheRequest = axios.create({
 
 const getTargetingApi = async () => {
     try {
-        console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getTargeting`)
+        // console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getTargeting`)
         const {data} = await sflCoreCacheRequest.get(`getTargeting`)
         return data
     } catch (e) {

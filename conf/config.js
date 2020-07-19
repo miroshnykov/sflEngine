@@ -36,7 +36,7 @@ config = {
         'sourceTypeSweepstakes',
         'sourceTypeVod'
     ],
-    intervalUpdate: 300000,//5min
+    intervalUpdate: 60000,//1min , 300000,//5min
     intervalSendAggragator: 10000,//10sec
     redisLocal: {
         host: 'localhost',
