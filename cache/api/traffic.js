@@ -1,7 +1,7 @@
 const config = require('plain-config')()
 const axios = require('axios')
 const {catchHandler} = require('../../middlewares/catchErr')
-
+const metrics = require('../../metrics')
 console.log(` call to coreCache host:${config.cacheEngine.host} to get budget by campaign`)
 const sflCoreCacheRequest = axios.create({
     baseURL: config.cacheEngine.host,
@@ -33,6 +33,11 @@ const getConditionUnderLimit = async () => {
 
 const addClick = async (campaignId, clickCount, cpc) => {
     try {
+        metrics.setStartMetric({
+            route: 'addClick',
+            method: 'GET'
+        })
+
         let obj = {}
         obj.campaignId = campaignId
         obj.clickCount = clickCount
@@ -47,6 +52,7 @@ const addClick = async (campaignId, clickCount, cpc) => {
 
         console.log(`\n      ***** sendClick  before send, data: ${JSON.stringify(params)}`)
         const {data} = await sflCoreCacheRequest(params)
+        metrics.sendMetricsRequest(200)
         return data
     } catch (e) {
         catchHandler(e, 'addClick')
