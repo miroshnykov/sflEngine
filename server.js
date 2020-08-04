@@ -95,10 +95,10 @@ if (cluster.isMaster) {
         metrics.sendMetricsSystem()
     }, config.influxdb.intervalSystem)
 
-    setInterval(() => {
-        if (config.env === 'development') return
-        metrics.sendMetricsDisk()
-    }, config.influxdb.intervalDisk)
+    // setInterval(() => {
+    //     if (config.env === 'development') return
+    //     metrics.sendMetricsDisk()
+    // }, config.influxdb.intervalDisk)
 
 
 } else {
