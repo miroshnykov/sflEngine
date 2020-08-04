@@ -30,7 +30,13 @@ if (cluster.isMaster) {
     }
 
     cluster.on(`exit`, (worker, code, signal) => {
+
+        metrics.setStartMetric({
+            route: 'workerDied',
+            method: 'GET'
+        })
         logger.info(`worker  ${worker.process.pid} died `)
+        metrics.sendMetricsRequest(200)
     })
 
     cluster.on('message', (worker, msg) => {
