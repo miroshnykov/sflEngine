@@ -50,21 +50,34 @@ if (cluster.isMaster) {
     })
 
     setInterval(async () => {
-        // console.time('targeting')
-        let response = await setTargetingLocal()
-        if (response.length > 0) {
-            // logger.info(`update local redis successfully`)
-        } else {
+        try {
 
+            let response = await setTargetingLocal()
+            if (response.length > 0) {
+                // logger.info(`update local redis successfully`)
+                metrics.setStartMetric({
+                    route: 'segmentsDataExists',
+                    method: 'GET'
+                })
+                metrics.sendMetricsRequest(200)
+            } else {
+                metrics.setStartMetric({
+                    route: 'segmentsDataEmpty',
+                    method: 'GET'
+                })
+
+                logger.info(`redis not updated \x1b[33m { empty or some errors to get data  from core-cache-engine }\x1b[0m `)
+                metrics.sendMetricsRequest(200)
+            }
+
+        } catch (e) {
+            console.log(e)
             metrics.setStartMetric({
-                route: 'targetingEmpty',
+                route: 'segmentsDataError',
                 method: 'GET'
             })
-            logger.info(`redis not updated \x1b[33m { empty or some errors to get data  from core-cache-engine }\x1b[0m `)
-            metrics.sendMetricsRequest(200)
+            metrics.sendMetricsRequest(500)
         }
-
-        // console.timeEnd('targeting')
 
     }, config.intervalUpdate)
 
@@ -78,14 +91,14 @@ if (cluster.isMaster) {
         let timer = new Date();
         let t = Math.round(timer.getTime() / 1000);
 
-        if (Object.keys(logBuffer).length >= 5){
+        if (Object.keys(logBuffer).length >= 5) {
             console.log('Buffer count:', Object.keys(logBuffer).length)
         }
         for (const index in logBuffer) {
             if (index < t - 4) {
                 if (logBuffer[index].length === 0) return
 
-                for (const j in logBuffer[index]){
+                for (const j in logBuffer[index]) {
                     sendToAggr(logBuffer[index][j])
                     metrics.sendMetricsRequest(200)
                 }
