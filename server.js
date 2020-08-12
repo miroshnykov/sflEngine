@@ -127,6 +127,10 @@ if (cluster.isMaster) {
 
     app.use('/signup', signup)
 
+    app.use('/health', (req, res, next) => {
+        res.send('Ok')
+    })
+
     app.use(require('./middlewares/not-found'));
 
     app.use(require('./middlewares/error'));
