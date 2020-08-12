@@ -43,7 +43,7 @@ config = {
         port: 6379
     },
     cacheEngine: {
-        host: 'https://sfl-cach.surge.systems/',
+        host: 'https://sfl-cache.surge.systems/',
         path: 'getTargeting',
         port: 8089
     },
