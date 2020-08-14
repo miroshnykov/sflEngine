@@ -15,7 +15,7 @@ const sendToAggr = async (stats) => {
 
     try {
 
-        console.log(`config.aggragatorApi:`, config.aggragatorApi)
+        // console.log(`config.aggragatorApi:`, config.aggragatorApi)
         let obj = {}
         obj.key = Base64.encode(JSON.stringify(stats))
         obj.event = stats.event_type
@@ -28,7 +28,7 @@ const sendToAggr = async (stats) => {
             data: obj
         }
 
-        console.log(`\n      ***** send to aggr before send, data: ${JSON.stringify(params)}`)
+        console.log(`send to aggr before send, data: ${JSON.stringify(params)}`)
         const {data} = await aggrRequest(params)
         metrics.influxdb(200, `aggregator`)
         return data
