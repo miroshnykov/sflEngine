@@ -1,6 +1,8 @@
 const config = require('plain-config')()
 const axios = require('axios')
 
+const metrics = require('../metrics')
+
 const refCodeRequest = axios.create({
     baseURL: config.affiliateApi.host,
 })
@@ -14,6 +16,7 @@ const getRefCodeInfo = async (refCode) => {
 
     } catch(e) {
         console.log('*** Not able to parse refCodeInfo from api, use default ')
+        metrics.influxdb(500, `getRefCodeInfoError`)
     }
 }
 

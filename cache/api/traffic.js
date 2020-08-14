@@ -14,6 +14,7 @@ const getBudgetStatusByCampaign = async (campaignId) => {
         return data
     } catch (e) {
         catchHandler(e, 'getBudgetStatusByCampaign')
+        metrics.influxdb(500, `getBudgetStatusByCampaignError`)
         return []
     }
 
@@ -26,6 +27,7 @@ const getConditionUnderLimit = async () => {
         return data
     } catch (e) {
         catchHandler(e, 'getConditionUnderLimit')
+        metrics.influxdb(500, `getConditionUnderLimitError`)
         return []
     }
 
@@ -33,10 +35,6 @@ const getConditionUnderLimit = async () => {
 
 const addClick = async (campaignId, clickCount, cpc) => {
     try {
-        metrics.setStartMetric({
-            route: 'addClick',
-            method: 'GET'
-        })
 
         let obj = {}
         obj.campaignId = campaignId
@@ -52,10 +50,11 @@ const addClick = async (campaignId, clickCount, cpc) => {
 
         console.log(`\n      ***** sendClick  before send, data: ${JSON.stringify(params)}`)
         const {data} = await sflCoreCacheRequest(params)
-        metrics.sendMetricsRequest(200)
+        metrics.influxdb(200, `addClick`)
         return data
     } catch (e) {
         catchHandler(e, 'addClick')
+        metrics.influxdb(500, `addClickError`)
     }
 
 }

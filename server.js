@@ -31,12 +31,8 @@ if (cluster.isMaster) {
 
     cluster.on(`exit`, (worker, code, signal) => {
 
-        metrics.setStartMetric({
-            route: 'workerDied',
-            method: 'GET'
-        })
         logger.info(`worker  ${worker.process.pid} died `)
-        metrics.sendMetricsRequest(200)
+        metrics.influxdb(500, `workerDied`)
     })
 
     cluster.on('message', (worker, msg) => {
@@ -55,38 +51,20 @@ if (cluster.isMaster) {
             let response = await setTargetingLocal()
             if (response.length > 0) {
                 // logger.info(`update local redis successfully`)
-                metrics.setStartMetric({
-                    route: 'segmentsDataExists',
-                    method: 'GET'
-                })
-                metrics.sendMetricsRequest(200)
+                metrics.influxdb(200, `segmentsDataExists`)
             } else {
-                metrics.setStartMetric({
-                    route: 'segmentsDataEmpty',
-                    method: 'GET'
-                })
-
                 logger.info(`redis not updated \x1b[33m { empty or some errors to get data  from core-cache-engine }\x1b[0m `)
-                metrics.sendMetricsRequest(200)
+                metrics.influxdb(200, `segmentsDataEmpty`)
             }
 
         } catch (e) {
             console.log(e)
-            metrics.setStartMetric({
-                route: 'segmentsDataError',
-                method: 'GET'
-            })
-            metrics.sendMetricsRequest(500)
+            metrics.influxdb(500, `segmentsDataError`)
         }
 
     }, config.intervalUpdate)
 
     setInterval(async () => {
-
-        metrics.setStartMetric({
-            route: 'aggregator',
-            method: 'GET'
-        })
 
         let timer = new Date();
         let t = Math.round(timer.getTime() / 1000);
@@ -100,7 +78,7 @@ if (cluster.isMaster) {
 
                 for (const j in logBuffer[index]) {
                     sendToAggr(logBuffer[index][j])
-                    metrics.sendMetricsRequest(200)
+
                 }
                 delete logBuffer[index]
             }
@@ -137,6 +115,7 @@ if (cluster.isMaster) {
 
     app.listen({port: config.port}, () => {
             console.log(`\n🚀\x1b[35m Server ready at http://localhost:${config.port}, worker pid:${process.pid} \x1b[0m \n`)
+            metrics.influxdb(200, `serverRunning`)
         }
     )
 }

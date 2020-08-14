@@ -15,6 +15,38 @@ let data_metrics = {
 const hostname = os.hostname()
 let num_cpu = cpu.num();//return CPU's nums
 
+exports.influxdb = (statusCode = 200, route = "/", method = "GET") => {
+    let data = {
+        latency: Date.now() - data_metrics.start,
+        code: statusCode,
+        route: route,
+        method: method
+    }
+
+    clientInfluxdb.write(project + '_request')
+        .tag({
+            project: project,
+            host: hostname,
+            route: data.route,
+            method: data.method,
+            status: _.sortedIndex([99, 199, 299, 399, 499, 599], data.code) * 100,
+            spdy: _.sortedIndex([5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000], data.latency)
+        })
+        .field(data)
+        .time(Date.now(), 'ms')
+        .queue()
+
+
+    // batch post to influxdb when queue length gte config.influxdb.intervalRequest
+    if (clientInfluxdb.writeQueueLength >= config.influxdb.intervalRequest) {
+        clientInfluxdb.syncWrite()
+            .catch((error) => {
+                console.error(error)
+            })
+    }
+}
+
+
 exports.sendMetricsRequest = function (code) {
     // console.log(`sendMetricsRequest code ${code}, project: ${project}`)
     clientInfluxdb.write(project + '_request')
@@ -77,7 +109,8 @@ exports.sendMetricsSystem = function () {
             })
             .field(fields)
             .time(Date.now(), 'ms')
-            .then(() => {})
+            .then(() => {
+            })
             .catch((error) => {
                 pino.error(error)
             })
@@ -115,7 +148,8 @@ exports.sendMetricsDisk = function () {
                 })
                 .field(fields)
                 .time(Date.now(), 'ms')
-                .then(() => {})
+                .then(() => {
+                })
                 .catch((error) => {
                     pino.error(error)
                 })

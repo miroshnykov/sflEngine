@@ -1,6 +1,8 @@
 const config = require('plain-config')()
 const {catchHandler} = require('../middlewares/catchErr')
 
+const metrics = require('../metrics')
+
 const asyncRedis = require('async-redis')
 const redisClient = asyncRedis.createClient(config.redisLocal.port, config.redisLocal.host)
 
@@ -25,6 +27,7 @@ const setDataCache = async (key, data) => {
         // console.log(`*** Redis SET { ${key} } \n`)
 
     } catch (e) {
+        metrics.influxdb(500, `setDataCacheError`)
         catchHandler(e, 'setDataCache')
     }
 }
@@ -53,6 +56,7 @@ const getDataCache = async (key) => {
 
     } catch (e) {
         catchHandler(e, 'getDataCache')
+        metrics.influxdb(500, `getDataCacheError`)
         return []
     }
 }
