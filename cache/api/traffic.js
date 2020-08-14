@@ -48,7 +48,7 @@ const addClick = async (campaignId, clickCount, cpc) => {
 
         }
 
-        console.log(`\n      ***** sendClick  before send, data: ${JSON.stringify(params)}`)
+        console.log(`sendClick before send, data: ${JSON.stringify(params)}`)
         const {data} = await sflCoreCacheRequest(params)
         metrics.influxdb(200, `addClick`)
         return data
