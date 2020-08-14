@@ -1,6 +1,7 @@
 const {catchHandler} = require('../../middlewares/catchErr')
 const {getDataCache, setDataCache} = require('../redis')
 const {getTargetingApi} = require('../api/targeting')
+const metrics = require('../../metrics')
 
 const getTargetingLocal = async () => {
 
@@ -8,6 +9,7 @@ const getTargetingLocal = async () => {
         return await getDataCache(`targetingLocal`)
     } catch (e) {
         catchHandler(e, 'getTargetingLocal')
+        metrics.influxdb(500, `getTargetingLocalError`)
         return []
     }
 }
@@ -21,6 +23,7 @@ const setTargetingLocal = async () => {
 
     } catch (e) {
         catchHandler(e, 'setTargetingLocal')
+        metrics.influxdb(500, `setTargetingLocalError`)
         return []
     }
 }
