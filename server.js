@@ -10,6 +10,7 @@ const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
+const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
 const app = express()
 let logBuffer = {}
 const metrics = require('./metrics')
@@ -60,6 +61,19 @@ if (cluster.isMaster) {
         } catch (e) {
             console.log(e)
             metrics.influxdb(500, `segmentsDataError`)
+        }
+
+    }, config.intervalUpdate)
+
+    setInterval(async () => {
+        try {
+
+            let response = await setProductsBucketsLocal()
+            logger.info(`setProductsBucketsLocal redis successfully, count:${response.length}`)
+
+        } catch (e) {
+            console.log(e)
+            metrics.influxdb(500, `setProductsBucketsLocalError`)
         }
 
     }, config.intervalUpdate)
