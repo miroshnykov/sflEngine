@@ -10,7 +10,6 @@ const getTargetingLocal = async () => {
     } catch (e) {
         catchHandler(e, 'getTargetingLocal')
         metrics.influxdb(500, `getTargetingLocalError`)
-        return []
     }
 }
 
@@ -26,7 +25,6 @@ const setTargetingLocal = async () => {
     } catch (e) {
         catchHandler(e, 'setTargetingLocal')
         metrics.influxdb(500, `setTargetingLocalError`)
-        return []
     }
 }
 

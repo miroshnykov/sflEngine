@@ -2,7 +2,7 @@ const config = require('plain-config')()
 const axios = require('axios')
 const {catchHandler} = require('../../middlewares/catchErr')
 const metrics = require('../../metrics')
-console.log(` call to coreCache host:${config.cacheEngine.host} to get budget by campaign`)
+console.log(` call to coreCache host:${config.cacheEngine.host}getBudgetStatusByCampaign?campaignId= to get budget by campaign`)
 const sflCoreCacheRequest = axios.create({
     baseURL: config.cacheEngine.host,
 })
