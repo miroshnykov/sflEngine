@@ -28,7 +28,6 @@ const setProductsBucketsLocal = async () => {
     } catch (e) {
         catchHandler(e, 'setProductsBucketsLocal')
         metrics.influxdb(500, `setProductsBucketsLocalError`)
-        return []
     }
 }
 

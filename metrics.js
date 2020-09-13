@@ -16,6 +16,7 @@ const hostname = os.hostname()
 let num_cpu = cpu.num();//return CPU's nums
 
 exports.influxdb = (statusCode = 200, route = "/", method = "GET") => {
+    if (config.env === 'development') return
     let data = {
         latency: Date.now() - data_metrics.start,
         code: statusCode,
