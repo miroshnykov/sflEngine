@@ -51,10 +51,10 @@ if (cluster.isMaster) {
 
             let response = await setTargetingLocal()
             if (response.length > 0) {
-                // logger.info(`update local redis successfully`)
+                // logger.info(`update targeting local redis successfully`)
                 metrics.influxdb(200, `segmentsDataExists`)
             } else {
-                logger.info(`redis not updated \x1b[33m { empty or some errors to get data  from core-cache-engine }\x1b[0m `)
+                logger.info(`targeting local redis not updated { empty or some errors to get data  from core-cache-engine } `)
                 metrics.influxdb(200, `segmentsDataEmpty`)
             }
 
@@ -69,7 +69,14 @@ if (cluster.isMaster) {
         try {
 
             let response = await setProductsBucketsLocal()
-            logger.info(`setProductsBucketsLocal redis successfully, count:${response.length}`)
+            if (response){
+                logger.info(`setProductsBucketsLocal redis successfully, count:${response.length}`)
+                metrics.influxdb(200, `setProductsBucketsLocal`)
+            } else {
+                logger.info(`setProductsBucketsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
+                metrics.influxdb(200, `setProductsBucketsLocalEmpty`)
+            }
+
 
         } catch (e) {
             console.log(e)

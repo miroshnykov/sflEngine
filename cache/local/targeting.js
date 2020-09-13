@@ -17,8 +17,10 @@ const getTargetingLocal = async () => {
 const setTargetingLocal = async () => {
 
     try {
-        let targeting = await getTargetingApi() || []
-        await setDataCache('targetingLocal', targeting)
+        let targeting = await getTargetingApi()
+        if (targeting) {
+            await setDataCache('targetingLocal', targeting)
+        }
         return targeting
 
     } catch (e) {

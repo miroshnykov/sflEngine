@@ -17,8 +17,12 @@ const getProductsBucketsLocal = async () => {
 const setProductsBucketsLocal = async () => {
 
     try {
-        let productsBucketsData = await getProductsBucketsApi() || []
-        await setDataCache('productsBucketsLocal', productsBucketsData)
+        let productsBucketsData = await getProductsBucketsApi()
+        // console.log('productsBucketsData:',productsBucketsData)
+        if (productsBucketsData){
+            await setDataCache('productsBucketsLocal', productsBucketsData)
+        }
+
         return productsBucketsData
 
     } catch (e) {
