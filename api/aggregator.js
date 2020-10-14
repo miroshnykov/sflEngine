@@ -5,8 +5,6 @@ const {catchHandler} = require('../middlewares/catchErr')
 
 const metrics = require('../metrics')
 
-const timer = new Date()
-
 const aggrRequest = axios.create({
     baseURL: config.aggragatorApi.host,
 })
@@ -16,6 +14,7 @@ const sendToAggr = async (stats) => {
     try {
 
         // console.log(`config.aggragatorApi:`, config.aggragatorApi)
+        let timer = new Date()
         let obj = {}
         obj.key = Base64.encode(JSON.stringify(stats))
         obj.event = stats.event_type
