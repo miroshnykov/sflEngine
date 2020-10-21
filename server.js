@@ -11,6 +11,7 @@ const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
 const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
+const {addClick} = require('./cache/api/traffic')
 const app = express()
 let logBuffer = {}
 const metrics = require('./metrics')
@@ -74,7 +75,7 @@ if (cluster.isMaster) {
         try {
 
             let response = await setProductsBucketsLocal()
-            if (response){
+            if (response) {
                 logger.info(` *CRON* setProductsBucketsLocal redis successfully, count:${response.length}`)
                 metrics.influxdb(200, `setProductsBucketsLocal`)
             } else {
@@ -103,7 +104,9 @@ if (cluster.isMaster) {
                 if (logBuffer[index].length === 0) return
 
                 for (const j in logBuffer[index]) {
-                    sendToAggr(logBuffer[index][j])
+                    let statsData = logBuffer[index][j]
+                    sendToAggr(statsData)
+                    addClick(statsData.sflCampaignId, 1, statsData.sflTargetingCpc, statsData.lid)
 
                 }
                 delete logBuffer[index]

@@ -33,7 +33,7 @@ const getConditionUnderLimit = async () => {
 
 }
 
-const addClick = async (campaignId, clickCount, cpc) => {
+const addClick = async (campaignId, clickCount, cpc, lid) => {
     try {
 
         let obj = {}
@@ -48,12 +48,12 @@ const addClick = async (campaignId, clickCount, cpc) => {
 
         }
 
-        console.log(`sendClick before send, data: ${JSON.stringify(params)}`)
+        console.log(`sendClick for lid:${lid} before send, data: ${JSON.stringify(params)}`)
         const {data} = await sflCoreCacheRequest(params)
         metrics.influxdb(200, `addClick`)
         return data
     } catch (e) {
-        catchHandler(e, 'addClick')
+        catchHandler(e, 'addClickError')
         metrics.influxdb(500, `addClickError`)
     }
 
