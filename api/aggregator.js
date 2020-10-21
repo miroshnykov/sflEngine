@@ -12,11 +12,13 @@ const aggrRequest = axios.create({
 const sendToAggr = async (stats) => {
 
     try {
-
+        let statsClone = Object.assign({}, stats)
+        delete statsClone.sflCampaignId
+        delete statsClone.sflTargetingCpc
         // console.log(`config.aggragatorApi:`, config.aggragatorApi)
         let timer = new Date()
         let obj = {}
-        obj.key = Base64.encode(JSON.stringify(stats))
+        obj.key = Base64.encode(JSON.stringify(statsClone))
         obj.event = stats.event_type
         obj.time = timer.getTime()
         obj.count = 1
