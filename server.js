@@ -71,25 +71,25 @@ if (cluster.isMaster) {
 
     }, config.intervalUpdate)
 
-    setInterval(async () => {
-        try {
-
-            let response = await setProductsBucketsLocal()
-            if (response) {
-                logger.info(` *CRON* setProductsBucketsLocal redis successfully, count:${response.length}`)
-                metrics.influxdb(200, `setProductsBucketsLocal`)
-            } else {
-                logger.info(` *CRON* setProductsBucketsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
-                metrics.influxdb(200, `setProductsBucketsLocalEmpty`)
-            }
-
-
-        } catch (e) {
-            console.log(e)
-            metrics.influxdb(500, `setProductsBucketsLocalError`)
-        }
-
-    }, config.intervalUpdate)
+    // setInterval(async () => {
+    //     try {
+    //
+    //         let response = await setProductsBucketsLocal()
+    //         if (response) {
+    //             logger.info(` *CRON* setProductsBucketsLocal redis successfully, count:${response.length}`)
+    //             metrics.influxdb(200, `setProductsBucketsLocal`)
+    //         } else {
+    //             logger.info(` *CRON* setProductsBucketsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
+    //             metrics.influxdb(200, `setProductsBucketsLocalEmpty`)
+    //         }
+    //
+    //
+    //     } catch (e) {
+    //         console.log(e)
+    //         metrics.influxdb(500, `setProductsBucketsLocalError`)
+    //     }
+    //
+    // }, config.intervalUpdate)
 
     setInterval(async () => {
 

@@ -14,7 +14,7 @@ const getTargetingApi = async () => {
         const {data} = await sflCoreCacheRequest.get(`getTargeting`)
         return data
     } catch (e) {
-        catchHandler(e, 'getTargeting')
+        catchHandler(e, 'getTargetingError')
         metrics.influxdb(500, `getTargetingError`)
     }
 
