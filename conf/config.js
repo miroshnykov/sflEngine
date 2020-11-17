@@ -29,7 +29,7 @@ config = {
     sflOffer: {
         recipeFolderCampaigns:'/tmp/recipe_sfl/campaigns.json.gz',
         recipeFolderOffers:'/tmp/recipe_sfl/offers.json.gz',
-        host: 'http://localhost:8091/'
+        host: 'http://0.0.0.0:8091',
     },
     aggragatorApi: {
         host: 'https://aggregator1.surge.systems/'
