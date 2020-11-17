@@ -23,6 +23,11 @@ const addToBuffer = (buffer, t, msg) => {
     buffer[t][buffer[t].length] = msg;
 }
 
+console.log('config.sflOffer.host:', config.sflOffer)
+const socket = require('socket.io-client')(config.sflOffer.host)
+const ss = require('socket.io-stream')
+const fs = require('fs')
+
 if (cluster.isMaster) {
     logger.info(`Master pid:${process.pid} is running`);
     logger.info(`Using node ${process.version} in mode ${config.env} spawning ${numCores} processes, port ${config.port}`)
@@ -47,9 +52,10 @@ if (cluster.isMaster) {
 
     })
 
+
     setInterval(async () => {
         try {
-
+            if (config.env === 'development') return
             let response = await setTargetingLocal()
             if (!response) {
                 logger.info(` *CRON* setTargetingLocal getTargetingApi get errors`)
@@ -120,6 +126,46 @@ if (cluster.isMaster) {
         if (config.env === 'development') return
         metrics.sendMetricsSystem()
     }, config.influxdb.intervalSystem)
+
+    let campaignsFile = config.sflOffer.recipeFolderCampaigns
+    let offersFile = config.sflOffer.recipeFolderOffers
+
+    socket.on('connect', () => {
+        console.log('connected')
+    });
+
+    ss(socket).on('sendingCampaigns', (stream) => {
+        console.time(`campaignsFileSpeed`)
+        stream.pipe(fs.createWriteStream(campaignsFile))
+        stream.on('end', () => {
+            console.log(`campaigns file received, size:${getFileSize(campaignsFile)} MB`)
+            console.timeEnd(`campaignsFileSpeed`)
+        });
+    });
+
+
+    ss(socket).on('sendingOffers', (stream) => {
+        console.time(`offersFileSpeed`)
+        stream.pipe(fs.createWriteStream(offersFile))
+        stream.on('end', () => {
+            console.log(`offers file received, size:${getFileSize(offersFile)} MB`)
+            console.timeEnd(`offersFileSpeed`)
+        });
+    });
+
+
+    const getFileSize = (filename) => {
+        let stats = fs.statSync(filename)
+        let fileSizeInBytes = stats.size
+        return fileSizeInBytes / (1024 * 1024)
+    }
+
+
+    setInterval(async () => {
+        socket.emit('sendFileCampaign')
+        socket.emit('sendFileOffer')
+    }, 300000) // 5min
+
 
     // setInterval(() => {
     //     if (config.env === 'development') return
