@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js --conf=home/conf/config.js",
+    "start": "node server.js --conf=/run/secrets/sfl-core-engine.js",
     "startLocal": "node server.js --conf=/home/app/conf/config-local.js"
   },
   "author": "",
