@@ -24,14 +24,17 @@ const addToBuffer = (buffer, t, msg) => {
     buffer[t][buffer[t].length] = msg;
 }
 
-const socket = require('socket.io-client')(config.sflOffer.host)
-const ss = require('socket.io-stream')
-const fs = require('fs')
 
 let campaignsFile = config.sflOffer.recipeFolderCampaigns
 let offersFile = config.sflOffer.recipeFolderOffers
 
 if (cluster.isMaster) {
+
+    const socket = require('socket.io-client')(config.sflOffer.host)
+    const ss = require('socket.io-stream')
+    const fs = require('fs')
+
+
     logger.info(`Master pid:${process.pid} is running`);
     logger.info(`Using node ${process.version} in mode ${config.env} spawning ${numCores} processes, port ${config.port}`)
 
