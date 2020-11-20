@@ -8,7 +8,7 @@ const numCores = config.cores || require(`os`).cpus().length
 const {sendToAggr} = require('./api/aggregator')
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
-const {signup, ad} = require(`./lib/traffic`)
+const {signup, ad, getDataCache} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
 const {setCampaigns, setOffers} = require('./cache/local/offers')
 const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
@@ -191,6 +191,7 @@ if (cluster.isMaster) {
 
     app.use('/signup', signup)
     app.use('/ad', ad)
+    app.use('/getDataCache', getDataCache)
 
     app.use('/health', (req, res, next) => {
         res.send('Ok')
