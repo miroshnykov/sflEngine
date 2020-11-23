@@ -35,11 +35,10 @@ let offersFile = config.sflOffer.recipeFolderOffers
 
 if (cluster.isMaster) {
 
-    // let host  ='https://sfl-offers.surge.systems/'
-    let host = 'http://0.0.0.0:8091'
+    // let host = 'https://sfl-offers.surge.systems/'
+    // let host = 'http://0.0.0.0:8091'
 
-    const socket = require('socket.io-client')(host)
-    // const socket = require('socket.io-client')('http://0.0.0.0:8091')
+    const socket = require('socket.io-client')(config.sflOffer.host)
     const ss = require('socket.io-stream')
     const fs = require('fs')
 
@@ -68,7 +67,7 @@ if (cluster.isMaster) {
     })
 
     socket.on('connect', () => {
-        console.log(`\n socket connected, host:${host}\n`)
+        console.log(`\n socket connected, host:${config.sflOffer.host}\n`)
     });
 
     socket.on('updRecipe', async (message) => {
@@ -79,7 +78,7 @@ if (cluster.isMaster) {
         console.time(`campaignsFileSpeed`)
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
-            console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile)}`)
+            console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile) || 0}`)
             console.timeEnd(`campaignsFileSpeed`)
         });
     });
@@ -89,25 +88,31 @@ if (cluster.isMaster) {
         console.time(`offersFileSpeed`)
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
-            console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile)}`)
+            console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile) || 0}`)
             console.timeEnd(`offersFileSpeed`)
         });
     });
 
 
     const getFileSize = (filename) => {
-        let stats = fs.statSync(filename)
-        let fileSizeInBytes = stats.size
-        // return fileSizeInBytes / (1024 * 1024)
-        return fileSizeInBytes
+        try {
+            let stats = fs.statSync(filename)
+            return stats.size
+        } catch (e) {
+            console.log('getFileSizeError:', e)
+        }
     }
-
 
     setInterval(async () => {
         socket.emit('sendFileCampaign')
         socket.emit('sendFileOffer')
     }, 300000) //  300000->5min 20000->20 sec
 
+    setTimeout(async () => {
+        console.log('One time to get recipe file')
+        socket.emit('sendFileCampaign')
+        socket.emit('sendFileOffer')
+    }, 10000) //  300000->5min 20000->20 sec
 
     // let once = false
     setInterval(async () => {
