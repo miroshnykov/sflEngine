@@ -10,7 +10,12 @@ const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup, ad, getDataCache} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
-const {setCampaigns, setOffers} = require('./cache/local/offers')
+const {
+    setCampaigns,
+    setOffers,
+    sqsProcessing
+} = require('./cache/local/offers')
+
 const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
 const {addClick} = require('./cache/api/traffic')
 const app = express()
@@ -30,7 +35,11 @@ let offersFile = config.sflOffer.recipeFolderOffers
 
 if (cluster.isMaster) {
 
-    const socket = require('socket.io-client')(config.sflOffer.host)
+    // let host  ='https://sfl-offers.surge.systems/'
+    let host = 'http://0.0.0.0:8091'
+
+    const socket = require('socket.io-client')(host)
+    // const socket = require('socket.io-client')('http://0.0.0.0:8091')
     const ss = require('socket.io-stream')
     const fs = require('fs')
 
@@ -59,14 +68,18 @@ if (cluster.isMaster) {
     })
 
     socket.on('connect', () => {
-        console.log(` \n ******** Socket connected, host:${config.sflOffer.host} ***********\n`)
+        console.log(`\n socket connected, host:${host}\n`)
     });
+
+    socket.on('updRecipe', async (message) => {
+        await sqsProcessing(message)
+    })
 
     ss(socket).on('sendingCampaigns', (stream) => {
         console.time(`campaignsFileSpeed`)
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
-            console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile)} MB`)
+            console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile)}`)
             console.timeEnd(`campaignsFileSpeed`)
         });
     });
@@ -76,7 +89,7 @@ if (cluster.isMaster) {
         console.time(`offersFileSpeed`)
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
-            console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile)} MB`)
+            console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile)}`)
             console.timeEnd(`offersFileSpeed`)
         });
     });
@@ -85,7 +98,8 @@ if (cluster.isMaster) {
     const getFileSize = (filename) => {
         let stats = fs.statSync(filename)
         let fileSizeInBytes = stats.size
-        return fileSizeInBytes / (1024 * 1024)
+        // return fileSizeInBytes / (1024 * 1024)
+        return fileSizeInBytes
     }
 
 
