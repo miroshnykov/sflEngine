@@ -22,28 +22,6 @@ const sqsProcessing = async (message) => {
     }
 }
 
-const getOffer = async (id) => {
-
-    try {
-        return await getDataCache(`offer-${id}`)
-    } catch (e) {
-        catchHandler(e, 'getOfferError')
-        metrics.influxdb(500, `getOfferError`)
-    }
-}
-
-const getCampaign = async (id) => {
-
-    try {
-        return await getDataCache(`campaigns-${id}`)
-
-    } catch (e) {
-        catchHandler(e, 'getCampaignError')
-        metrics.influxdb(500, `getCampaignError`)
-    }
-}
-
-
 const setOffers = async () => {
 
     try {
@@ -78,6 +56,18 @@ const setData = async (key, body) => {
     } catch (e) {
         catchHandler(e, 'setDataError')
         metrics.influxdb(500, `setDataError`)
+    }
+}
+
+const getData = async (key) => {
+
+    try {
+        console.log('getData:', key)
+        return await getDataCache(`${key}`)
+
+    } catch (e) {
+        catchHandler(e, 'getDataError')
+        metrics.influxdb(500, `getDataError`)
     }
 }
 
@@ -123,8 +113,7 @@ const setCampaigns = async () => {
 module.exports = {
     setOffers,
     setCampaigns,
-    getOffer,
-    getCampaign,
+    getData,
     sqsProcessing
 
 }

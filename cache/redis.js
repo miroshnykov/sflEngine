@@ -46,13 +46,12 @@ const delDataCache = async (key) => {
 const getDataCache = async (key) => {
 
     try {
-        let affiliates = JSON.parse(await getRedis(key))
         // if (affiliates) {
             // console.log(`*** REDIS GET { ${key} } count of records: ${affiliates.length} `)
 
         // }
 
-        return affiliates
+        return JSON.parse(await getRedis(key))
 
     } catch (e) {
         catchHandler(e, 'getDataCache')
