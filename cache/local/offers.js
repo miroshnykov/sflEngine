@@ -47,20 +47,21 @@ const getCampaign = async (id) => {
 const setOffers = async () => {
 
     try {
-        console.time('setOffersInsertSpeed')
+        // console.time('setOffersInsertSpeed')
         let gunzip = zlib.createGunzip();
         // let campaignsFile = config.sflOffer.recipeFolderCampaigns
-        let stream = fs.createReadStream(config.sflOffer.recipeFolderOffers)
+        let file = config.sflOffer.recipeFolderOffers
+        let stream = fs.createReadStream(file)
+        console.log('file:', file)
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
             await setDataCache(`offer-${item.offerId}`, item)
         })
 
-        jsonStream.on('end', () => {
-            console.log('done')
-            console.timeEnd('setOffersInsertSpeed')
-        })
+        // jsonStream.on('end', async () => {
+        //     console.log('offer end')
+        // })
 
     } catch (e) {
         catchHandler(e, 'setOffersError')
@@ -96,7 +97,7 @@ const delData = async (key) => {
 const setCampaigns = async () => {
 
     try {
-        console.time('setCampaignsInsertSpeed')
+        // console.time('setCampaignsInsertSpeed')
         let gunzip = zlib.createGunzip();
         let file = config.sflOffer.recipeFolderCampaigns
         console.log('file:', file)
@@ -107,10 +108,10 @@ const setCampaigns = async () => {
             await setDataCache(`campaign-${item.campaignId}`, item)
         })
 
-        jsonStream.on('end', () => {
-            console.log('done')
-            console.timeEnd('setCampaignsInsertSpeed')
-        })
+        // jsonStream.on('end', () => {
+        //     console.log('campaigns end')
+        // })
+
 
     } catch (e) {
         catchHandler(e, 'setCampaignsError')

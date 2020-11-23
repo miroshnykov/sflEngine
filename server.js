@@ -106,21 +106,25 @@ if (cluster.isMaster) {
     setInterval(async () => {
         socket.emit('sendFileCampaign')
         socket.emit('sendFileOffer')
-    }, 300000) //  300000->5min 20000->20 sec
+    }, config.sflOffer.intervalGetRecipeFiles) //  300000->5min 20000->20 sec
 
+    setInterval(async () => {
+        await setOffers()
+        await setCampaigns()
+    }, config.sflOffer.intervalSetRedis) // wait 30 second then GZ file create   330000->5.5min 20000->20 sec
+
+    // run one time then instance initialize
     setTimeout(async () => {
         console.log('One time to get recipe file')
         socket.emit('sendFileCampaign')
         socket.emit('sendFileOffer')
-    }, 10000) //  300000->5min 20000->20 sec
+    }, config.sflOffer.timeOutGetRecipeFiles) // 10 sec
 
-    // let once = false
-    setInterval(async () => {
-        // if (once) return
+    setTimeout(async () => {
+        console.log('One time set local redis')
         await setOffers()
         await setCampaigns()
-        // once = true
-    }, 330000) // waite 30 second then GZ file create   330000->5.5min 20000->20 sec
+    }, config.sflOffer.timeOutSetRedis) // 20 sec
 
     setInterval(async () => {
         try {
