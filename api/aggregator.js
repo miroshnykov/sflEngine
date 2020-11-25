@@ -31,12 +31,12 @@ const sendToAggr = async (stats) => {
 
         console.log(`send to aggr before send, data: ${JSON.stringify(params)}`)
         const {data} = await aggrRequest(params)
-        metrics.influxdb(200, `aggregatorSfl`)
+        metrics.influxdb(200, `aggregator`)
         return data
 
     } catch (e) {
-        catchHandler(e, 'aggregatorSflError')
-        metrics.influxdb(500, `aggregatorSflError`)
+        catchHandler(e, 'aggregatorError')
+        metrics.influxdb(500, `aggregatorError`)
     }
 }
 
