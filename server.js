@@ -5,7 +5,7 @@ const cluster = require(`cluster`)
 const numCores = config.cores || require(`os`).cpus().length
 // const {v4} = require('uuid')
 // const axios = require('axios')
-const {sendToAggr} = require('./api/aggregator')
+const {sendToAggr, sendToAggrOffer} = require('./api/aggregator')
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup, ad, getDataCache} = require(`./lib/traffic`)
@@ -20,6 +20,7 @@ const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
 const {addClick} = require('./cache/api/traffic')
 const app = express()
 let logBuffer = {}
+let logBufferOffer = {}
 const metrics = require('./metrics')
 
 const addToBuffer = (buffer, t, msg) => {
@@ -29,6 +30,12 @@ const addToBuffer = (buffer, t, msg) => {
     buffer[t][buffer[t].length] = msg;
 }
 
+const addToBufferOffer = (buffer, t, msg) => {
+    if (!buffer[t]) {
+        buffer[t] = [];
+    }
+    buffer[t][buffer[t].length] = msg;
+}
 
 let campaignsFile = config.sflOffer.recipeFolderCampaigns
 let offersFile = config.sflOffer.recipeFolderOffers
@@ -62,6 +69,9 @@ if (cluster.isMaster) {
         let t = Math.round(timer.getTime() / 1000);
         if (msg.type === "click") {
             addToBuffer(logBuffer, t, msg.stats);
+        }
+        if (msg.type === "clickOffer") {
+            addToBufferOffer(logBufferOffer, t, msg.stats);
         }
 
     })
@@ -104,23 +114,27 @@ if (cluster.isMaster) {
     }
 
     setInterval(async () => {
+        if (config.env === 'development') return
         socket.emit('sendFileCampaign')
         socket.emit('sendFileOffer')
     }, config.sflOffer.intervalGetRecipeFiles) //  300000->5min 20000->20 sec
 
     setInterval(async () => {
+        if (config.env === 'development') return
         await setOffers()
         await setCampaigns()
     }, config.sflOffer.intervalSetRedis) // wait 30 second then GZ file create   330000->5.5min 20000->20 sec
 
     // run one time then instance initialize
     setTimeout(async () => {
+        if (config.env === 'development') return
         console.log('One time to get recipe file')
         socket.emit('sendFileCampaign')
         socket.emit('sendFileOffer')
     }, config.sflOffer.timeOutGetRecipeFiles) // 10 sec
 
     setTimeout(async () => {
+        if (config.env === 'development') return
         console.log('One time set local redis')
         await setOffers()
         await setCampaigns()
@@ -194,6 +208,29 @@ if (cluster.isMaster) {
 
 
     }, config.intervalSendAggragator)
+
+    setInterval(async () => {
+
+        let timer = new Date();
+        let t = Math.round(timer.getTime() / 1000);
+
+        if (Object.keys(logBufferOffer).length >= 5) {
+            console.log('logBufferOffer count:', Object.keys(logBufferOffer).length)
+        }
+        for (const index in logBufferOffer) {
+            if (index < t - 4) {
+                if (logBufferOffer[index].length === 0) return
+
+                for (const j in logBufferOffer[index]) {
+                    let statsData = logBufferOffer[index][j]
+                    sendToAggrOffer(statsData)
+
+                }
+                delete logBufferOffer[index]
+            }
+        }
+
+    }, config.intervalSendAggragatorOffer)
 
     setInterval(() => {
         if (config.env === 'development') return
