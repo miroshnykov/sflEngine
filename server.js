@@ -80,6 +80,17 @@ if (cluster.isMaster) {
         console.log(`\n socket connected, host:${config.sflOffer.host}\n`)
     });
 
+    socket.on('error', (e) => {
+        console.log(`\n some errors, host:${config.sflOffer.host}\n`, e)
+        metrics.influxdb(500, `socketError`)
+    });
+
+    socket.on('connect_error', (e) => {
+        console.log(`\n connect_error, host:${config.sflOffer.host}\n`, e)
+        metrics.influxdb(500, `connectError`)
+    });
+
+
     socket.on('updRecipe', async (message) => {
         await sqsProcessing(message)
     })
@@ -115,29 +126,53 @@ if (cluster.isMaster) {
 
     setInterval(async () => {
         if (config.env === 'development') return
-        socket.emit('sendFileCampaign')
-        socket.emit('sendFileOffer')
+        try {
+            socket.emit('sendFileCampaign')
+            socket.emit('sendFileOffer')
+        } catch (e) {
+            console.log(`emitSendFilesTimeError:`, e)
+            metrics.influxdb(500, `emitSendFilesTimeError`)
+        }
+
     }, config.sflOffer.intervalGetRecipeFiles) //  300000->5min 20000->20 sec
 
     setInterval(async () => {
         if (config.env === 'development') return
-        await setOffers()
-        await setCampaigns()
+        try {
+            await setOffers()
+            await setCampaigns()
+        } catch (e) {
+            console.log(`setOffersCampaignsError:`, e)
+            metrics.influxdb(500, `setOffersCampaignsError`)
+        }
+
     }, config.sflOffer.intervalSetRedis) // wait 30 second then GZ file create   330000->5.5min 20000->20 sec
 
     // run one time then instance initialize
     setTimeout(async () => {
         if (config.env === 'development') return
-        console.log('One time to get recipe file')
-        socket.emit('sendFileCampaign')
-        socket.emit('sendFileOffer')
+        try {
+            console.log('One time to get recipe file')
+            socket.emit('sendFileCampaign')
+            socket.emit('sendFileOffer')
+        } catch (e) {
+            console.log(`emitSendFileOneTimeError:`, e)
+            metrics.influxdb(500, `emitSendFileOneTimeError`)
+        }
+
     }, config.sflOffer.timeOutGetRecipeFiles) // 10 sec
 
     setTimeout(async () => {
         if (config.env === 'development') return
         console.log('One time set local redis')
-        await setOffers()
-        await setCampaigns()
+        try {
+            await setOffers()
+            await setCampaigns()
+        } catch (e) {
+            console.log(`setOffersCampaignsOneTimeError:`, e)
+            metrics.influxdb(500, `setOffersCampaignsOneTimeError`)
+        }
+
     }, config.sflOffer.timeOutSetRedis) // 20 sec
 
     setInterval(async () => {
@@ -262,7 +297,7 @@ if (cluster.isMaster) {
     app.use(require('./middlewares/error'));
 
     app.listen({port: config.port}, () => {
-            console.log(`\n🚀\x1b[35m Server ready at http://localhost:${config.port}, worker pid:${process.pid} \x1b[0m \n`)
+            console.log(`\n🚀\x1b[35m Server ready at http://localhost:${config.port}, worker pid:${process.pid} , env:${config.env}\x1b[0m \n`)
             metrics.influxdb(200, `serverRunning`)
         }
     )
