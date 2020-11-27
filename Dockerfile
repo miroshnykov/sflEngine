@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 ARG node_version=12.16.1
 
-COPY tests/run_docker_tests.sh /usr/local/bin/run_docker_tests.sh
+#COPY tests/run_docker_tests.sh /usr/local/bin/run_docker_tests.sh
 RUN rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update 
@@ -17,6 +17,9 @@ RUN apt-get install \
 
 RUN curl --silent --location https://deb.nodesource.com/setup_12.x | bash -
 RUN apt-get install --yes nodejs
+
+RUN mkdir /tmp/recipe_sfl
+RUN chmod 755 /tmp
 
 WORKDIR /home/app
 COPY . .

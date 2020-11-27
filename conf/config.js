@@ -26,6 +26,16 @@ config = {
     affiliateApi: {
         host: 'http://affiliate-api.ad-center.com'
     },
+    sflOffer: {
+        recipeFolderCampaigns: '/tmp/recipe_sfl/campaigns.json.gz',
+        recipeFolderOffers: '/tmp/recipe_sfl/offers.json.gz',
+        host: 'https://sfl-offers.surge.systems/',
+        decryptionKey: '',
+        intervalGetRecipeFiles: 300000, // 300000 -> 5min
+        intervalSetRedis: 330000, // 330000 -> 5.5min
+        timeOutGetRecipeFiles: 10000, // 10000 -> 10sec
+        timeOutSetRedis: 20000 // 20000 -> 20 sec
+    },
     aggragatorApi: {
         host: 'https://aggregator1.surge.systems/'
     },
@@ -39,6 +49,7 @@ config = {
     ],
     intervalUpdate: 60000,//1min , 300000,//5min
     intervalSendAggragator: 10000,//10sec
+    intervalSendAggragatorOffer: 15000,//15sec
     redisLocal: {
         host: 'localhost',
         port: 6379
