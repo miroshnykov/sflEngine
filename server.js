@@ -297,6 +297,7 @@ if (cluster.isMaster) {
     app.use(require('./middlewares/error'));
 
     app.listen({port: config.port}, () => {
+            console.log(JSON.stringify(config))
             console.log(`\n🚀\x1b[35m Server ready at http://localhost:${config.port}, worker pid:${process.pid} , env:${config.env}\x1b[0m \n`)
             metrics.influxdb(200, `serverRunning`)
         }
