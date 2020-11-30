@@ -100,7 +100,7 @@ if (cluster.isMaster) {
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
             console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile) || 0}`)
-            metrics.influxdb(200, `campaignsFileReceived`)
+            metrics.influxdb(200, `fileReceivedCampaigns`)
             console.timeEnd(`campaignsFileSpeed`)
         });
     });
@@ -111,7 +111,7 @@ if (cluster.isMaster) {
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
             console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile) || 0}`)
-            metrics.influxdb(200, `offersFileReceived`)
+            metrics.influxdb(200, `fileReceivedOffers`)
             console.timeEnd(`offersFileSpeed`)
         });
     });
