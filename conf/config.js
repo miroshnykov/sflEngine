@@ -31,7 +31,7 @@ config = {
         recipeFolderOffers: '/tmp/recipe_sfl/offers.json.gz',
         // host: 'https://sfl-offers.surge.systems/',
         host: 'https://sfl-offers-staging.surge.systems/',
-        decryptionKey: 'hrenVamVsemANetokenVocheredStano',
+        decryptionKey: '',
         intervalGetRecipeFiles: 300000, // 300000 -> 5min
         intervalSetRedis: 330000, // 330000 -> 5.5min
         timeOutGetRecipeFiles: 10000, // 10000 -> 10sec
