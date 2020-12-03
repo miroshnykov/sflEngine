@@ -29,8 +29,7 @@ config = {
     sflOffer: {
         recipeFolderCampaigns: '/tmp/recipe_sfl/campaigns.json.gz',
         recipeFolderOffers: '/tmp/recipe_sfl/offers.json.gz',
-        // host: 'https://sfl-offers.surge.systems/',
-        host: 'https://sfl-offers-staging.surge.systems/',
+        host: 'https://sfl-offers.surge.systems/',
         decryptionKey: '',
         intervalGetRecipeFiles: 300000, // 300000 -> 5min
         intervalSetRedis: 330000, // 330000 -> 5.5min
