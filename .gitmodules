@@ -1,0 +1,3 @@
+[submodule "cicd"]
+	path = cicd
+	url = git@gitlab.com:ActionMediaInc/adcenter/am-devops-toolbox.git
