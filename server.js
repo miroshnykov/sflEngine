@@ -22,6 +22,9 @@ const app = express()
 let logBuffer = {}
 let logBufferOffer = {}
 const metrics = require('./metrics')
+const path = require('path');
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const addToBuffer = (buffer, t, msg) => {
     if (!buffer[t]) {
