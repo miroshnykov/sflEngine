@@ -15,6 +15,9 @@ const {addClick} = require('./cache/api/traffic')
 const app = express()
 let logBuffer = {}
 const metrics = require('./metrics')
+const path = require('path');
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const addToBuffer = (buffer, t, msg) => {
     if (!buffer[t]) {
