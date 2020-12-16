@@ -10,6 +10,7 @@ const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup, ad, getDataCache} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
+const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
 const {
     setCampaigns,
     setOffers,
@@ -200,6 +201,46 @@ if (cluster.isMaster) {
         } catch (e) {
             console.log(e)
             metrics.influxdb(500, `segmentsDataError`)
+        }
+
+    }, config.intervalUpdate)
+
+    setInterval(async () => {
+        try {
+
+            let response = await setSegmentsLocal()
+            if (response) {
+                logger.info(` *CRON* setSegmentsLocal redis successfully, count:${response.length}`)
+                metrics.influxdb(200, `setSegmentsLocal`)
+            } else {
+                logger.info(` *CRON* setSegmentsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
+                metrics.influxdb(200, `setSegmentsLocalEmpty`)
+            }
+
+
+        } catch (e) {
+            console.log(e)
+            metrics.influxdb(500, `setSegmentsLocalError`)
+        }
+
+    }, config.intervalUpdate)
+
+    setInterval(async () => {
+        try {
+
+            let response = await setLandingPagesLocal()
+            if (response) {
+                logger.info(` *CRON* setLandingPagesLocal redis successfully, count:${response.length}`)
+                metrics.influxdb(200, `setLandingPagesLocal`)
+            } else {
+                logger.info(` *CRON* setSegmentsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
+                metrics.influxdb(200, `setLandingPagesLocalEmpty`)
+            }
+
+
+        } catch (e) {
+            console.log(e)
+            metrics.influxdb(500, `setLandingPagesLocalError`)
         }
 
     }, config.intervalUpdate)
