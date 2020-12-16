@@ -29,6 +29,11 @@ const setOffers = async () => {
         let gunzip = zlib.createGunzip();
         // let campaignsFile = config.sflOffer.recipeFolderCampaigns
         let file = config.sflOffer.recipeFolderOffers
+        console.log('sflOffer config:', config.sflOffer)
+        if (!file){
+            console.log('no recipe file offer')
+            return
+        }
         let stream = fs.createReadStream(file)
         console.log('file:', file)
         let jsonStream = JSONStream.parse('*')
