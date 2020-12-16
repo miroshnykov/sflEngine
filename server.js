@@ -5,7 +5,7 @@ const cluster = require(`cluster`)
 const numCores = config.cores || require(`os`).cpus().length
 // const {v4} = require('uuid')
 // const axios = require('axios')
-const {sendToAggr, sendToAggrOffer} = require('./api/aggregator')
+const {sendToAggr, sendToAggrOffer, sendToAggrStats} = require('./api/aggregator')
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup, ad, getDataCache} = require(`./lib/traffic`)
@@ -22,6 +22,7 @@ const {addClick} = require('./cache/api/traffic')
 const app = express()
 let logBuffer = {}
 let logBufferOffer = {}
+let logBufferAggrStats = {}
 const metrics = require('./metrics')
 const path = require('path');
 
@@ -35,6 +36,13 @@ const addToBuffer = (buffer, t, msg) => {
 }
 
 const addToBufferOffer = (buffer, t, msg) => {
+    if (!buffer[t]) {
+        buffer[t] = [];
+    }
+    buffer[t][buffer[t].length] = msg;
+}
+
+const addToBufferAggrStats = (buffer, t, msg) => {
     if (!buffer[t]) {
         buffer[t] = [];
     }
@@ -76,6 +84,9 @@ if (cluster.isMaster) {
         }
         if (msg.type === "clickOffer") {
             addToBufferOffer(logBufferOffer, t, msg.stats);
+        }
+        if (msg.type === "clickAggrStats") {
+            addToBufferAggrStats(logBufferAggrStats, t, msg.stats);
         }
 
     })
@@ -289,6 +300,31 @@ if (cluster.isMaster) {
 
 
     }, config.intervalSendAggragator)
+
+
+    setInterval(async () => {
+
+        let timer = new Date();
+        let t = Math.round(timer.getTime() / 1000);
+
+        if (Object.keys(logBufferAggrStats).length >= 5) {
+            console.log('Buffer count:', Object.keys(logBufferAggrStats).length)
+        }
+        for (const index in logBufferAggrStats) {
+            if (index < t - 4) {
+                if (logBufferAggrStats[index].length === 0) return
+
+                for (const j in logBufferAggrStats[index]) {
+                    let statsData = logBufferAggrStats[index][j]
+                    sendToAggrStats(statsData)
+
+                }
+                delete logBufferAggrStats[index]
+            }
+        }
+
+
+    }, config.intervalSendAggragatorStats)
 
     setInterval(async () => {
 
