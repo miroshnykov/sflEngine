@@ -31,7 +31,7 @@ const setOffers = async () => {
         let file = config.sflOffer.recipeFolderOffers
         console.log('sflOffer config:', config.sflOffer)
         if (!file){
-            console.log('no recipe file offer')
+            console.log(' no recipe file offer')
             return
         }
         let stream = fs.createReadStream(file)
