@@ -90,7 +90,11 @@ const setCampaigns = async () => {
         // console.time('setCampaignsInsertSpeed')
         let gunzip = zlib.createGunzip();
         let file = config.sflOffer.recipeFolderCampaigns
-        console.log('file:', file)
+        console.log('sflOffer config:', config.sflOffer)
+        if (!file){
+            console.log('no recipe file campaign')
+            return
+        }
         let stream = fs.createReadStream(file)
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
