@@ -35,12 +35,68 @@ const sendToAggr = async (stats) => {
         return data
 
     } catch (e) {
-        console.log('*** Not able to send to aggr  ')
-        catchHandler(e, 'sendToAggr')
+        catchHandler(e, 'aggregatorError')
         metrics.influxdb(500, `aggregatorError`)
     }
 }
 
+const sendToAggrOffer = async (stats) => {
+
+    try {
+        let statsClone = Object.assign({}, stats)
+        let timer = new Date()
+        let obj = {}
+        obj.key = Base64.encode(JSON.stringify(statsClone))
+        obj.event = stats.event_type
+        obj.time = timer.getTime()
+        obj.count = 1
+
+        let params = {
+            method: 'POST',
+            url: `sfloffer`,
+            data: obj
+        }
+
+        console.log(`send to aggr before send, data: ${JSON.stringify(params)}`)
+        const {data} = await aggrRequest(params)
+        metrics.influxdb(200, `aggregatorSflOffer`)
+        return data
+
+    } catch (e) {
+        catchHandler(e, 'aggregatorSflOfferError')
+        metrics.influxdb(500, `aggregatorSflOfferError`)
+    }
+}
+
+const sendToAggrStats = async (stats) => {
+
+    try {
+        let statsClone = Object.assign({}, stats)
+        let timer = new Date()
+        let obj = {}
+        obj.key = Base64.encode(JSON.stringify(statsClone))
+        obj.event = stats.event_type
+        obj.time = timer.getTime()
+        obj.count = 1
+
+        let params = {
+            method: 'POST',
+            url: `aggregator`,
+            data: obj
+        }
+
+        console.log(`send to aggr stats before send, data: ${JSON.stringify(params)}`)
+        const {data} = await aggrRequest(params)
+        metrics.influxdb(200, `aggregatorSflStats`)
+        return data
+
+    } catch (e) {
+        catchHandler(e, 'aggregatorSflStatsError')
+        metrics.influxdb(500, `aggregatorSflStatsError`)
+    }
+}
 module.exports = {
-    sendToAggr
+    sendToAggr,
+    sendToAggrOffer,
+    sendToAggrStats
 }

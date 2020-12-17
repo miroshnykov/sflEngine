@@ -1,7 +1,7 @@
 const Influx = require('influxdb-nodejs')
 const config = require('plain-config')()
 const clientInfluxdb = new Influx(config.influxdb.host)
-const project = config.influxdb.project
+const project = config.env === 'staging' && `${config.influxdb.project}-staging` || config.influxdb.project
 const os = require('os')
 const _ = require('lodash')
 const {diskinfo} = require('@dropb/diskinfo')
@@ -15,6 +15,7 @@ let data_metrics = {
 const hostname = os.hostname()
 let num_cpu = cpu.num();//return CPU's nums
 
+console.log(`Metrics name:${project}`)
 exports.influxdb = (statusCode = 200, route = "/", method = "GET") => {
     if (config.env === 'development') return
     let data = {
