@@ -97,12 +97,12 @@ if (cluster.isMaster) {
 
     socket.on('error', (e) => {
         console.log(`\n some errors, host:${config.sflOffer.host}\n`, e)
-        metrics.influxdb(500, `socketError`)
+        metrics.influxdb(500, `sflOfferSocketError`)
     });
 
     socket.on('connect_error', (e) => {
         console.log(`\n connect_error, host:${config.sflOffer.host}\n`, e)
-        metrics.influxdb(500, `connectError`)
+        metrics.influxdb(500, `sflOfferConnectError`)
     });
 
 
