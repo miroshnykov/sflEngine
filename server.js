@@ -10,7 +10,7 @@ const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const {signup, ad, getDataCache} = require(`./lib/traffic`)
 const {setTargetingLocal} = require('./cache/local/targeting')
-const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
+const {setBlockSegmentsLocal, setLandingPagesLocal} = require('./cache/local/blockSegments')
 const {
     setCampaigns,
     setOffers,
@@ -198,20 +198,20 @@ if (cluster.isMaster) {
             let response = await setTargetingLocal()
             if (!response) {
                 logger.info(` *CRON* setTargetingLocal getTargetingApi get errors`)
-                metrics.influxdb(500, `segmentsDataApiError`)
+                metrics.influxdb(500, `targetingDataApiError`)
                 return
             }
             if (response.length > 0) {
                 // logger.info(` *CRON* update targeting local redis successfully`)
-                metrics.influxdb(200, `segmentsDataExists`)
+                metrics.influxdb(200, `targetingDataExists`)
             } else {
-                logger.info(`  *CRON*  targeting local redis not updated { empty or some errors to get data  from core-cache-engine } `)
-                metrics.influxdb(200, `segmentsDataEmpty`)
+                logger.info(`  *CRON*  targeting local redis not updated { empty or some errors to get data  from sfl_cache } `)
+                metrics.influxdb(200, `targetingDataEmpty`)
             }
 
         } catch (e) {
             console.log(e)
-            metrics.influxdb(500, `segmentsDataError`)
+            metrics.influxdb(500, `targetingDataError`)
         }
 
     }, config.intervalUpdate)
@@ -219,19 +219,19 @@ if (cluster.isMaster) {
     setInterval(async () => {
         try {
 
-            let response = await setSegmentsLocal()
+            let response = await setBlockSegmentsLocal()
             if (response) {
-                logger.info(` *CRON* setSegmentsLocal redis successfully, count:${response.length}`)
-                metrics.influxdb(200, `setSegmentsLocal`)
+                logger.info(` *CRON* setBlockSegmentsLocal redis successfully, count:${response.length}`)
+                metrics.influxdb(200, `setBlockSegmentsLocal`)
             } else {
-                logger.info(` *CRON* setSegmentsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
-                metrics.influxdb(200, `setSegmentsLocalEmpty`)
+                logger.info(` *CRON* setBlockSegmentsLocal not updated { empty or some errors to get data  from sfl_cache } `)
+                metrics.influxdb(200, `setBlockSegmentsLocalEmpty`)
             }
 
 
         } catch (e) {
             console.log(e)
-            metrics.influxdb(500, `setSegmentsLocalError`)
+            metrics.influxdb(500, `setBlockSegmentsLocalError`)
         }
 
     }, config.intervalUpdate)
@@ -244,7 +244,7 @@ if (cluster.isMaster) {
                 logger.info(` *CRON* setLandingPagesLocal redis successfully, count:${response.length}`)
                 metrics.influxdb(200, `setLandingPagesLocal`)
             } else {
-                logger.info(` *CRON* setSegmentsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
+                logger.info(` *CRON* setLandingPagesLocal not updated { empty or some errors to get data  from sfl_cache } `)
                 metrics.influxdb(200, `setLandingPagesLocalEmpty`)
             }
 
