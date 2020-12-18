@@ -24,7 +24,7 @@ const setDataCache = async (key, data) => {
 
     try {
         await setRedis(key, JSON.stringify(data))
-        console.log(`*** Redis SET { ${key} } \n`)
+        // console.log(`*** Redis SET { ${key} } \n`)
 
     } catch (e) {
         metrics.influxdb(500, `setDataCacheError`)
