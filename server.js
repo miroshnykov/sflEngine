@@ -17,6 +17,8 @@ const {
     sqsProcessing
 } = require('./cache/local/offers')
 
+const {setAffiliates} = require('./cache/local/affiliates')
+
 const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
 const {addClick} = require('./cache/api/traffic')
 const app = express()
@@ -51,6 +53,7 @@ const addToBufferAggrStats = (buffer, t, msg) => {
 
 let campaignsFile = config.sflOffer.recipeFolderCampaigns
 let offersFile = config.sflOffer.recipeFolderOffers
+let affiliatesFile = config.recipe.affiliates
 
 if (cluster.isMaster) {
 
@@ -131,6 +134,16 @@ if (cluster.isMaster) {
         });
     });
 
+    ss(socket).on('sendingAffiliates', (stream) => {
+        console.time(`affiliatesFileSpeed`)
+        stream.pipe(fs.createWriteStream(affiliatesFile))
+        stream.on('end', () => {
+            console.log(`affiliates file received, ${affiliatesFile}, size:${getFileSize(affiliatesFile) || 0}`)
+            metrics.influxdb(200, `fileReceivedAffiliates`)
+            console.timeEnd(`affiliatesFileSpeed`)
+        });
+    });
+
 
     const getFileSize = (filename) => {
         try {
@@ -146,6 +159,7 @@ if (cluster.isMaster) {
         try {
             socket.emit('sendFileCampaign')
             socket.emit('sendFileOffer')
+            socket.emit('sendFileAffiliates')
         } catch (e) {
             console.log(`emitSendFilesTimeError:`, e)
             metrics.influxdb(500, `emitSendFilesTimeError`)
@@ -158,6 +172,7 @@ if (cluster.isMaster) {
         try {
             await setOffers()
             await setCampaigns()
+            await setAffiliates()
         } catch (e) {
             console.log(`setOffersCampaignsError:`, e)
             metrics.influxdb(500, `setOffersCampaignsError`)
@@ -172,6 +187,7 @@ if (cluster.isMaster) {
             console.log('One time to get recipe file')
             socket.emit('sendFileCampaign')
             socket.emit('sendFileOffer')
+            socket.emit('sendFileAffiliates')
         } catch (e) {
             console.log(`emitSendFileOneTimeError:`, e)
             metrics.influxdb(500, `emitSendFileOneTimeError`)
@@ -185,6 +201,7 @@ if (cluster.isMaster) {
         try {
             await setOffers()
             await setCampaigns()
+            await setAffiliates()
         } catch (e) {
             console.log(`setOffersCampaignsOneTimeError:`, e)
             metrics.influxdb(500, `setOffersCampaignsOneTimeError`)

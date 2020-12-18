@@ -36,6 +36,9 @@ config = {
         timeOutGetRecipeFiles: 10000, // 10000 -> 10sec
         timeOutSetRedis: 20000 // 20000 -> 20 sec
     },
+    recipe: {
+        affiliates: '/tmp/recipe_sfl/affiliates.json.gz',
+    },
     aggragatorApi: {
         host: 'https://aggregator1.surge.systems/'
     },
