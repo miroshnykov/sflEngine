@@ -18,6 +18,8 @@ const setRedis = async (key, value) => (await redisClient.set(key, value))
 
 const getRedis = async (value) => (await redisClient.get(value))
 
+const getKeys = async (value) => (await redisClient.keys(value))
+
 const deleteRedis = async (key) => (await redisClient.del(key))
 
 const setDataCache = async (key, data) => {
@@ -46,10 +48,6 @@ const delDataCache = async (key) => {
 const getDataCache = async (key) => {
 
     try {
-        // if (affiliates) {
-            // console.log(`*** REDIS GET { ${key} } count of records: ${affiliates.length} `)
-
-        // }
 
         return JSON.parse(await getRedis(key))
 
@@ -61,8 +59,22 @@ const getDataCache = async (key) => {
 }
 
 
+const getKeysCache = async (key) => {
+
+    try {
+
+        return await getKeys(key)
+
+    } catch (e) {
+        catchHandler(e, 'getKeysCache')
+        metrics.influxdb(500, `getKeysCacheError`)
+        return []
+    }
+}
+
 module.exports = {
     getDataCache,
     setDataCache,
-    delDataCache
+    delDataCache,
+    getKeysCache
 }

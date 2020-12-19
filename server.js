@@ -17,6 +17,8 @@ const {
     sqsProcessing
 } = require('./cache/local/offers')
 
+const {getKeysCache} = require('./cache/redis')
+
 const {setAffiliates} = require('./cache/local/affiliates')
 
 const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
@@ -27,6 +29,7 @@ let logBufferOffer = {}
 let logBufferAggrStats = {}
 const metrics = require('./metrics')
 const path = require('path');
+const os = require('os')
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -194,6 +197,21 @@ if (cluster.isMaster) {
         }
 
     }, config.sflOffer.timeOutGetRecipeFiles) // 10 sec
+
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            let offers = await getKeysCache('offer*')
+            let campaigns = await getKeysCache('campaign*')
+            const computerName = os.hostname()
+            metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}`)
+
+        } catch (e) {
+            console.log(`recipeDataError:`, e)
+            metrics.influxdb(500, `recipeDataError`)
+        }
+
+    }, 450000) // 7.5 min
 
     setTimeout(async () => {
         if (config.env === 'development') return
