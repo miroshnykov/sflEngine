@@ -205,6 +205,7 @@ if (cluster.isMaster) {
             let campaigns = await getKeysCache('campaign*')
             const computerName = os.hostname()
             metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}`)
+            metrics.influxdb(200, `computerName-${computerName}`)
 
         } catch (e) {
             console.log(`recipeDataError:`, e)
