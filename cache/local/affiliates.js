@@ -12,13 +12,13 @@ const setAffiliates = async () => {
     try {
         let gunzip = zlib.createGunzip();
         let file = config.recipe.affiliates
-        console.log('affiliates config:', config.recipe)
+        // console.log('affiliates config:', config.recipe)
         if (!file){
             console.log(' no recipe file affiliates')
             return
         }
         let stream = fs.createReadStream(file)
-        console.log('file:', file)
+        // console.log('file:', file)
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {

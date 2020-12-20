@@ -117,33 +117,33 @@ if (cluster.isMaster) {
     })
 
     ss(socket).on('sendingCampaigns', (stream) => {
-        console.time(`campaignsFileSpeed`)
+        // console.time(`campaignsFileSpeed`)
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
             console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile) || 0}`)
             metrics.influxdb(200, `fileReceivedCampaigns`)
-            console.timeEnd(`campaignsFileSpeed`)
+            // console.timeEnd(`campaignsFileSpeed`)
         });
     });
 
 
     ss(socket).on('sendingOffers', (stream) => {
-        console.time(`offersFileSpeed`)
+        // console.time(`offersFileSpeed`)
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
             console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile) || 0}`)
             metrics.influxdb(200, `fileReceivedOffers`)
-            console.timeEnd(`offersFileSpeed`)
+            // console.timeEnd(`offersFileSpeed`)
         });
     });
 
     ss(socket).on('sendingAffiliates', (stream) => {
-        console.time(`affiliatesFileSpeed`)
+        // console.time(`affiliatesFileSpeed`)
         stream.pipe(fs.createWriteStream(affiliatesFile))
         stream.on('end', () => {
             console.log(`affiliates file received, ${affiliatesFile}, size:${getFileSize(affiliatesFile) || 0}`)
             metrics.influxdb(200, `fileReceivedAffiliates`)
-            console.timeEnd(`affiliatesFileSpeed`)
+            // console.timeEnd(`affiliatesFileSpeed`)
         });
     });
 
