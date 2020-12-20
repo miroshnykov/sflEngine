@@ -17,7 +17,7 @@ const {
     sqsProcessing
 } = require('./cache/local/offers')
 
-const {getKeysCache} = require('./cache/redis')
+const {getKeysCache, getDbSizeCache} = require('./cache/redis')
 
 const {setAffiliates} = require('./cache/local/affiliates')
 
@@ -203,9 +203,10 @@ if (cluster.isMaster) {
         try {
             let offers = await getKeysCache('offer*')
             let campaigns = await getKeysCache('campaign*')
+            let dbSizeCache = await getDbSizeCache()
             const computerName = os.hostname()
             metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}`)
-            metrics.influxdb(200, `computerName-${computerName}`)
+            metrics.influxdb(200, `computerName-${computerName}-redisRecords-${dbSizeCache}`)
 
         } catch (e) {
             console.log(`recipeDataError:`, e)
