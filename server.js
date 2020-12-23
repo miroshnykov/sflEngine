@@ -20,6 +20,7 @@ const {
 const {getKeysCache, getDbSizeCache} = require('./cache/redis')
 
 const {setAffiliates} = require('./cache/local/affiliates')
+const {setAffiliateWebsites} = require('./cache/local/affiliateWebsites')
 
 const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
 const {addClick} = require('./cache/api/traffic')
@@ -57,6 +58,7 @@ const addToBufferAggrStats = (buffer, t, msg) => {
 let campaignsFile = config.sflOffer.recipeFolderCampaigns
 let offersFile = config.sflOffer.recipeFolderOffers
 let affiliatesFile = config.recipe.affiliates
+let affiliateWebsitesFile = config.recipe.affiliateWebsites
 
 if (cluster.isMaster) {
 
@@ -148,6 +150,14 @@ if (cluster.isMaster) {
     });
 
 
+    ss(socket).on('sendingAffiliateWebsites', (stream) => {
+        stream.pipe(fs.createWriteStream(affiliateWebsitesFile))
+        stream.on('end', () => {
+            console.log(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${getFileSize(affiliateWebsitesFile) || 0}`)
+            metrics.influxdb(200, `fileReceivedAffiliateWebsites`)
+        });
+    });
+
     const getFileSize = (filename) => {
         try {
             let stats = fs.statSync(filename)
@@ -163,6 +173,7 @@ if (cluster.isMaster) {
             socket.emit('sendFileCampaign')
             socket.emit('sendFileOffer')
             socket.emit('sendFileAffiliates')
+            socket.emit('sendFileAffiliateWebsites')
         } catch (e) {
             console.log(`emitSendFilesTimeError:`, e)
             metrics.influxdb(500, `emitSendFilesTimeError`)
@@ -176,6 +187,7 @@ if (cluster.isMaster) {
             await setOffers()
             await setCampaigns()
             await setAffiliates()
+            await setAffiliateWebsites()
         } catch (e) {
             console.log(`setOffersCampaignsError:`, e)
             metrics.influxdb(500, `setOffersCampaignsError`)
@@ -191,6 +203,7 @@ if (cluster.isMaster) {
             socket.emit('sendFileCampaign')
             socket.emit('sendFileOffer')
             socket.emit('sendFileAffiliates')
+            socket.emit('sendFileAffiliateWebsites')
         } catch (e) {
             console.log(`emitSendFileOneTimeError:`, e)
             metrics.influxdb(500, `emitSendFileOneTimeError`)
@@ -203,9 +216,11 @@ if (cluster.isMaster) {
         try {
             let offers = await getKeysCache('offer*')
             let campaigns = await getKeysCache('campaign*')
+            let affiliates = await getKeysCache('affiliate*')
+            let affiliateWebsites = await getKeysCache('affiliateWebsites*')
             let dbSizeCache = await getDbSizeCache()
             const computerName = os.hostname()
-            metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}`)
+            metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}-affiliates-${affiliates.length}-affiliateWebsites-${affiliateWebsites.length}`)
             metrics.influxdb(200, `computerName-${computerName}-redisRecords-${dbSizeCache}`)
 
         } catch (e) {
@@ -222,6 +237,7 @@ if (cluster.isMaster) {
             await setOffers()
             await setCampaigns()
             await setAffiliates()
+            await setAffiliateWebsites()
         } catch (e) {
             console.log(`setOffersCampaignsOneTimeError:`, e)
             metrics.influxdb(500, `setOffersCampaignsOneTimeError`)

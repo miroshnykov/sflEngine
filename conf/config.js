@@ -38,6 +38,7 @@ config = {
     },
     recipe: {
         affiliates: '/tmp/recipe_sfl/affiliates.json.gz',
+        affiliateWebsites: '/tmp/recipe_sfl/affiliateWebsites.json.gz',
     },
     aggragatorApi: {
         host: 'https://aggregator1.surge.systems/'
