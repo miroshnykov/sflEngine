@@ -8,14 +8,14 @@ const sflCoreCacheRequest = axios.create({
     baseURL: config.cacheEngine.host,
 })
 
-const getBlockSegmentsApi = async () => {
+const getSegmentsApi = async () => {
     try {
-        // console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getBlockSegments`)
-        const {data} = await sflCoreCacheRequest.get(`getBlockSegments`)
+        // console.log(`*** call endpoint to get DATA ${config.cacheEngine.host}getSegments`)
+        const {data} = await sflCoreCacheRequest.get(`getSegments`)
         return data
     } catch (e) {
-        catchHandler(e, 'getBlockSegmentsApiError')
-        metrics.influxdb(500, `getBlockSegmentsApiError`)
+        catchHandler(e, 'getSegmentsApiError')
+        metrics.influxdb(500, `getSegmentsApiError`)
     }
 
 }
@@ -33,6 +33,6 @@ const getLandingPagesApi = async () => {
 }
 
 module.exports = {
-    getBlockSegmentsApi,
+    getSegmentsApi,
     getLandingPagesApi
 }

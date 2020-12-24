@@ -1,16 +1,15 @@
-// const getTime = (date) => (~~(date.getTime() / 1000))
 const express = require('express')
 const config = require('plain-config')()
 const cluster = require(`cluster`)
 const numCores = config.cores || require(`os`).cpus().length
-// const {v4} = require('uuid')
-// const axios = require('axios')
 const {sendToAggr, sendToAggrOffer, sendToAggrStats} = require('./api/aggregator')
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
-const {signup, ad, getDataCache} = require(`./lib/traffic`)
+const traffic = require(`./routes/signup`)
+const offers = require(`./routes/offers`)
+const recipeData = require(`./routes/recipeData`)
 const {setTargetingLocal} = require('./cache/local/targeting')
-const {setBlockSegmentsLocal, setLandingPagesLocal} = require('./cache/local/blockSegments')
+const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
 const {
     setCampaigns,
     setOffers,
@@ -272,19 +271,19 @@ if (cluster.isMaster) {
     setInterval(async () => {
         try {
 
-            let response = await setBlockSegmentsLocal()
+            let response = await setSegmentsLocal()
             if (response) {
-                logger.info(` *CRON* setBlockSegmentsLocal redis successfully, count:${response.length}`)
-                metrics.influxdb(200, `setBlockSegmentsLocal`)
+                logger.info(` *CRON* setSegmentsLocal redis successfully, count:${response.length}`)
+                metrics.influxdb(200, `setSegmentsLocal`)
             } else {
-                logger.info(` *CRON* setBlockSegmentsLocal not updated { empty or some errors to get data  from sfl_cache } `)
-                metrics.influxdb(200, `setBlockSegmentsLocalEmpty`)
+                logger.info(` *CRON* setSegmentsLocal not updated { empty or some errors to get data  from sfl_cache } `)
+                metrics.influxdb(200, `setSegmentsLocalEmpty`)
             }
 
 
         } catch (e) {
             console.log(e)
-            metrics.influxdb(500, `setBlockSegmentsLocalError`)
+            metrics.influxdb(500, `setSegmentsLocalError`)
         }
 
     }, config.intervalUpdate)
@@ -419,13 +418,9 @@ if (cluster.isMaster) {
 
     app.set('trust proxy', true)
 
-    app.use('/signup', signup)
-    app.use('/ad', ad)
-    app.use('/getDataCache', getDataCache)
-
-    app.use('/health', (req, res, next) => {
-        res.send('Ok')
-    })
+    app.use('/signup', traffic.signup)
+    app.use('/ad', offers.ad)
+    app.use('/getRecipeData', recipeData.getRecipeData)
 
     app.use(require('./middlewares/not-found'));
 
