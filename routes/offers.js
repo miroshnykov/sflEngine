@@ -19,6 +19,9 @@ const {catchHandler} = require('../middlewares/catchErr')
 // offer id 28 with cap
 // http://localhost:8088/ad?offer=d6a5c6885f46299bdc3df7402eff9132:78c249392e405e8d5f747c7d1aadb118afce7de44de6078f7a0c3026b6ddbe41beee2da1aea5ae5c2cebe79af15fba73
 
+// offer 6 stage
+// https://sfl-engin-staging.surge.systems/ad?offer=29152edc3f320183afa799a07c16709c:5f52073798d7b90a8812f5b50673897848074900f0db47eb1ca65022b92dfc7bdb845e16d6b966c7fef63e33204bf025
+
 let offers = {
     ad: async (req, res, next) => {
         try {

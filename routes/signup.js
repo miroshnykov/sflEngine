@@ -8,6 +8,8 @@ const metrics = require('../metrics')
 
 // https://sfl-engin.surge.systems/signup?prod=1&ref=5197044&source_type=Sweepstakes&platform=ios1&debugging=debugging
 
+// https://sfl-engin-staging.surge.systems/signup?prod=1&ref=5204378&debugging=debugging
+
 let traffic = {
     signup: async (req, res, next) => {
         try {
