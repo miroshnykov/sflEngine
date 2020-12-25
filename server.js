@@ -422,6 +422,10 @@ if (cluster.isMaster) {
     app.use('/ad', offers.ad)
     app.use('/getRecipeData', recipeData.getRecipeData)
 
+    app.use('/health', (req, res, next) => {
+        res.send('Ok')
+    })
+
     app.use(require('./middlewares/not-found'));
 
     app.use(require('./middlewares/error'));
