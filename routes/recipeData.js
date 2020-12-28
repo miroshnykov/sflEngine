@@ -3,11 +3,16 @@ const config = require('plain-config')()
 const os = require('os')
 const {catchHandler} = require('../middlewares/catchErr')
 
+// http://localhost:8088/getRecipeData?offerId=2
+// http://localhost:8088/getRecipeData?campaignId=2
+
+// https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6
+
+// https://sfl-engin.surge.systems/getRecipeData?offerId=6
+
 let recipeData = {
     getRecipeData: async (req, res, next) => {
         try {
-            // http://localhost:8088/getDataCache?offerId=2
-            // http://localhost:8088/getDataCache?campaignId=2
             let offerId = req.query.offerId
             let campaignId = req.query.campaignId
             let affiliateWebsites = req.query.affiliateWebsites
