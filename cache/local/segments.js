@@ -62,6 +62,7 @@ const setLandingPagesLocal = async () => {
 
     try {
         let lps = await getLandingPagesApi()
+        console.log(`setLandingPagesLocal lps:`,JSON.stringify(lps))
         if (lps) {
             await setDataCache('landingPages', lps)
         }
