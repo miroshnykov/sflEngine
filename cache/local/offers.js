@@ -29,13 +29,13 @@ const setOffers = async () => {
         let gunzip = zlib.createGunzip();
         // let campaignsFile = config.sflOffer.recipeFolderCampaigns
         let file = config.sflOffer.recipeFolderOffers
-        console.log('sflOffer config:', config.sflOffer)
+        // console.log(`sflOffer config:${JSON.stringify(config.sflOffer)}`)
         if (!file){
             console.log(' no recipe file offer')
             return
         }
         let stream = fs.createReadStream(file)
-        console.log('file:', file)
+        // console.log('file:', file)
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
@@ -55,7 +55,7 @@ const setOffers = async () => {
 const setData = async (key, body) => {
 
     try {
-        console.log(`setData key:${key}:`, body)
+        // console.log(`setData key:${key}:`, body)
         await setDataCache(key, JSON.parse(body))
 
     } catch (e) {
@@ -67,7 +67,7 @@ const setData = async (key, body) => {
 const getData = async (key) => {
 
     try {
-        console.log('getData:', key)
+        // console.log('getData:', key)
         return await getDataCache(`${key}`)
 
     } catch (e) {
@@ -80,7 +80,7 @@ const delData = async (key) => {
 
     try {
 
-        console.log('delData:', key)
+        // console.log('delData:', key)
         await delDataCache(`${key}`)
 
     } catch (e) {
@@ -95,7 +95,7 @@ const setCampaigns = async () => {
         // console.time('setCampaignsInsertSpeed')
         let gunzip = zlib.createGunzip();
         let file = config.sflOffer.recipeFolderCampaigns
-        console.log('sflOffer config:', config.sflOffer)
+        // console.log('sflOffer config:', config.sflOffer)
         if (!file){
             console.log('no recipe file campaign')
             return

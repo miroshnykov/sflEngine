@@ -1,21 +1,25 @@
-// const getTime = (date) => (~~(date.getTime() / 1000))
 const express = require('express')
 const config = require('plain-config')()
 const cluster = require(`cluster`)
 const numCores = config.cores || require(`os`).cpus().length
-// const {v4} = require('uuid')
-// const axios = require('axios')
 const {sendToAggr, sendToAggrOffer, sendToAggrStats} = require('./api/aggregator')
 const cors = require('cors')
 const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
-const {signup, ad, getDataCache} = require(`./lib/traffic`)
+const traffic = require(`./routes/signup`)
+const offers = require(`./routes/offers`)
+const recipeData = require(`./routes/recipeData`)
 const {setTargetingLocal} = require('./cache/local/targeting')
-const {setBlockSegmentsLocal, setLandingPagesLocal} = require('./cache/local/blockSegments')
+const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
 const {
     setCampaigns,
     setOffers,
     sqsProcessing
 } = require('./cache/local/offers')
+
+const {getKeysCache, getDbSizeCache} = require('./cache/redis')
+
+const {setAffiliates} = require('./cache/local/affiliates')
+const {setAffiliateWebsites} = require('./cache/local/affiliateWebsites')
 
 const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
 const {addClick} = require('./cache/api/traffic')
@@ -25,6 +29,7 @@ let logBufferOffer = {}
 let logBufferAggrStats = {}
 const metrics = require('./metrics')
 const path = require('path');
+const os = require('os')
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -51,6 +56,8 @@ const addToBufferAggrStats = (buffer, t, msg) => {
 
 let campaignsFile = config.sflOffer.recipeFolderCampaigns
 let offersFile = config.sflOffer.recipeFolderOffers
+let affiliatesFile = config.recipe.affiliates
+let affiliateWebsitesFile = config.recipe.affiliateWebsites
 
 if (cluster.isMaster) {
 
@@ -111,26 +118,44 @@ if (cluster.isMaster) {
     })
 
     ss(socket).on('sendingCampaigns', (stream) => {
-        console.time(`campaignsFileSpeed`)
+        // console.time(`campaignsFileSpeed`)
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
             console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile) || 0}`)
             metrics.influxdb(200, `fileReceivedCampaigns`)
-            console.timeEnd(`campaignsFileSpeed`)
+            // console.timeEnd(`campaignsFileSpeed`)
         });
     });
 
 
     ss(socket).on('sendingOffers', (stream) => {
-        console.time(`offersFileSpeed`)
+        // console.time(`offersFileSpeed`)
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
             console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile) || 0}`)
             metrics.influxdb(200, `fileReceivedOffers`)
-            console.timeEnd(`offersFileSpeed`)
+            // console.timeEnd(`offersFileSpeed`)
         });
     });
 
+    ss(socket).on('sendingAffiliates', (stream) => {
+        // console.time(`affiliatesFileSpeed`)
+        stream.pipe(fs.createWriteStream(affiliatesFile))
+        stream.on('end', () => {
+            console.log(`affiliates file received, ${affiliatesFile}, size:${getFileSize(affiliatesFile) || 0}`)
+            metrics.influxdb(200, `fileReceivedAffiliates`)
+            // console.timeEnd(`affiliatesFileSpeed`)
+        });
+    });
+
+
+    ss(socket).on('sendingAffiliateWebsites', (stream) => {
+        stream.pipe(fs.createWriteStream(affiliateWebsitesFile))
+        stream.on('end', () => {
+            console.log(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${getFileSize(affiliateWebsitesFile) || 0}`)
+            metrics.influxdb(200, `fileReceivedAffiliateWebsites`)
+        });
+    });
 
     const getFileSize = (filename) => {
         try {
@@ -146,6 +171,8 @@ if (cluster.isMaster) {
         try {
             socket.emit('sendFileCampaign')
             socket.emit('sendFileOffer')
+            socket.emit('sendFileAffiliates')
+            socket.emit('sendFileAffiliateWebsites')
         } catch (e) {
             console.log(`emitSendFilesTimeError:`, e)
             metrics.influxdb(500, `emitSendFilesTimeError`)
@@ -158,6 +185,8 @@ if (cluster.isMaster) {
         try {
             await setOffers()
             await setCampaigns()
+            await setAffiliates()
+            await setAffiliateWebsites()
         } catch (e) {
             console.log(`setOffersCampaignsError:`, e)
             metrics.influxdb(500, `setOffersCampaignsError`)
@@ -172,6 +201,8 @@ if (cluster.isMaster) {
             console.log('One time to get recipe file')
             socket.emit('sendFileCampaign')
             socket.emit('sendFileOffer')
+            socket.emit('sendFileAffiliates')
+            socket.emit('sendFileAffiliateWebsites')
         } catch (e) {
             console.log(`emitSendFileOneTimeError:`, e)
             metrics.influxdb(500, `emitSendFileOneTimeError`)
@@ -179,12 +210,33 @@ if (cluster.isMaster) {
 
     }, config.sflOffer.timeOutGetRecipeFiles) // 10 sec
 
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            let offers = await getKeysCache('offer*')
+            let campaigns = await getKeysCache('campaign*')
+            let affiliates = await getKeysCache('affiliate*')
+            let affiliateWebsites = await getKeysCache('affiliateWebsites*')
+            let dbSizeCache = await getDbSizeCache()
+            const computerName = os.hostname()
+            metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}-affiliates-${affiliates.length}-affiliateWebsites-${affiliateWebsites.length}`)
+            metrics.influxdb(200, `computerName-${computerName}-redisRecords-${dbSizeCache}`)
+
+        } catch (e) {
+            console.log(`recipeDataError:`, e)
+            metrics.influxdb(500, `recipeDataError`)
+        }
+
+    }, 450000) // 7.5 min
+
     setTimeout(async () => {
         if (config.env === 'development') return
         console.log('One time set local redis')
         try {
             await setOffers()
             await setCampaigns()
+            await setAffiliates()
+            await setAffiliateWebsites()
         } catch (e) {
             console.log(`setOffersCampaignsOneTimeError:`, e)
             metrics.influxdb(500, `setOffersCampaignsOneTimeError`)
@@ -219,19 +271,19 @@ if (cluster.isMaster) {
     setInterval(async () => {
         try {
 
-            let response = await setBlockSegmentsLocal()
+            let response = await setSegmentsLocal()
             if (response) {
-                logger.info(` *CRON* setBlockSegmentsLocal redis successfully, count:${response.length}`)
-                metrics.influxdb(200, `setBlockSegmentsLocal`)
+                logger.info(` *CRON* setSegmentsLocal redis successfully, count:${response.length}`)
+                metrics.influxdb(200, `setSegmentsLocal`)
             } else {
-                logger.info(` *CRON* setBlockSegmentsLocal not updated { empty or some errors to get data  from sfl_cache } `)
-                metrics.influxdb(200, `setBlockSegmentsLocalEmpty`)
+                logger.info(` *CRON* setSegmentsLocal not updated { empty or some errors to get data  from sfl_cache } `)
+                metrics.influxdb(200, `setSegmentsLocalEmpty`)
             }
 
 
         } catch (e) {
             console.log(e)
-            metrics.influxdb(500, `setBlockSegmentsLocalError`)
+            metrics.influxdb(500, `setSegmentsLocalError`)
         }
 
     }, config.intervalUpdate)
@@ -366,9 +418,9 @@ if (cluster.isMaster) {
 
     app.set('trust proxy', true)
 
-    app.use('/signup', signup)
-    app.use('/ad', ad)
-    app.use('/getDataCache', getDataCache)
+    app.use('/signup', traffic.signup)
+    app.use('/ad', offers.ad)
+    app.use('/getRecipeData', recipeData.getRecipeData)
 
     app.use('/health', (req, res, next) => {
         res.send('Ok')

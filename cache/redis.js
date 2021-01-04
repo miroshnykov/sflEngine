@@ -18,13 +18,16 @@ const setRedis = async (key, value) => (await redisClient.set(key, value))
 
 const getRedis = async (value) => (await redisClient.get(value))
 
+const getKeys = async (value) => (await redisClient.keys(value))
+const getDbSize = async () => (await redisClient.dbsize())
+
 const deleteRedis = async (key) => (await redisClient.del(key))
 
 const setDataCache = async (key, data) => {
 
     try {
         await setRedis(key, JSON.stringify(data))
-        console.log(`*** Redis SET { ${key} } \n`)
+        // console.log(`*** Redis SET { ${key} } \n`)
 
     } catch (e) {
         metrics.influxdb(500, `setDataCacheError`)
@@ -46,10 +49,6 @@ const delDataCache = async (key) => {
 const getDataCache = async (key) => {
 
     try {
-        // if (affiliates) {
-            // console.log(`*** REDIS GET { ${key} } count of records: ${affiliates.length} `)
-
-        // }
 
         return JSON.parse(await getRedis(key))
 
@@ -61,8 +60,33 @@ const getDataCache = async (key) => {
 }
 
 
+const getKeysCache = async (key) => {
+
+    try {
+
+        return await getKeys(key)
+
+    } catch (e) {
+        catchHandler(e, 'getKeysCacheError')
+        metrics.influxdb(500, `getKeysCacheError`)
+        return []
+    }
+}
+
+const getDbSizeCache = async () => {
+    try {
+        return await getDbSize()
+    } catch (e) {
+        catchHandler(e, 'getDbSizeCacheError')
+        metrics.influxdb(500, `getDbSizeCacheError`)
+        return []
+    }
+}
+
 module.exports = {
     getDataCache,
     setDataCache,
-    delDataCache
+    delDataCache,
+    getKeysCache,
+    getDbSizeCache
 }

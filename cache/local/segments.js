@@ -1,6 +1,6 @@
 const {catchHandler} = require('../../middlewares/catchErr')
 const {getDataCache, setDataCache} = require('../redis')
-const {getBlockSegmentsApi, getLandingPagesApi} = require('../api/blockSegments')
+const {getSegmentsApi, getLandingPagesApi} = require('../api/segments')
 const metrics = require('../../metrics')
 
 const getBlockSegmentsLocal = async () => {
@@ -13,18 +13,37 @@ const getBlockSegmentsLocal = async () => {
     }
 }
 
-const setBlockSegmentsLocal = async () => {
+const getStandardSegmentsLocal = async () => {
 
     try {
-        let blockSegments = await getBlockSegmentsApi()
+        return await getDataCache(`standardSegments`)
+    } catch (e) {
+        catchHandler(e, 'getStandardSegmentsLocalError')
+        metrics.influxdb(500, `getStandardSegmentsLocalError`)
+    }
+}
+
+
+const setSegmentsLocal = async () => {
+
+    try {
+        let segments = await getSegmentsApi()
+
+        let blockSegments = segments.filter(item => item.segmentType === 'block')
+
+        let standardSegments = segments.filter(item => item.segmentType === 'standard')
+
         if (blockSegments) {
             await setDataCache('blockSegments', blockSegments)
         }
-        return blockSegments
+        if (standardSegments) {
+            await setDataCache('standardSegments', standardSegments)
+        }
+        return segments
 
     } catch (e) {
-        catchHandler(e, 'setBlockSegmentsLocalError')
-        metrics.influxdb(500, `setBlockSegmentsLocalError`)
+        catchHandler(e, 'setSegmentsLocalError')
+        metrics.influxdb(500, `setSegmentsLocalError`)
     }
 }
 
@@ -56,8 +75,9 @@ const setLandingPagesLocal = async () => {
 
 module.exports = {
     getBlockSegmentsLocal,
+    getStandardSegmentsLocal,
     getLandingPagesLocal,
-    setBlockSegmentsLocal,
+    setSegmentsLocal,
     setLandingPagesLocal
 }
 
