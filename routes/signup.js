@@ -46,7 +46,10 @@ let traffic = {
             if (resultSflTargeting && resultSflTargeting.success) {
                 console.log(`***************** Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
                 if (!debug) {
-                    // res.redirect(resultSflTargeting.lp)
+                    res.redirect(resultSflTargeting.lp)
+                    // res.send(params)
+                    // return
+                } else {
                     res.send(params)
                     return
                 }
