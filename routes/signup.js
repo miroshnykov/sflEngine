@@ -19,11 +19,19 @@ let traffic = {
             let params = await getParams(req)
             const debug = params.debugging === `debugging` && true || false
 
+            if (debug) {
+                params.response.headers = req.headers
+                params.response.ip = req.ip
+            }
+
             let resultBlockSegments = await blockSegmentsHandle(req, res, params)
             if (resultBlockSegments && resultBlockSegments.success) {
                 console.log(`***************** ResolveBlockSegments, LP:${resultBlockSegments.lp}`)
                 if (!debug) {
-                    // res.redirect(resultBlockSegments.lp)
+                    res.redirect(resultBlockSegments.lp)
+                    //res.send(params)
+                    return
+                } else {
                     res.send(params)
                     return
                 }
@@ -34,7 +42,10 @@ let traffic = {
             if (resultStandardSegments && resultStandardSegments.success) {
                 console.log(`***************** ResolveStandardSegments, LP:${resultStandardSegments.lp}`)
                 if (!debug) {
-                    // res.redirect(resultStandardSegments.lp)
+                    res.redirect(resultStandardSegments.lp)
+                    // res.send(params)
+                    return
+                } else {
                     res.send(params)
                     return
                 }
@@ -46,20 +57,18 @@ let traffic = {
             if (resultSflTargeting && resultSflTargeting.success) {
                 console.log(`***************** Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
                 if (!debug) {
-                    // res.redirect(resultSflTargeting.lp)
+                    res.redirect(resultSflTargeting.lp)
+                    // res.send(params)
+                    return
+                } else {
                     res.send(params)
                     return
                 }
             }
 
-            if (debug) {
-                params.response.headers = req.headers
-                params.response.ip = req.ip
-                res.send(params)
-                return
-            }
-
-            res.send(params)
+            // default
+            let frlp = config.redirectFlowRotator.url + params.originalUrl
+            res.redirect(frlp)
 
         } catch (e) {
             catchHandler(e, 'signupError')
