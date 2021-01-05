@@ -215,7 +215,7 @@ if (cluster.isMaster) {
         try {
             let offers = await getKeysCache('offer*')
             let campaigns = await getKeysCache('campaign*')
-            let affiliates = await getKeysCache('affiliate*')
+            let affiliates = await getKeysCache('affiliate-*')
             let affiliateWebsites = await getKeysCache('affiliateWebsites*')
             let dbSizeCache = await getDbSizeCache()
             const computerName = os.hostname()
