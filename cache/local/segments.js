@@ -29,16 +29,19 @@ const setSegmentsLocal = async () => {
     try {
         let segments = await getSegmentsApi()
 
-        let blockSegments = segments.filter(item => item.segmentType === 'block')
+        if (segments && segments.length !== 0) {
+            let blockSegments = segments.filter(item => item.segmentType === 'block')
 
-        let standardSegments = segments.filter(item => item.segmentType === 'standard')
+            let standardSegments = segments.filter(item => item.segmentType === 'standard')
 
-        if (blockSegments) {
-            await setDataCache('blockSegments', blockSegments)
+            if (blockSegments) {
+                await setDataCache('blockSegments', blockSegments)
+            }
+            if (standardSegments) {
+                await setDataCache('standardSegments', standardSegments)
+            }
         }
-        if (standardSegments) {
-            await setDataCache('standardSegments', standardSegments)
-        }
+
         return segments
 
     } catch (e) {
@@ -62,7 +65,7 @@ const setLandingPagesLocal = async () => {
 
     try {
         let lps = await getLandingPagesApi()
-        console.log(`setLandingPagesLocal lps:`,JSON.stringify(lps))
+        // console.log(`setLandingPagesLocal lps:`, JSON.stringify(lps))
         if (lps) {
             await setDataCache('landingPages', lps)
         }

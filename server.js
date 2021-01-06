@@ -215,7 +215,7 @@ if (cluster.isMaster) {
         try {
             let offers = await getKeysCache('offer*')
             let campaigns = await getKeysCache('campaign*')
-            let affiliates = await getKeysCache('affiliate*')
+            let affiliates = await getKeysCache('affiliate-*')
             let affiliateWebsites = await getKeysCache('affiliateWebsites*')
             let dbSizeCache = await getDbSizeCache()
             const computerName = os.hostname()
@@ -343,7 +343,7 @@ if (cluster.isMaster) {
                 for (const j in logBuffer[index]) {
                     let statsData = logBuffer[index][j]
                     sendToAggr(statsData)
-                    addClick(statsData.sflCampaignId, 1, statsData.sflTargetingCpc, statsData.lid)
+                    // addClick(statsData.sflCampaignId, 1, statsData.sflTargetingCpc, statsData.lid)
 
                 }
                 delete logBuffer[index]
