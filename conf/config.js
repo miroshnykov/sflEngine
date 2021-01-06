@@ -51,7 +51,7 @@ config = {
         'sourceTypeSweepstakes',
         'sourceTypeVod'
     ],
-    intervalUpdate: 60000,//1min , 300000,//5min
+    intervalUpdate: 300000,//1min , 300000,//5min
     intervalSendAggragator: 10000,//10sec
     intervalSendAggragatorOffer: 15000,//15sec
     intervalSendAggragatorStats: 20000,//20sec

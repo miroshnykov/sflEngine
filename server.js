@@ -343,7 +343,7 @@ if (cluster.isMaster) {
                 for (const j in logBuffer[index]) {
                     let statsData = logBuffer[index][j]
                     sendToAggr(statsData)
-                    addClick(statsData.sflCampaignId, 1, statsData.sflTargetingCpc, statsData.lid)
+                    // addClick(statsData.sflCampaignId, 1, statsData.sflTargetingCpc, statsData.lid)
 
                 }
                 delete logBuffer[index]
