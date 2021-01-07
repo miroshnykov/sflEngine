@@ -213,10 +213,10 @@ if (cluster.isMaster) {
     setInterval(async () => {
         if (config.env === 'development') return
         try {
-            let offers = await getKeysCache('offer*')
-            let campaigns = await getKeysCache('campaign*')
+            let offers = await getKeysCache('offer-*')
+            let campaigns = await getKeysCache('campaign-*')
             let affiliates = await getKeysCache('affiliate-*')
-            let affiliateWebsites = await getKeysCache('affiliateWebsites*')
+            let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
             let dbSizeCache = await getDbSizeCache()
             const computerName = os.hostname()
             metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}-affiliates-${affiliates.length}-affiliateWebsites-${affiliateWebsites.length}`)

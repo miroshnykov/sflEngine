@@ -1,6 +1,5 @@
 const {catchHandler} = require('../../middlewares/catchErr')
-const {getDataCache, setDataCache, delDataCache} = require('../redis')
-const {getTargetingApi} = require('../api/targeting')
+const {getDataCache, setDataCache, delDataCache, getKeysCache} = require('../redis')
 const metrics = require('../../metrics')
 const zlib = require('zlib')
 const fs = require('fs')
@@ -25,12 +24,19 @@ const sqsProcessing = async (message) => {
 const setOffers = async () => {
 
     try {
+
+        let offers = await getKeysCache('offer-*')
+        // console.log('offers count:',offers.length)
+        for (const offer of offers) {
+            await delDataCache(offer)
+        }
+
         // console.time('setOffersInsertSpeed')
         let gunzip = zlib.createGunzip();
         // let campaignsFile = config.sflOffer.recipeFolderCampaigns
         let file = config.sflOffer.recipeFolderOffers
         // console.log(`sflOffer config:${JSON.stringify(config.sflOffer)}`)
-        if (!file){
+        if (!file) {
             console.log(' no recipe file offer')
             return
         }
@@ -92,11 +98,19 @@ const delData = async (key) => {
 const setCampaigns = async () => {
 
     try {
+
+        let campaigns = await getKeysCache('campaign-*')
+        // console.log('campaigns count:',campaigns.length)
+
+        for (const campaign of campaigns) {
+            await delDataCache(campaign)
+        }
+
         // console.time('setCampaignsInsertSpeed')
         let gunzip = zlib.createGunzip();
         let file = config.sflOffer.recipeFolderCampaigns
         // console.log('sflOffer config:', config.sflOffer)
-        if (!file){
+        if (!file) {
             console.log('no recipe file campaign')
             return
         }

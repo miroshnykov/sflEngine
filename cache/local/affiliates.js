@@ -1,6 +1,5 @@
 const {catchHandler} = require('../../middlewares/catchErr')
-const {getDataCache, setDataCache, delDataCache} = require('../redis')
-const {getTargetingApi} = require('../api/targeting')
+const { setDataCache, delDataCache, getKeysCache} = require('../redis')
 const metrics = require('../../metrics')
 const zlib = require('zlib')
 const fs = require('fs')
@@ -10,10 +9,17 @@ const config = require('plain-config')()
 const setAffiliates = async () => {
 
     try {
+
+        let affiliates = await getKeysCache('affiliate-*')
+        // console.log('affiliates count:',affiliates.length)
+        for (const affiliate of affiliates) {
+            await delDataCache(affiliate)
+        }
+
         let gunzip = zlib.createGunzip();
         let file = config.recipe.affiliates
         // console.log('affiliates config:', config.recipe)
-        if (!file){
+        if (!file) {
             console.log(' no recipe file affiliates')
             return
         }
