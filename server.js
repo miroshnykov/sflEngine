@@ -183,16 +183,54 @@ if (cluster.isMaster) {
     setInterval(async () => {
         if (config.env === 'development') return
         try {
+            console.log(' **** setOffers to Redis')
             await setOffers()
-            await setCampaigns()
-            await setAffiliates()
-            await setAffiliateWebsites()
+            // await setCampaigns()
+            // await setAffiliates()
+            // await setAffiliateWebsites()
         } catch (e) {
-            console.log(`setOffersCampaignsError:`, e)
-            metrics.influxdb(500, `setOffersCampaignsError`)
+            console.log(`setOffersError:`, e)
+            metrics.influxdb(500, `setOffersError`)
         }
 
     }, config.sflOffer.intervalSetRedis) // wait 30 second then GZ file create   330000->5.5min 20000->20 sec
+
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            console.log(' **** setCampaigns  to Redis')
+            await setCampaigns()
+        } catch (e) {
+            console.log(`setCampaignsError:`, e)
+            metrics.influxdb(500, `setCampaignsError`)
+        }
+
+    }, config.sflOffer.intervalSetRedis + 30000)
+
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            console.log(' **** setAffiliates  to Redis')
+            await setAffiliates()
+        } catch (e) {
+            console.log(`setAffiliatesError:`, e)
+            metrics.influxdb(500, `setAffiliatesError`)
+        }
+
+    }, config.sflOffer.intervalSetRedis + 40000)
+
+
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            console.log('setAffiliateWebsites  to Redis')
+            await setAffiliateWebsites()
+        } catch (e) {
+            console.log(`setAffiliateWebsitesError:`, e)
+            metrics.influxdb(500, `setAffiliateWebsitesError`)
+        }
+
+    }, config.sflOffer.intervalSetRedis + 50000)
 
     // run one time then instance initialize
     setTimeout(async () => {
