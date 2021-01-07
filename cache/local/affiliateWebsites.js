@@ -5,13 +5,21 @@ const zlib = require('zlib')
 const fs = require('fs')
 const JSONStream = require("JSONStream")
 const config = require('plain-config')()
+const {getKeysCache, delDataCache} = require('../redis')
 
 const setAffiliateWebsites = async () => {
 
     try {
+
+        let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
+        // console.log('affiliateWebsites count:',affiliateWebsites.length)
+        for (const affiliateWebsite of affiliateWebsites) {
+            await delDataCache(affiliateWebsite)
+        }
+
         let gunzip = zlib.createGunzip();
         let file = config.recipe.affiliateWebsites
-        if (!file){
+        if (!file) {
             console.log(' no recipe file affiliates')
             return
         }

@@ -39,7 +39,7 @@ const delDataCache = async (key) => {
 
     try {
         await deleteRedis(key)
-        console.log(`*** Redis DEL { ${key} } \n`)
+        // console.log(`*** Redis DEL { ${key} } \n`)
 
     } catch (e) {
         catchHandler(e, 'delDataCache')
