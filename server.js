@@ -121,8 +121,9 @@ if (cluster.isMaster) {
         // console.time(`campaignsFileSpeed`)
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
-            console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedCampaigns`)
+            let size = getFileSize(campaignsFile) || 0
+            console.log(`campaigns file received, ${campaignsFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedCampaigns-size-${size}`)
             // console.timeEnd(`campaignsFileSpeed`)
         });
     });
@@ -132,8 +133,9 @@ if (cluster.isMaster) {
         // console.time(`offersFileSpeed`)
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
-            console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedOffers`)
+            let size = getFileSize(offersFile) || 0
+            console.log(`offers file received, ${offersFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedOffers-size-${size}`)
             // console.timeEnd(`offersFileSpeed`)
         });
     });
@@ -142,8 +144,9 @@ if (cluster.isMaster) {
         // console.time(`affiliatesFileSpeed`)
         stream.pipe(fs.createWriteStream(affiliatesFile))
         stream.on('end', () => {
-            console.log(`affiliates file received, ${affiliatesFile}, size:${getFileSize(affiliatesFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedAffiliates`)
+            let size = getFileSize(affiliatesFile) || 0
+            console.log(`affiliates file received, ${affiliatesFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedAffiliates-size-${size}`)
             // console.timeEnd(`affiliatesFileSpeed`)
         });
     });
@@ -152,8 +155,9 @@ if (cluster.isMaster) {
     ss(socket).on('sendingAffiliateWebsites', (stream) => {
         stream.pipe(fs.createWriteStream(affiliateWebsitesFile))
         stream.on('end', () => {
-            console.log(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${getFileSize(affiliateWebsitesFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedAffiliateWebsites`)
+            let size = getFileSize(affiliateWebsitesFile) || 0
+            console.log(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedAffiliateWebsites-size-${size}`)
         });
     });
 
