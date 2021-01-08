@@ -183,7 +183,7 @@ if (cluster.isMaster) {
     setInterval(async () => {
         if (config.env === 'development') return
         try {
-            console.log(' **** setOffers to Redis')
+            logger.info(` **** setOffers to Redis`)
             await setOffers()
             // await setCampaigns()
             // await setAffiliates()
@@ -198,7 +198,7 @@ if (cluster.isMaster) {
     setInterval(async () => {
         if (config.env === 'development') return
         try {
-            console.log(' **** setCampaigns  to Redis')
+            logger.info(` **** setCampaigns to Redis`)
             await setCampaigns()
         } catch (e) {
             console.log(`setCampaignsError:`, e)
@@ -210,7 +210,7 @@ if (cluster.isMaster) {
     setInterval(async () => {
         if (config.env === 'development') return
         try {
-            console.log(' **** setAffiliates  to Redis')
+            logger.info(` **** setAffiliates to Redis`)
             await setAffiliates()
         } catch (e) {
             console.log(`setAffiliatesError:`, e)
@@ -223,7 +223,7 @@ if (cluster.isMaster) {
     setInterval(async () => {
         if (config.env === 'development') return
         try {
-            console.log('setAffiliateWebsites  to Redis')
+            logger.info(` **** setAffiliateWebsites to Redis`)
             await setAffiliateWebsites()
         } catch (e) {
             console.log(`setAffiliateWebsitesError:`, e)
