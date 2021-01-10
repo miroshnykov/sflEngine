@@ -7,6 +7,7 @@ const _ = require('lodash')
 const {diskinfo} = require('@dropb/diskinfo')
 const cpu = require('cpu')
 const pino = require('pino')()
+const logger = require('bunyan-loader')(config.log).child({scope: 'metrics.js'})
 let data_metrics = {
     start: 0,
     route: '',
@@ -15,7 +16,7 @@ let data_metrics = {
 const hostname = os.hostname()
 let num_cpu = cpu.num();//return CPU's nums
 
-console.log(`Metrics name:${project}`)
+logger.info(` *** Metrics name:${project}`)
 exports.influxdb = (statusCode = 200, route = "/", method = "GET") => {
     if (config.env === 'development') return
     let data = {

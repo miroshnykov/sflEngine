@@ -65,7 +65,7 @@ config = {
         port: 8089
     },
     log: {
-        name: `core-engine`,
+        name: `sfl-engine`,
         streams: [{
             level: `INFO`,
             stream: process.stdout

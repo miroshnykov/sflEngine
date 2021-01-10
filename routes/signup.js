@@ -3,7 +3,8 @@ const {sflTargetingHandle} = require('../lib/targeting/targetingHandle')
 const {getParams} = require('../lib/params')
 const {catchHandler} = require('../middlewares/catchErr')
 const metrics = require('../metrics')
-
+const config = require('plain-config')()
+const logger = require('bunyan-loader')(config.log).child({scope: 'signup.js'})
 // http://localhost:8088/signup?prod=650&ref=5204378&source_type=Sweepstakes&platform=Android&debugging=debugging
 
 // https://sfl-engin.surge.systems/signup?prod=1&ref=5197044&source_type=Sweepstakes&platform=ios1&debugging=debugging
@@ -26,7 +27,7 @@ let traffic = {
 
             let resultBlockSegments = await blockSegmentsHandle(req, res, params)
             if (resultBlockSegments && resultBlockSegments.success) {
-                console.log(`***************** ResolveBlockSegments, LP:${resultBlockSegments.lp}`)
+                logger.info(`***************** ResolveBlockSegments, LP:${resultBlockSegments.lp}`)
                 if (!debug) {
                     res.redirect(resultBlockSegments.lp)
                     //res.send(params)
@@ -40,7 +41,7 @@ let traffic = {
 
             let resultStandardSegments = await standardSegmentsHandle(req, res, params)
             if (resultStandardSegments && resultStandardSegments.success) {
-                console.log(`***************** ResolveStandardSegments, LP:${resultStandardSegments.lp}`)
+                logger.info(`***************** ResolveStandardSegments, LP:${resultStandardSegments.lp}`)
                 if (!debug) {
                     res.redirect(resultStandardSegments.lp)
                     // res.send(params)
@@ -55,7 +56,7 @@ let traffic = {
             let resultSflTargeting = await sflTargetingHandle(req, res, params)
 
             if (resultSflTargeting && resultSflTargeting.success) {
-                console.log(`***************** Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
+                logger.info(`***************** Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
                 if (!debug) {
                     res.redirect(resultSflTargeting.lp)
                     // res.send(params)
@@ -72,7 +73,7 @@ let traffic = {
 
         } catch (e) {
             catchHandler(e, 'signupError')
-            console.log(e)
+            logger.error(e)
             metrics.influxdb(500, `signup`)
             next(e)
         }
