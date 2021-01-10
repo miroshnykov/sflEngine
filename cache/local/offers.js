@@ -45,6 +45,10 @@ const setOffers = async () => {
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
+            if (!item.offerId){
+                metrics.influxdb(500, `setOffersEmpty`)
+                return
+            }
             await setDataCache(`offer-${item.offerId}`, item)
         })
 
@@ -118,6 +122,10 @@ const setCampaigns = async () => {
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
+            if (!item.campaignId){
+                metrics.influxdb(500, `setCampaignsEmpty`)
+                return
+            }
             await setDataCache(`campaign-${item.campaignId}`, item)
         })
 

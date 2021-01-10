@@ -27,6 +27,10 @@ const setAffiliateWebsites = async () => {
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
+            if (!item.affiliateId){
+                metrics.influxdb(500, `setAffiliateWebsitesEmpty`)
+                return
+            }
             await setDataCache(`affiliateWebsites-${item.affiliateId}`, item)
         })
 
