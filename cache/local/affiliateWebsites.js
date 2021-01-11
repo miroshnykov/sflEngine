@@ -7,6 +7,9 @@ const JSONStream = require("JSONStream")
 const config = require('plain-config')()
 const {getKeysCache, delDataCache} = require('../redis')
 
+const os = require('os')
+const hostname = os.hostname()
+
 const setAffiliateWebsites = async () => {
 
     try {
@@ -28,7 +31,7 @@ const setAffiliateWebsites = async () => {
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
             if (!item.affiliateId){
-                metrics.influxdb(500, `setAffiliateWebsitesEmpty`)
+                metrics.influxdb(500, `setAffiliateWebsitesEmpty-${hostname}`)
                 return
             }
             await setDataCache(`affiliateWebsites-${item.affiliateId}`, item)
