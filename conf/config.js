@@ -27,16 +27,16 @@ config = {
         host: 'http://affiliate-api.ad-center.com'
     },
     sflOffer: {
-        recipeFolderCampaigns: '/tmp/recipe_sfl/campaigns.json.gz',
-        recipeFolderOffers: '/tmp/recipe_sfl/offers.json.gz',
         host: 'https://sfl-offers.surge.systems/',
         decryptionKey: '',
-        intervalGetRecipeFiles: 300000, // 300000 -> 5min
-        intervalSetRedis: 330000, // 330000 -> 5.5min
-        timeOutGetRecipeFiles: 10000, // 10000 -> 10sec
-        timeOutSetRedis: 20000 // 20000 -> 20 sec
+        intervalGetRecipeFiles: 330000, // 330000 -> 5.5min
+        intervalSetRedis: 360000, // 360000 -> 6min
+        timeOutGetRecipeFiles: 20000, // 20000 -> 20sec
+        timeOutSetRedis: 40000 // 40000 -> 40sec
     },
     recipe: {
+        offers:'/tmp/recipe_sfl/offers.json.gz',
+        campaigns:'/tmp/recipe_sfl/campaigns.json.gz',
         affiliates: '/tmp/recipe_sfl/affiliates.json.gz',
         affiliateWebsites: '/tmp/recipe_sfl/affiliateWebsites.json.gz',
     },

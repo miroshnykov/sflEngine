@@ -54,8 +54,8 @@ const addToBufferAggrStats = (buffer, t, msg) => {
     buffer[t][buffer[t].length] = msg;
 }
 
-let campaignsFile = config.sflOffer.recipeFolderCampaigns
-let offersFile = config.sflOffer.recipeFolderOffers
+let campaignsFile = config.recipe.campaigns
+let offersFile = config.recipe.offers
 let affiliatesFile = config.recipe.affiliates
 let affiliateWebsitesFile = config.recipe.affiliateWebsites
 
@@ -182,7 +182,7 @@ if (cluster.isMaster) {
             metrics.influxdb(500, `emitSendFilesTimeError`)
         }
 
-    }, config.sflOffer.intervalGetRecipeFiles) //  300000->5min 20000->20 sec
+    }, config.sflOffer.intervalGetRecipeFiles)
 
     setInterval(async () => {
         if (config.env === 'development') return
@@ -197,7 +197,7 @@ if (cluster.isMaster) {
             metrics.influxdb(500, `setOffersError`)
         }
 
-    }, config.sflOffer.intervalSetRedis) // wait 30 second then GZ file create   330000->5.5min 20000->20 sec
+    }, config.sflOffer.intervalSetRedis)
 
     setInterval(async () => {
         if (config.env === 'development') return
@@ -250,7 +250,7 @@ if (cluster.isMaster) {
             metrics.influxdb(500, `emitSendFileOneTimeError`)
         }
 
-    }, config.sflOffer.timeOutGetRecipeFiles) // 10 sec
+    }, config.sflOffer.timeOutGetRecipeFiles)
 
     setInterval(async () => {
         if (config.env === 'development') return
@@ -284,7 +284,7 @@ if (cluster.isMaster) {
             metrics.influxdb(500, `setOffersCampaignsOneTimeError`)
         }
 
-    }, config.sflOffer.timeOutSetRedis) // 20 sec
+    }, config.sflOffer.timeOutSetRedis)
 
     setInterval(async () => {
         try {
