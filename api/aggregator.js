@@ -9,6 +9,8 @@ const aggrRequest = axios.create({
     baseURL: config.aggragatorApi.host,
 })
 
+const logger = require('bunyan-loader')(config.log).child({scope: 'aggregator.js'})
+
 const sendToAggr = async (stats) => {
 
     try {
@@ -29,7 +31,7 @@ const sendToAggr = async (stats) => {
             data: obj
         }
 
-        console.log(`send to aggr before send, data: ${JSON.stringify(params)}`)
+        logger.info(`send to aggr before send, data: ${JSON.stringify(params)}`)
         const {data} = await aggrRequest(params)
         metrics.influxdb(200, `aggregator`)
         return data
@@ -57,7 +59,7 @@ const sendToAggrOffer = async (stats) => {
             data: obj
         }
 
-        console.log(`send to aggr before send, data: ${JSON.stringify(params)}`)
+        logger.info(`send to aggr before send, data: ${JSON.stringify(params)}`)
         const {data} = await aggrRequest(params)
         metrics.influxdb(200, `aggregatorSflOffer`)
         return data
@@ -85,7 +87,7 @@ const sendToAggrStats = async (stats) => {
             data: obj
         }
 
-        console.log(`send to aggr stats before send, data: ${JSON.stringify(params)}`)
+        logger.info(`send to aggr stats before send, data: ${JSON.stringify(params)}`)
         const {data} = await aggrRequest(params)
         metrics.influxdb(200, `aggregatorSflStats`)
         return data

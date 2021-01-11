@@ -6,12 +6,16 @@ const metrics = require('../metrics')
 const asyncRedis = require('async-redis')
 const redisClient = asyncRedis.createClient(config.redisLocal.port, config.redisLocal.host)
 
+const logger = require('bunyan-loader')(config.log).child({scope: 'redis.js'})
+
 redisClient.on('connect', () => {
-    console.log(`\x1b[36m  Redis connected to host localhost port ${config.redisLocal.port} \x1b[0m`)
+    // console.log(`\x1b[36m  Redis connected to host localhost port ${config.redisLocal.port} \x1b[0m`)
+    logger.info(` *** Redis connected to host localhost port:${config.redisLocal.port} } `)
 })
 
 redisClient.on('error', (err) => {
-    console.log('\x1b[41m Redis error: ' + err + '\x1b[0m')
+    // console.log('\x1b[41m Redis error: ' + err + '\x1b[0m')
+    logger.error('Redis error:', err)
 })
 
 const setRedis = async (key, value) => (await redisClient.set(key, value))

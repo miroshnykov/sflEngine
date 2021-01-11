@@ -33,8 +33,8 @@ const setOffers = async () => {
 
         // console.time('setOffersInsertSpeed')
         let gunzip = zlib.createGunzip();
-        // let campaignsFile = config.sflOffer.recipeFolderCampaigns
-        let file = config.sflOffer.recipeFolderOffers
+        // let campaignsFile = config.recipe.offers
+        let file = config.recipe.offers
         // console.log(`sflOffer config:${JSON.stringify(config.sflOffer)}`)
         if (!file) {
             console.log(' no recipe file offer')
@@ -45,6 +45,10 @@ const setOffers = async () => {
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
+            if (!item.offerId){
+                metrics.influxdb(500, `setOffersEmpty`)
+                return
+            }
             await setDataCache(`offer-${item.offerId}`, item)
         })
 
@@ -108,7 +112,7 @@ const setCampaigns = async () => {
 
         // console.time('setCampaignsInsertSpeed')
         let gunzip = zlib.createGunzip();
-        let file = config.sflOffer.recipeFolderCampaigns
+        let file = config.recipe.campaigns
         // console.log('sflOffer config:', config.sflOffer)
         if (!file) {
             console.log('no recipe file campaign')
@@ -118,6 +122,10 @@ const setCampaigns = async () => {
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
+            if (!item.campaignId){
+                metrics.influxdb(500, `setCampaignsEmpty`)
+                return
+            }
             await setDataCache(`campaign-${item.campaignId}`, item)
         })
 

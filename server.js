@@ -54,8 +54,8 @@ const addToBufferAggrStats = (buffer, t, msg) => {
     buffer[t][buffer[t].length] = msg;
 }
 
-let campaignsFile = config.sflOffer.recipeFolderCampaigns
-let offersFile = config.sflOffer.recipeFolderOffers
+let campaignsFile = config.recipe.campaigns
+let offersFile = config.recipe.offers
 let affiliatesFile = config.recipe.affiliates
 let affiliateWebsitesFile = config.recipe.affiliateWebsites
 
@@ -99,16 +99,16 @@ if (cluster.isMaster) {
     })
 
     socket.on('connect', () => {
-        console.log(`\n socket connected, host:${config.sflOffer.host}\n`)
+        logger.info(` *** socket connected, host:${config.sflOffer.host}`)
     });
 
     socket.on('error', (e) => {
-        console.log(`\n some errors, host:${config.sflOffer.host}\n`, e)
+        logger.info(` *** some errors, host:${config.sflOffer.host}`, e)
         metrics.influxdb(500, `sflOfferSocketError`)
     });
 
     socket.on('connect_error', (e) => {
-        console.log(`\n connect_error, host:${config.sflOffer.host}\n`, e)
+        logger.info(` *** connect_error, host:${config.sflOffer.host}`, e)
         metrics.influxdb(500, `sflOfferConnectError`)
     });
 
@@ -121,8 +121,9 @@ if (cluster.isMaster) {
         // console.time(`campaignsFileSpeed`)
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
-            console.log(`campaigns file received, ${campaignsFile}, size:${getFileSize(campaignsFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedCampaigns`)
+            let size = getFileSize(campaignsFile) || 0
+            logger.info(`campaigns file received, ${campaignsFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedCampaigns-size-${size}`)
             // console.timeEnd(`campaignsFileSpeed`)
         });
     });
@@ -132,8 +133,9 @@ if (cluster.isMaster) {
         // console.time(`offersFileSpeed`)
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
-            console.log(`offers file received, ${offersFile}, size:${getFileSize(offersFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedOffers`)
+            let size = getFileSize(offersFile) || 0
+            logger.info(`offers file received, ${offersFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedOffers-size-${size}`)
             // console.timeEnd(`offersFileSpeed`)
         });
     });
@@ -142,8 +144,9 @@ if (cluster.isMaster) {
         // console.time(`affiliatesFileSpeed`)
         stream.pipe(fs.createWriteStream(affiliatesFile))
         stream.on('end', () => {
-            console.log(`affiliates file received, ${affiliatesFile}, size:${getFileSize(affiliatesFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedAffiliates`)
+            let size = getFileSize(affiliatesFile) || 0
+            logger.info(`affiliates file received, ${affiliatesFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedAffiliates-size-${size}`)
             // console.timeEnd(`affiliatesFileSpeed`)
         });
     });
@@ -152,8 +155,9 @@ if (cluster.isMaster) {
     ss(socket).on('sendingAffiliateWebsites', (stream) => {
         stream.pipe(fs.createWriteStream(affiliateWebsitesFile))
         stream.on('end', () => {
-            console.log(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${getFileSize(affiliateWebsitesFile) || 0}`)
-            metrics.influxdb(200, `fileReceivedAffiliateWebsites`)
+            let size = getFileSize(affiliateWebsitesFile) || 0
+            logger.info(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${size}`)
+            metrics.influxdb(200, `fileReceivedAffiliateWebsites-size-${size}`)
         });
     });
 
@@ -162,7 +166,7 @@ if (cluster.isMaster) {
             let stats = fs.statSync(filename)
             return stats.size
         } catch (e) {
-            console.log('getFileSizeError:', e)
+            logger.error('getFileSizeError:', e)
         }
     }
 
@@ -174,41 +178,79 @@ if (cluster.isMaster) {
             socket.emit('sendFileAffiliates')
             socket.emit('sendFileAffiliateWebsites')
         } catch (e) {
-            console.log(`emitSendFilesTimeError:`, e)
+            logger.error(`emitSendFilesTimeError:`, e)
             metrics.influxdb(500, `emitSendFilesTimeError`)
         }
 
-    }, config.sflOffer.intervalGetRecipeFiles) //  300000->5min 20000->20 sec
+    }, config.sflOffer.intervalGetRecipeFiles)
 
     setInterval(async () => {
         if (config.env === 'development') return
         try {
+            logger.info(` **** setOffers to Redis`)
             await setOffers()
-            await setCampaigns()
-            await setAffiliates()
-            await setAffiliateWebsites()
+            // await setCampaigns()
+            // await setAffiliates()
+            // await setAffiliateWebsites()
         } catch (e) {
-            console.log(`setOffersCampaignsError:`, e)
-            metrics.influxdb(500, `setOffersCampaignsError`)
+            logger.error(`setOffersError:`, e)
+            metrics.influxdb(500, `setOffersError`)
         }
 
-    }, config.sflOffer.intervalSetRedis) // wait 30 second then GZ file create   330000->5.5min 20000->20 sec
+    }, config.sflOffer.intervalSetRedis)
+
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            logger.info(` **** setCampaigns to Redis`)
+            await setCampaigns()
+        } catch (e) {
+            logger.error(`setCampaignsError:`, e)
+            metrics.influxdb(500, `setCampaignsError`)
+        }
+
+    }, config.sflOffer.intervalSetRedis + 30000)
+
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            logger.info(` **** setAffiliates to Redis`)
+            await setAffiliates()
+        } catch (e) {
+            logger.error(`setAffiliatesError:`, e)
+            metrics.influxdb(500, `setAffiliatesError`)
+        }
+
+    }, config.sflOffer.intervalSetRedis + 40000)
+
+
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            logger.info(` **** setAffiliateWebsites to Redis`)
+            await setAffiliateWebsites()
+        } catch (e) {
+            logger.error(`setAffiliateWebsitesError:`, e)
+            metrics.influxdb(500, `setAffiliateWebsitesError`)
+        }
+
+    }, config.sflOffer.intervalSetRedis + 50000)
 
     // run one time then instance initialize
     setTimeout(async () => {
         if (config.env === 'development') return
         try {
-            console.log('One time to get recipe file')
+            logger.info('One time to get recipe file')
             socket.emit('sendFileCampaign')
             socket.emit('sendFileOffer')
             socket.emit('sendFileAffiliates')
             socket.emit('sendFileAffiliateWebsites')
         } catch (e) {
-            console.log(`emitSendFileOneTimeError:`, e)
+            logger.error(`emitSendFileOneTimeError:`, e)
             metrics.influxdb(500, `emitSendFileOneTimeError`)
         }
 
-    }, config.sflOffer.timeOutGetRecipeFiles) // 10 sec
+    }, config.sflOffer.timeOutGetRecipeFiles)
 
     setInterval(async () => {
         if (config.env === 'development') return
@@ -223,7 +265,7 @@ if (cluster.isMaster) {
             metrics.influxdb(200, `computerName-${computerName}-redisRecords-${dbSizeCache}`)
 
         } catch (e) {
-            console.log(`recipeDataError:`, e)
+            logger.error(`recipeDataError:`, e)
             metrics.influxdb(500, `recipeDataError`)
         }
 
@@ -231,18 +273,18 @@ if (cluster.isMaster) {
 
     setTimeout(async () => {
         if (config.env === 'development') return
-        console.log('One time set local redis')
+        logger.info('One time set local redis')
         try {
             await setOffers()
             await setCampaigns()
             await setAffiliates()
             await setAffiliateWebsites()
         } catch (e) {
-            console.log(`setOffersCampaignsOneTimeError:`, e)
+            logger.error(`setOffersCampaignsOneTimeError:`, e)
             metrics.influxdb(500, `setOffersCampaignsOneTimeError`)
         }
 
-    }, config.sflOffer.timeOutSetRedis) // 20 sec
+    }, config.sflOffer.timeOutSetRedis)
 
     setInterval(async () => {
         try {
@@ -262,7 +304,7 @@ if (cluster.isMaster) {
             }
 
         } catch (e) {
-            console.log(e)
+            logger.error(e)
             metrics.influxdb(500, `targetingDataError`)
         }
 
@@ -282,7 +324,7 @@ if (cluster.isMaster) {
 
 
         } catch (e) {
-            console.log(e)
+            logger.error(e)
             metrics.influxdb(500, `setSegmentsLocalError`)
         }
 
@@ -302,7 +344,7 @@ if (cluster.isMaster) {
 
 
         } catch (e) {
-            console.log(e)
+            logger.error(e)
             metrics.influxdb(500, `setLandingPagesLocalError`)
         }
 
@@ -334,7 +376,7 @@ if (cluster.isMaster) {
         let t = Math.round(timer.getTime() / 1000);
 
         if (Object.keys(logBuffer).length >= 5) {
-            console.log('Buffer count:', Object.keys(logBuffer).length)
+            logger.info('Buffer count:', Object.keys(logBuffer).length)
         }
         for (const index in logBuffer) {
             if (index < t - 4) {
@@ -360,7 +402,7 @@ if (cluster.isMaster) {
         let t = Math.round(timer.getTime() / 1000);
 
         if (Object.keys(logBufferAggrStats).length >= 5) {
-            console.log('Buffer count:', Object.keys(logBufferAggrStats).length)
+            logger.info('Buffer count:', Object.keys(logBufferAggrStats).length)
         }
         for (const index in logBufferAggrStats) {
             if (index < t - 4) {
@@ -384,7 +426,7 @@ if (cluster.isMaster) {
         let t = Math.round(timer.getTime() / 1000);
 
         if (Object.keys(logBufferOffer).length >= 5) {
-            console.log('logBufferOffer count:', Object.keys(logBufferOffer).length)
+            logger.info('logBufferOffer count:', Object.keys(logBufferOffer).length)
         }
         for (const index in logBufferOffer) {
             if (index < t - 4) {
@@ -432,7 +474,8 @@ if (cluster.isMaster) {
 
     app.listen({port: config.port}, () => {
             // console.log(JSON.stringify(config))
-            console.log(`\n🚀\x1b[35m Server ready at http://localhost:${config.port}, worker pid:${process.pid} , env:${config.env}\x1b[0m \n`)
+            // console.log(`\n🚀\x1b[35m Server ready at http://localhost:${config.port}, worker pid:${process.pid} , env:${config.env}\x1b[0m \n`)
+            logger.info(`🚀 Server ready at http://localhost:${config.port}, worker pid:${process.pid}, env:${config.env}`)
             metrics.influxdb(200, `serverRunning`)
         }
     )
