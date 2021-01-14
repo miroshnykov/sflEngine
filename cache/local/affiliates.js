@@ -24,7 +24,7 @@ const setAffiliates = async () => {
             logger.info(`Size of affiliates the same lets add to redis  `)
         } else {
             logger.info(`Size of recipe file affiliates is different, need to reSend file from sfl-offer`)
-            metrics.influxdb(500, `affiliatesFileDifferent_-${hostname}`)
+            metrics.influxdb(200, `FileDifferentAffiliates-${hostname}`)
             return
         }
 

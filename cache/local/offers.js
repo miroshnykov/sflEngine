@@ -41,7 +41,7 @@ const setOffers = async () => {
             logger.info(`Size of OFFERS the same lets add to redis  `)
         } else{
             logger.info(`Size of recipe file OFFERS is different, need to reSend file from sfl-offer`)
-            metrics.influxdb(500, `offersFileDifferent_-${hostname}`)
+            metrics.influxdb(200, `fileDifferentOffer_-${hostname}`)
             return
         }
 
@@ -137,7 +137,7 @@ const setCampaigns = async () => {
             logger.info(`Size the same lets add to redis  `)
         } else{
             logger.info(`Size of recipe file campaigns is different , need to reSend file from sfl-offer`)
-            metrics.influxdb(500, `campaignFileDifferent_-${hostname}`)
+            metrics.influxdb(200, `fileDifferentCampaigns_-${hostname}`)
             return
         }
 
