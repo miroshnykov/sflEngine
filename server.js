@@ -32,6 +32,7 @@ let logBufferAggrStats = {}
 const metrics = require('./metrics')
 const path = require('path');
 const os = require('os')
+const computerName = os.hostname()
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -120,38 +121,73 @@ if (cluster.isMaster) {
     })
 
     ss(socket).on('sendingCampaigns', (stream) => {
-        // console.time(`campaignsFileSpeed`)
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
             let size = getFileSize(campaignsFile) || 0
             logger.info(`campaigns file received, ${campaignsFile}, size:${size}`)
             metrics.influxdb(200, `fileReceivedCampaigns-size-${size}`)
-            // console.timeEnd(`campaignsFileSpeed`)
-        });
-    });
+            setTimeout(async () => {
+                if (config.env === 'development') return
+                try {
+                    logger.info(` *** set Redis Campaigns`)
+                    await setCampaigns()
+                    metrics.influxdb(200, `setRedisCampaigns-${computerName}`)
+                } catch (e) {
+                    logger.error(`setRedisCampaignsError:`, e)
+                    metrics.influxdb(500, `setRedisCampaignsError-${computerName}`)
+                }
 
+            }, 20000) // 20 sec
+
+        })
+    })
 
     ss(socket).on('sendingOffers', (stream) => {
-        // console.time(`offersFileSpeed`)
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
             let size = getFileSize(offersFile) || 0
             logger.info(`offers file received, ${offersFile}, size:${size}`)
             metrics.influxdb(200, `fileReceivedOffers-size-${size}`)
-            // console.timeEnd(`offersFileSpeed`)
+
+            setTimeout(async () => {
+                if (config.env === 'development') return
+
+                try {
+                    logger.info(` *** set Redis Offers`)
+                    await setOffers()
+                    metrics.influxdb(200, `setRedisOffers-${computerName}`)
+                } catch (e) {
+                    logger.error(`setRedisOffersError:`, e)
+                    metrics.influxdb(500, `setRedisOffersError-${computerName}`)
+                }
+
+            }, 30000) // 30 sec
+
         });
     });
 
     ss(socket).on('sendingAffiliates', (stream) => {
-        // console.time(`affiliatesFileSpeed`)
         stream.pipe(fs.createWriteStream(affiliatesFile))
         stream.on('end', () => {
             let size = getFileSize(affiliatesFile) || 0
             logger.info(`affiliates file received, ${affiliatesFile}, size:${size}`)
+
+            setTimeout(async () => {
+                if (config.env === 'development') return
+                try {
+                    logger.info(` *** set Redis Affiliates`)
+                    await setAffiliates()
+                    metrics.influxdb(200, `setRedisAffiliates-${computerName}`)
+                } catch (e) {
+                    logger.error(`setRedisAffiliatesError:`, e)
+                    metrics.influxdb(500, `setRedisAffiliatesError-${computerName}`)
+                }
+
+            }, 40000) // 40 sec
+
             metrics.influxdb(200, `fileReceivedAffiliates-size-${size}`)
-            // console.timeEnd(`affiliatesFileSpeed`)
-        });
-    });
+        })
+    })
 
 
     ss(socket).on('sendingAffiliateWebsites', (stream) => {
@@ -160,60 +196,73 @@ if (cluster.isMaster) {
             let size = getFileSize(affiliateWebsitesFile) || 0
             logger.info(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${size}`)
             metrics.influxdb(200, `fileReceivedAffiliateWebsites-size-${size}`)
+            setTimeout(async () => {
+                if (config.env === 'development') return
+                try {
+                    logger.info(` *** set Redis AffiliateWebsites`)
+                    await setAffiliateWebsites()
+                    metrics.influxdb(200, `setRedisAffiliateWebsites-${computerName}`)
+                } catch (e) {
+                    logger.error(`setRedisAffiliateWebsitesError:`, e)
+                    metrics.influxdb(500, `setRedisAffiliateWebsitesError-${computerName}`)
+                }
+
+            }, 50000) // 50 sec
+
         });
     });
 
-    setInterval(async () => {
-        if (config.env === 'development') return
-        try {
-            logger.info(` **** setOffers to Redis`)
-            await setOffers()
-            // await setCampaigns()
-            // await setAffiliates()
-            // await setAffiliateWebsites()
-        } catch (e) {
-            logger.error(`setOffersError_:`, e)
-            metrics.influxdb(500, `setOffersError_`)
-        }
-
-    }, config.sflOffer.intervalSetRedis)
-
-    setInterval(async () => {
-        if (config.env === 'development') return
-        try {
-            logger.info(` **** setCampaigns to Redis`)
-            await setCampaigns()
-        } catch (e) {
-            logger.error(`setCampaignsError_:`, e)
-            metrics.influxdb(500, `setCampaignsError_`)
-        }
-
-    }, config.sflOffer.intervalSetRedis + 30000)
-
-    setInterval(async () => {
-        if (config.env === 'development') return
-        try {
-            logger.info(` **** setAffiliates to Redis`)
-            await setAffiliates()
-        } catch (e) {
-            logger.error(`setAffiliatesError_:`, e)
-            metrics.influxdb(500, `setAffiliatesError_`)
-        }
-
-    }, config.sflOffer.intervalSetRedis + 40000)
-
-
-    setInterval(async () => {
-        if (config.env === 'development') return
-        try {
-            logger.info(` **** setAffiliateWebsites to Redis`)
-            await setAffiliateWebsites()
-        } catch (e) {
-            logger.error(`setAffiliateWebsitesError_:`, e)
-            metrics.influxdb(500, `setAffiliateWebsitesError_`)
-        }
-
-    }, config.sflOffer.intervalSetRedis + 50000)
+    // setInterval(async () => {
+    //     if (config.env === 'development') return
+    //     try {
+    //         logger.info(` **** setOffers to Redis`)
+    //         await setOffers()
+    //         // await setCampaigns()
+    //         // await setAffiliates()
+    //         // await setAffiliateWebsites()
+    //     } catch (e) {
+    //         logger.error(`setOffersError_:`, e)
+    //         metrics.influxdb(500, `setOffersError_`)
+    //     }
+    //
+    // }, config.sflOffer.intervalSetRedis)
+    //
+    // setInterval(async () => {
+    //     if (config.env === 'development') return
+    //     try {
+    //         logger.info(` **** setCampaigns to Redis`)
+    //         await setCampaigns()
+    //     } catch (e) {
+    //         logger.error(`setCampaignsError_:`, e)
+    //         metrics.influxdb(500, `setCampaignsError_`)
+    //     }
+    //
+    // }, config.sflOffer.intervalSetRedis + 30000)
+    //
+    // setInterval(async () => {
+    //     if (config.env === 'development') return
+    //     try {
+    //         logger.info(` **** setAffiliates to Redis`)
+    //         await setAffiliates()
+    //     } catch (e) {
+    //         logger.error(`setAffiliatesError_:`, e)
+    //         metrics.influxdb(500, `setAffiliatesError_`)
+    //     }
+    //
+    // }, config.sflOffer.intervalSetRedis + 40000)
+    //
+    //
+    // setInterval(async () => {
+    //     if (config.env === 'development') return
+    //     try {
+    //         logger.info(` **** setAffiliateWebsites to Redis`)
+    //         await setAffiliateWebsites()
+    //     } catch (e) {
+    //         logger.error(`setAffiliateWebsitesError_:`, e)
+    //         metrics.influxdb(500, `setAffiliateWebsitesError_`)
+    //     }
+    //
+    // }, config.sflOffer.intervalSetRedis + 50000)
 
 
     // setInterval(async () => {
@@ -231,7 +280,7 @@ if (cluster.isMaster) {
     // }, config.sflOffer.intervalGetRecipeFiles)
 
     socket.on('fileSizeInfo', async (fileSizeInfo) => {
-        const computerName = os.hostname()
+
         try {
 
             let fileSizeInfoOld = await getDataCache('fileSizeInfo_')
@@ -318,7 +367,6 @@ if (cluster.isMaster) {
             let affiliates = await getKeysCache('affiliate-*')
             let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
             let dbSizeCache = await getDbSizeCache()
-            const computerName = os.hostname()
             metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}-affiliates-${affiliates.length}-affiliateWebsites-${affiliateWebsites.length}`)
             metrics.influxdb(200, `computerName-${computerName}-redisRecords-${dbSizeCache}`)
 

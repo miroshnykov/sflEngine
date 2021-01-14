@@ -80,43 +80,43 @@ const setOffers = async () => {
         metrics.influxdb(500, `setOffersError`)
     }
 }
-
-const setData = async (key, body) => {
-
-    try {
-        // console.log(`setData key:${key}:`, body)
-        await setDataCache(key, JSON.parse(body))
-
-    } catch (e) {
-        catchHandler(e, 'setDataError')
-        metrics.influxdb(500, `setDataError`)
-    }
-}
-
-const getData = async (key) => {
-
-    try {
-        // console.log('getData:', key)
-        return await getDataCache(`${key}`)
-
-    } catch (e) {
-        catchHandler(e, 'getDataError')
-        metrics.influxdb(500, `getDataError`)
-    }
-}
-
-const delData = async (key) => {
-
-    try {
-
-        // console.log('delData:', key)
-        await delDataCache(`${key}`)
-
-    } catch (e) {
-        catchHandler(e, 'delDataError')
-        metrics.influxdb(500, `delDataError`)
-    }
-}
+//
+// const setData = async (key, body) => {
+//
+//     try {
+//         // console.log(`setData key:${key}:`, body)
+//         await setDataCache(key, JSON.parse(body))
+//
+//     } catch (e) {
+//         catchHandler(e, 'setDataError')
+//         metrics.influxdb(500, `setDataError`)
+//     }
+// }
+//
+// const getData = async (key) => {
+//
+//     try {
+//         // console.log('getData:', key)
+//         return await getDataCache(`${key}`)
+//
+//     } catch (e) {
+//         catchHandler(e, 'getDataError')
+//         metrics.influxdb(500, `getDataError`)
+//     }
+// }
+//
+// const delData = async (key) => {
+//
+//     try {
+//
+//         // console.log('delData:', key)
+//         await delDataCache(`${key}`)
+//
+//     } catch (e) {
+//         catchHandler(e, 'delDataError')
+//         metrics.influxdb(500, `delDataError`)
+//     }
+// }
 
 const setCampaigns = async () => {
 
@@ -182,7 +182,7 @@ const setCampaigns = async () => {
 module.exports = {
     setOffers,
     setCampaigns,
-    getData,
+    // getData,
     sqsProcessing
 
 }
