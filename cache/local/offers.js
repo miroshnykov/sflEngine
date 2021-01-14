@@ -5,6 +5,10 @@ const zlib = require('zlib')
 const fs = require('fs')
 const JSONStream = require("JSONStream")
 const config = require('plain-config')()
+const logger = require('bunyan-loader')(config.log).child({scope: 'offers.js'})
+const os = require('os')
+const hostname = os.hostname()
+const {getFileSize} = require('./../../lib/utils')
 
 const sqsProcessing = async (message) => {
 
@@ -25,6 +29,22 @@ const setOffers = async () => {
 
     try {
 
+        let file = config.recipe.offers
+        let fileSizeInfo_ = await getDataCache('fileSizeInfo_')
+        if (!fileSizeInfo_){
+            logger.info(`Offer not define size in redis`)
+            return
+        }
+        let size = getFileSize(file) || 0
+        logger.info(`fileSizeInfo_offers:${fileSizeInfo_.offer}`)
+        if (size === fileSizeInfo_.offer){
+            logger.info(`Size of OFFERS the same lets add to redis  `)
+        } else{
+            logger.info(`Size of recipe file OFFERS is different, need to reSend file from sfl-offer`)
+            metrics.influxdb(500, `offersFileDifferent_-${hostname}`)
+            return
+        }
+
         let offers = await getKeysCache('offer-*')
         // console.log('offers count:',offers.length)
         for (const offer of offers) {
@@ -34,7 +54,6 @@ const setOffers = async () => {
         // console.time('setOffersInsertSpeed')
         let gunzip = zlib.createGunzip();
         // let campaignsFile = config.recipe.offers
-        let file = config.recipe.offers
         // console.log(`sflOffer config:${JSON.stringify(config.sflOffer)}`)
         if (!file) {
             console.log(' no recipe file offer')
@@ -102,6 +121,25 @@ const delData = async (key) => {
 const setCampaigns = async () => {
 
     try {
+        let file = config.recipe.campaigns
+
+        let fileSizeInfo_ = await getDataCache('fileSizeInfo_')
+        if (!fileSizeInfo_){
+            logger.info(`Campaign not define size in redis`)
+            return
+        }
+        let size = getFileSize(file) || 0
+
+        logger.info(`sizeFile:`, size)
+
+        logger.info(`fileSizeInfo_campaigns:${fileSizeInfo_.campaign}`)
+        if (size === fileSizeInfo_.campaign){
+            logger.info(`Size the same lets add to redis  `)
+        } else{
+            logger.info(`Size of recipe file campaigns is different , need to reSend file from sfl-offer`)
+            metrics.influxdb(500, `campaignFileDifferent_-${hostname}`)
+            return
+        }
 
         let campaigns = await getKeysCache('campaign-*')
         // console.log('campaigns count:',campaigns.length)
@@ -112,7 +150,7 @@ const setCampaigns = async () => {
 
         // console.time('setCampaignsInsertSpeed')
         let gunzip = zlib.createGunzip();
-        let file = config.recipe.campaigns
+
         // console.log('sflOffer config:', config.sflOffer)
         if (!file) {
             console.log('no recipe file campaign')

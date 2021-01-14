@@ -16,7 +16,9 @@ const {
     sqsProcessing
 } = require('./cache/local/offers')
 
-const {getKeysCache, getDbSizeCache} = require('./cache/redis')
+const {getKeysCache, getDbSizeCache, getDataCache, setDataCache} = require('./cache/redis')
+
+const {getFileSize} = require('./lib/utils')
 
 const {setAffiliates} = require('./cache/local/affiliates')
 const {setAffiliateWebsites} = require('./cache/local/affiliateWebsites')
@@ -161,29 +163,6 @@ if (cluster.isMaster) {
         });
     });
 
-    const getFileSize = (filename) => {
-        try {
-            let stats = fs.statSync(filename)
-            return stats.size
-        } catch (e) {
-            logger.error('getFileSizeError:', e)
-        }
-    }
-
-    setInterval(async () => {
-        if (config.env === 'development') return
-        try {
-            socket.emit('sendFileCampaign')
-            socket.emit('sendFileOffer')
-            socket.emit('sendFileAffiliates')
-            socket.emit('sendFileAffiliateWebsites')
-        } catch (e) {
-            logger.error(`emitSendFilesTimeError:`, e)
-            metrics.influxdb(500, `emitSendFilesTimeError`)
-        }
-
-    }, config.sflOffer.intervalGetRecipeFiles)
-
     setInterval(async () => {
         if (config.env === 'development') return
         try {
@@ -193,8 +172,8 @@ if (cluster.isMaster) {
             // await setAffiliates()
             // await setAffiliateWebsites()
         } catch (e) {
-            logger.error(`setOffersError:`, e)
-            metrics.influxdb(500, `setOffersError`)
+            logger.error(`setOffersError_:`, e)
+            metrics.influxdb(500, `setOffersError_`)
         }
 
     }, config.sflOffer.intervalSetRedis)
@@ -205,8 +184,8 @@ if (cluster.isMaster) {
             logger.info(` **** setCampaigns to Redis`)
             await setCampaigns()
         } catch (e) {
-            logger.error(`setCampaignsError:`, e)
-            metrics.influxdb(500, `setCampaignsError`)
+            logger.error(`setCampaignsError_:`, e)
+            metrics.influxdb(500, `setCampaignsError_`)
         }
 
     }, config.sflOffer.intervalSetRedis + 30000)
@@ -217,8 +196,8 @@ if (cluster.isMaster) {
             logger.info(` **** setAffiliates to Redis`)
             await setAffiliates()
         } catch (e) {
-            logger.error(`setAffiliatesError:`, e)
-            metrics.influxdb(500, `setAffiliatesError`)
+            logger.error(`setAffiliatesError_:`, e)
+            metrics.influxdb(500, `setAffiliatesError_`)
         }
 
     }, config.sflOffer.intervalSetRedis + 40000)
@@ -230,11 +209,90 @@ if (cluster.isMaster) {
             logger.info(` **** setAffiliateWebsites to Redis`)
             await setAffiliateWebsites()
         } catch (e) {
-            logger.error(`setAffiliateWebsitesError:`, e)
-            metrics.influxdb(500, `setAffiliateWebsitesError`)
+            logger.error(`setAffiliateWebsitesError_:`, e)
+            metrics.influxdb(500, `setAffiliateWebsitesError_`)
         }
 
     }, config.sflOffer.intervalSetRedis + 50000)
+
+
+    // setInterval(async () => {
+    //     if (config.env === 'development') return
+    //     try {
+    //         socket.emit('sendFileCampaign')
+    //         socket.emit('sendFileOffer')
+    //         socket.emit('sendFileAffiliates')
+    //         socket.emit('sendFileAffiliateWebsites')
+    //     } catch (e) {
+    //         logger.error(`emitSendFilesTimeError:`, e)
+    //         metrics.influxdb(500, `emitSendFilesTimeError`)
+    //     }
+    //
+    // }, config.sflOffer.intervalGetRecipeFiles)
+
+    socket.on('fileSizeInfo', async (fileSizeInfo) => {
+        const computerName = os.hostname()
+        try {
+
+            let fileSizeInfoOld = await getDataCache('fileSizeInfo_')
+            if (!fileSizeInfoOld) {
+                socket.emit('sendFileCampaign')
+                socket.emit('sendFileOffer')
+                socket.emit('sendFileAffiliates')
+                socket.emit('sendFileAffiliateWebsites')
+                await setDataCache('fileSizeInfo_', fileSizeInfo)
+                logger.info(`Set to redis fileSizeInfo,${JSON.stringify(fileSizeInfo)}`)
+                metrics.influxdb(200, `fileSizeInfoDifferent-${computerName}`)
+                return
+            }
+            if (fileSizeInfoOld.campaign !== fileSizeInfo.campaign) {
+                logger.info(`!!!! fileSizeInfo change { campaigns } OLD: ${fileSizeInfoOld.campaign}, NEW ${fileSizeInfo.campaign}`)
+                metrics.influxdb(200, `fileSizeInfoCampaignsDifferent-${computerName}`)
+                socket.emit('sendFileCampaign')
+            }
+
+            if (fileSizeInfoOld.offer !== fileSizeInfo.offer) {
+                logger.info(`!!!! fileSizeInfo change { offer } OLD: ${fileSizeInfoOld.campaign}, NEW ${fileSizeInfo.campaign}`)
+                metrics.influxdb(200, `fileSizeInfoOffersDifferent-${computerName}`)
+                socket.emit('sendFileOffer')
+            }
+
+            if (fileSizeInfoOld.affiliates !== fileSizeInfo.affiliates) {
+                logger.info(`!!!! fileSizeInfo change { AFFILIATES } OLD: ${fileSizeInfoOld.affiliates}, NEW ${fileSizeInfo.affiliates}`)
+                metrics.influxdb(200, `fileSizeInfoAffiliatesDifferent-${computerName}`)
+                socket.emit('sendFileAffiliates')
+            }
+
+            if (fileSizeInfoOld.affiliateWebsites !== fileSizeInfo.affiliateWebsites) {
+                logger.info(`!!!! fileSizeInfo change { AffiliateWebsites } OLD: ${fileSizeInfoOld.affiliateWebsites}, NEW ${fileSizeInfo.affiliateWebsites}`)
+                metrics.influxdb(200, `fileSizeInfoAffiliateWebsitesDifferent-${computerName}`)
+                socket.emit('sendFileAffiliateWebsites')
+            }
+
+            await setDataCache('fileSizeInfo_', fileSizeInfo)
+        } catch (e) {
+            logger.error(`fileSizeInfoError:`, e)
+            metrics.influxdb(500, `fileSizeInfoError-${computerName}`)
+        }
+
+
+    })
+
+    // check file size in sfl-offers
+    setInterval(async () => {
+
+        let fileSizeInfo = await getDataCache('fileSizeInfo_') || []
+        logger.info(`check fileSizeInfo:${JSON.stringify(fileSizeInfo)}`)
+        socket.emit('fileSizeInfo', fileSizeInfo);
+    }, config.sflOffer.intervalGetRecipeFiles)
+
+    // run one time check file size in sfl-offers
+    setTimeout(async () => {
+
+        let fileSizeInfo = await getDataCache('fileSizeInfo_') || []
+        logger.info(`check fileSizeInfo:${JSON.stringify(fileSizeInfo)}`)
+        socket.emit('fileSizeInfo', fileSizeInfo);
+    }, 20000)
 
     // run one time then instance initialize
     setTimeout(async () => {
