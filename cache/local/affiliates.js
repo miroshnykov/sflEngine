@@ -19,7 +19,7 @@ const setAffiliates = async () => {
             return
         }
         let size = getFileSize(file) || 0
-        logger.info(`affiliateWebsites:${fileSizeInfo_.affiliates}`)
+        logger.info(`fileSizeInfo_.affiliates:${fileSizeInfo_.affiliates}, Size from file affiliates:${size}`)
         if (size === fileSizeInfo_.affiliates) {
             logger.info(`Size of affiliates the same lets add to redis  `)
         } else {

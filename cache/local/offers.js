@@ -36,7 +36,8 @@ const setOffers = async () => {
             return
         }
         let size = getFileSize(file) || 0
-        logger.info(`fileSizeInfo_offers:${fileSizeInfo_.offer}`)
+        logger.info(`fileSizeInfo_.offer:${fileSizeInfo_.offer}, Size from file Offers:${size}`)
+
         if (size === fileSizeInfo_.offer) {
             logger.info(`Size of OFFERS the same lets add to redis  `)
         } else {
@@ -130,9 +131,7 @@ const setCampaigns = async () => {
         }
         let size = getFileSize(file) || 0
 
-        logger.info(`sizeFile:`, size)
-
-        logger.info(`fileSizeInfo_campaigns:${fileSizeInfo_.campaign}`)
+        logger.info(`fileSizeInfo_campaigns:${fileSizeInfo_.campaign}, Size from file Campaigns:${size}`)
         if (size === fileSizeInfo_.campaign) {
             logger.info(`Size the same lets add to redis  `)
         } else {
