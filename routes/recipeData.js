@@ -20,9 +20,16 @@ let recipeData = {
             let affiliateWebsites = req.query.affiliateWebsites
             let affiliateId = req.query.affiliateId
             let segments = req.query.segments
+            let debugging = req.query.debugging
             // response.params = params
             // response.originalUrl = originalUrl
             let response = {}
+
+            if (debugging !== 'debugging') {
+                res.send(response)
+                return
+            }
+
             response.offerId = offerId || 0
             response.campaignId = campaignId || 0
             response.affiliateWebsites = affiliateWebsites || 0
