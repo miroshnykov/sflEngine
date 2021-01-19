@@ -10,6 +10,7 @@ const {catchHandler} = require('../middlewares/catchErr')
 // https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6
 
 // https://sfl-engin.surge.systems/getRecipeData?offerId=6
+// https://sfl-engin.surge.systems/getRecipeData?segments=segments
 
 let recipeData = {
     getRecipeData: async (req, res, next) => {
@@ -42,7 +43,9 @@ let recipeData = {
             }
 
             if (segments) {
-                response.segments = await getData(`segments`) || []
+                response.blockSegments = await getData(`blockSegments`) || []
+                response.standardSegments = await getData(`standardSegments`) || []
+                response.landingPages = await getData(`landingPages`) || []
             }
 
             const computerName = os.hostname()
