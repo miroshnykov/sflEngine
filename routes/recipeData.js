@@ -5,6 +5,7 @@ const {catchHandler} = require('../middlewares/catchErr')
 
 // http://localhost:8088/getRecipeData?offerId=2
 // http://localhost:8088/getRecipeData?campaignId=2
+// http://localhost:8088/getRecipeData?segments=segments
 
 // https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6
 
@@ -17,6 +18,7 @@ let recipeData = {
             let campaignId = req.query.campaignId
             let affiliateWebsites = req.query.affiliateWebsites
             let affiliateId = req.query.affiliateId
+            let segments = req.query.segments
             // response.params = params
             // response.originalUrl = originalUrl
             let response = {}
@@ -37,6 +39,10 @@ let recipeData = {
             }
             if (affiliateId) {
                 response.affiliate = await getData(`affiliate-${affiliateId}`) || []
+            }
+
+            if (segments) {
+                response.segments = await getData(`segments`) || []
             }
 
             const computerName = os.hostname()
