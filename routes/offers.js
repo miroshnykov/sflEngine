@@ -131,7 +131,7 @@ const parseJson = (data) => {
         return JSON.parse(data)
     } catch (e) {
         console.log('parseJsonError:', e)
-        catchHandler('parseJsonError')
+        catchHandler(e, 'parseJsonError')
     }
 
 }
