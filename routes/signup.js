@@ -28,6 +28,7 @@ let traffic = {
             let resultBlockSegments = await blockSegmentsHandle(req, res, params)
             if (resultBlockSegments && resultBlockSegments.success) {
                 logger.info(`***************** ResolveBlockSegments, LP:${resultBlockSegments.lp}`)
+                params.FinalSolvedBlockedUrl = resultBlockSegments
                 if (!debug) {
                     res.redirect(resultBlockSegments.lp)
                     //res.send(params)
@@ -42,6 +43,7 @@ let traffic = {
             let resultStandardSegments = await standardSegmentsHandle(req, res, params)
             if (resultStandardSegments && resultStandardSegments.success) {
                 logger.info(`***************** ResolveStandardSegments, LP:${resultStandardSegments.lp}`)
+                params.FinalSolvedStandardUrl = resultStandardSegments
                 if (!debug) {
                     res.redirect(resultStandardSegments.lp)
                     // res.send(params)
@@ -57,7 +59,9 @@ let traffic = {
 
             if (resultSflTargeting && resultSflTargeting.success) {
                 logger.info(`***************** Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
+                params.FinalSolvedTargetingUrl = resultSflTargeting
                 if (!debug) {
+
                     res.redirect(resultSflTargeting.lp)
                     // res.send(params)
                     return
@@ -68,8 +72,17 @@ let traffic = {
             }
 
             // default
-            let frlp = config.redirectFlowRotator.url + params.originalUrl
-            res.redirect(frlp)
+            params.FinalSolvedDefaultUrl = resultSflTargeting
+            if (!debug) {
+                let frlp = config.redirectFlowRotator.url + params.originalUrl
+                metrics.influxdb(200, `sflDefaultRedirect`)
+                res.redirect(frlp)
+                return
+            } else {
+                res.send(params)
+                return
+            }
+
 
         } catch (e) {
             catchHandler(e, 'signupError')
