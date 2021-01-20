@@ -566,6 +566,28 @@ if (cluster.isMaster) {
 
     app.set('trust proxy', true)
 
+    const {getClientIp} = require('request-ip')
+
+    app.use(async (req, res, next) => {
+        let blockedIp = await getDataCache('blockedIp') || []
+
+        if (blockedIp.length === 0) {
+            blockedIp = config.blockedIp
+            logger.info('blockedIp Empty in Redis, get IPs from config:', JSON.stringify(blockedIp))
+        }
+
+        let ip = getClientIp(req)
+
+        if (blockedIp.includes(ip)) {
+            logger.info("\n\nIP Blocked >", ip)
+            metrics.influxdb(400, `blockedIp-${ip}`)
+            res.status(403).end('forbidden')
+        } else {
+            next()
+        }
+    });
+
+
     app.use('/signup', traffic.signup)
     app.use('/ad', offers.ad)
     app.use('/getRecipeData', recipeData.getRecipeData)
