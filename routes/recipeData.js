@@ -53,6 +53,7 @@ let recipeData = {
                 response.blockSegments = await getData(`blockSegments`) || []
                 response.standardSegments = await getData(`standardSegments`) || []
                 response.landingPages = await getData(`landingPages`) || []
+                response.blockedIp = await getData(`blockedIp_`) || []
             }
 
             const computerName = os.hostname()
