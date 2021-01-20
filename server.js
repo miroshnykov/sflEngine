@@ -343,6 +343,37 @@ if (cluster.isMaster) {
         socket.emit('fileSizeInfo', fileSizeInfo);
     }, 20000)
 
+
+
+    // check blockedIp
+    socket.on('blockedIp', async (blockedIpInfo) => {
+        try {
+            logger.info(`Set blockedIp to redis:${JSON.stringify(blockedIpInfo)}`)
+            await setDataCache('blockedIp_', blockedIpInfo)
+
+        } catch (e) {
+            logger.error(`blockedIpError:`, e)
+            metrics.influxdb(500, `blockedIpError-${computerName}`)
+        }
+
+    })
+
+    // check blockedIp
+    setInterval(async () => {
+
+        let blockedIpInfo = await getDataCache('blockedIp_') || []
+        logger.info(`check blockedIpInfo:${JSON.stringify(blockedIpInfo)}`)
+        socket.emit('blockedIp', blockedIpInfo)
+    }, config.sflOffer.intervalGetRecipeFiles + 30000)
+
+    // run one time  check blockedIp
+    setTimeout(async () => {
+
+        let blockedIpInfo = await getDataCache('blockedIp_') || []
+        logger.info(`check blockedIpInfo:${JSON.stringify(blockedIpInfo)}`)
+        socket.emit('blockedIp', blockedIpInfo)
+    }, 30000)
+
     // run one time then instance initialize
     setTimeout(async () => {
         if (config.env === 'development') return
@@ -565,6 +596,28 @@ if (cluster.isMaster) {
     app.use(cors())
 
     app.set('trust proxy', true)
+
+    const {getClientIp} = require('request-ip')
+
+    app.use(async (req, res, next) => {
+        let blockedIp = await getDataCache('blockedIp_') || []
+
+        if (blockedIp.length === 0) {
+            blockedIp = config.blockedIp
+            logger.info('blockedIp Empty in Redis, get IPs from config:', JSON.stringify(blockedIp))
+        }
+
+        let ip = getClientIp(req)
+
+        if (blockedIp.includes(ip)) {
+            logger.info("\n\nIP Blocked >", ip)
+            metrics.influxdb(400, `blockedIp-${ip}`)
+            res.status(403).end('forbidden')
+        } else {
+            next()
+        }
+    });
+
 
     app.use('/signup', traffic.signup)
     app.use('/ad', offers.ad)
