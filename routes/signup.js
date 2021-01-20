@@ -5,6 +5,7 @@ const {catchHandler} = require('../middlewares/catchErr')
 const metrics = require('../metrics')
 const config = require('plain-config')()
 const logger = require('bunyan-loader')(config.log).child({scope: 'signup.js'})
+const {rangeSpeed} = require('../lib/utils')
 // http://localhost:8088/signup?prod=650&ref=5204378&source_type=Sweepstakes&platform=Android&debugging=debugging
 
 // https://sfl-engin.surge.systems/signup?prod=1&ref=5197044&source_type=Sweepstakes&platform=ios1&debugging=debugging
@@ -72,10 +73,15 @@ let traffic = {
             }
 
             // default
-            params.FinalSolvedDefaultUrl = resultSflTargeting
+            let frlp = config.redirectFlowRotator.url + params.originalUrl
+            params.response.FR = frlp
+            logger.info(` ****** Redirect to FR: ${JSON.stringify(params.response)} \n`)
+            metrics.influxdb(200, `FRLP`)
+            params.endTime = new Date() - params.startTime
+            metrics.influxdb(200, `Speed-FR-${rangeSpeed(params.endTime)}`)
+            params.FinalSolvedFlowRotatorUrl = frlp
+
             if (!debug) {
-                let frlp = config.redirectFlowRotator.url + params.originalUrl
-                metrics.influxdb(200, `sflDefaultRedirect`)
                 res.redirect(frlp)
                 return
             } else {
