@@ -22,6 +22,12 @@ const {catchHandler} = require('../middlewares/catchErr')
 // offer 6 stage
 // https://sfl-engin-staging.surge.systems/ad?offer=29152edc3f320183afa799a07c16709c:5f52073798d7b90a8812f5b50673897848074900f0db47eb1ca65022b92dfc7bdb845e16d6b966c7fef63e33204bf025
 
+// offer 2  camp 2 stage
+// https://sfl-engin.surge.systems/ad?offer=d0889832773b232bf51cafd7e0f0dea9:f19fa31d3df0bbf2a6d14be452d5413f2d4fb6e39ae270e8e839739641a523b93fd6acdbaf3c61e46eec326200a54e56
+
+// offer 2  camp 4 stage
+// https://sfl-engin.surge.systems/ad?offer=2b4dec88c6269685cddeedaf6f2f938e:914ea3efb89e3bec7daaeb5cae74995ccc436e514c8d5884b0748fd01a0814ed7cff3d4d8f774e891e57a5e86daabc7f
+
 let offers = {
     ad: async (req, res, next) => {
         try {
@@ -60,7 +66,7 @@ let offers = {
                 params.response.customLpRules = 'There is no customLpRules  set up'
             }
 
-            if (offerInfo.geoOfferId) {
+            if (offerInfo.geoRules) {
                 let geoRules = parseJson(offerInfo.geoRules)
                 params.response.geoRules = geoRules
                 let resolveGeo = await geoRestrictions(params.country, geoRules.geo)
