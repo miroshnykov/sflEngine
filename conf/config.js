@@ -12,6 +12,7 @@ config = {
     maxmind: {
         path: '/home/conf/GeoIP/GeoIP2-City.mmdb'
     },
+    affiliateIdHashSalt : 0xCAAAF,
     redirectFlowRotator: {
         // url: 'https://titan.infra.systems'
         url: 'https://flow.concord.systems'
