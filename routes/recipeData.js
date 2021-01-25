@@ -8,9 +8,11 @@ const {catchHandler} = require('../middlewares/catchErr')
 // http://localhost:8088/getRecipeData?segments=segments
 
 // https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6
+// https://sfl-engin-staging.surge.systems/getRecipeData?segments=segments&debugging=debugging
+
 
 // https://sfl-engin.surge.systems/getRecipeData?offerId=6
-// https://sfl-engin.surge.systems/getRecipeData?segments=segments
+// https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
 
 let recipeData = {
     getRecipeData: async (req, res, next) => {

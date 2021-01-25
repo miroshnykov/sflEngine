@@ -22,9 +22,17 @@ const {catchHandler} = require('../middlewares/catchErr')
 // offer 6 stage
 // https://sfl-engin-staging.surge.systems/ad?offer=29152edc3f320183afa799a07c16709c:5f52073798d7b90a8812f5b50673897848074900f0db47eb1ca65022b92dfc7bdb845e16d6b966c7fef63e33204bf025
 
+// offer 2  camp 2 stage
+// https://sfl-engin.surge.systems/ad?offer=d0889832773b232bf51cafd7e0f0dea9:f19fa31d3df0bbf2a6d14be452d5413f2d4fb6e39ae270e8e839739641a523b93fd6acdbaf3c61e46eec326200a54e56
+
+// offer 2  camp 4 stage
+// https://sfl-engin.surge.systems/ad?offer=2b4dec88c6269685cddeedaf6f2f938e:914ea3efb89e3bec7daaeb5cae74995ccc436e514c8d5884b0748fd01a0814ed7cff3d4d8f774e891e57a5e86daabc7f
+
 let offers = {
     ad: async (req, res, next) => {
         try {
+
+            metrics.influxdb(200, `offersAD`)
 
             let params = await getOfferParams(req)
             const debug = params.debugging === `debugging` && true || false
@@ -36,73 +44,149 @@ let offers = {
             params.response.decodedObj = decodedObj
 
             let offerInfo = await getData(`offer-${decodedObj.offerId}`) || []
+            let campaignInfo = await getData(`campaign-${decodedObj.campaignId}`) || []
+
+
+
             params.response.offerInfo = offerInfo
             params.response.redirectUrl = offerInfo.landingPageUrl || ''
-
-            if (offerInfo.capOverrideOfferId) {
-                params.cap = '*************** capOverride ************* '
-                params.landingPageIdOrigin = offerInfo.landingPageIdOrigin || 0
-                params.capOverrideOfferId = offerInfo.capOverrideOfferId || 0
-            }
-
-
-            if (offerInfo.customLpRules) {
-                params.response.customLpRulesExists = '*************** customLpRules ************* '
-                let customLpRules = parseJson(offerInfo.customLpRules)
-                params.response.customLpRules = customLpRules
-                // console.log('resolveGeo:', resolveGeo)
-                // console.log('\nGeoRules:',geoRules)
-                // geoRules.geo.map(item=>{
-                //     console.log(item)
-                // } )
-
-            } else {
-                params.response.customLpRules = 'There is no customLpRules  set up'
-            }
-
-            if (offerInfo.geoOfferId) {
-                let geoRules = parseJson(offerInfo.geoRules)
-                params.response.geoRules = geoRules
-                let resolveGeo = await geoRestrictions(params.country, geoRules.geo)
-                params.response.resolveGeo = resolveGeo.length !== 0 && resolveGeo || 'No resolve GEO'
-                // console.log('resolveGeo:', resolveGeo)
-                // console.log('\nGeoRules:',geoRules)
-                // geoRules.geo.map(item=>{
-                //     console.log(item)
-                // } )
-
-            } else {
-                params.response.resolveGeo = 'There is no GEO restriction set up'
-            }
-
-            let campaignInfo = await getData(`campaign-${decodedObj.campaignId}`) || []
-            params.response.campaignInfo = campaignInfo
-            if (campaignInfo.targetRules) {
-                let resolveCampaignRules = await resolveRules(params, campaignInfo.targetRules)
-                // response.campaignrules = parseJson(campaignInfo.rules)
-                // response.campaignrules = 'uncomment this line'
-                params.response.resolveCampaignRules = resolveCampaignRules
-
-            } else {
-                params.response.resolveCampaignRules = 'There is no campaign targetRules'
-            }
+            params.lid = v4()
 
             params.offerId = decodedObj.offerId
             params.affiliateId = campaignInfo.affiliateId
             params.campaignId = decodedObj.campaignId
             params.landingPageId = offerInfo.landingPageId
             params.landingPageUrl = offerInfo.landingPageUrl
-            // res.send(response)
-            // return
+
+            metrics.influxdb(200, `offerId-${params.offerId}`)
+            metrics.influxdb(200, `campaignId-${params.campaignId}`)
+
             if (debug) {
                 params.response.headers = req.headers
                 params.response.ip = req.ip
-                // response.req = req
-                // console.log(req)
-                res.send(params)
-                return
             }
-            params.lid = v4()
+
+            // //
+            if (offerInfo.capOverrideOfferId) {
+                params.cap = '*************** capOverride ************* '
+                params.landingPageIdOrigin = offerInfo.landingPageIdOrigin || 0
+                params.capOverrideOfferId = offerInfo.capOverrideOfferId || 0
+                let offerRedirectInfo = await getData(`offer-${offerInfo.capOverrideOfferId}`) || []
+                // console.log('offerRedirectInfo:',offerRedirectInfo)
+                params.FinalRedirectionResolveCaps = offerRedirectInfo.landingPageUrl
+                params.response.CapFound = ` ***** FOUND CAPS *****`
+                let lidObj = lidOffer(req, params)
+                createLidOffer(lidObj)
+                params.response.lidObj = lidObj
+
+                metrics.influxdb(200, `offerCaps`)
+
+                if (!debug) {
+                    // res.redirect(resultBlockSegments.lp)
+                    params.willBERedirect = 'willBERedirectCap'
+                    res.send(params)
+                    return
+                } else {
+                    res.send(params)
+                    return
+                }
+
+            }
+
+
+            // if (offerInfo.customLpRules) {
+            //     params.response.customLpRulesExists = '*************** customLpRules ************* '
+            //     let customLpRules = parseJson(offerInfo.customLpRules)
+            //     params.response.customLpRules = customLpRules
+            //     // console.log('resolveGeo:', resolveGeo)
+            //     // console.log('\nGeoRules:',geoRules)
+            //     // geoRules.geo.map(item=>{
+            //     //     console.log(item)
+            //     // } )
+            //     params.FinalRedirectionResolveCustomLpRules = 'addedLater'
+            //     metrics.influxdb(200, `offerGeoRestriction`)
+            //     if (!debug) {
+            //         // res.redirect(resultBlockSegments.lp)
+            //         params.willBERedirectcustomLpRules = 'willBERedirectcustomLpRules'
+            //         res.send(params)
+            //         return
+            //     } else {
+            //         res.send(params)
+            //         return
+            //     }
+            //
+            //
+            // } else {
+            //     params.response.customLpRules = 'There is no customLpRules  set up'
+            // }
+
+            if (offerInfo.geoRules) {
+                let geoRules = parseJson(offerInfo.geoRules)
+                params.response.geoRules = geoRules
+                let resolveGeo = await geoRestrictions(params.country, geoRules.geo)
+                if (resolveGeo.length !==0){
+
+                    params.response.countryBan =  resolveGeo
+                    params.response.geoRestictinFound = ` ***** FOUND GEO RESTICTIONS **** `
+                    params.FinalRedirectionResolveGeo = 'I DON"T KNOW FOR NOW WILL FIGURE OUT'
+
+                    let lidObj = lidOffer(req, params)
+                    createLidOffer(lidObj)
+                    params.response.lidObj = lidObj
+                    metrics.influxdb(200, `offerGeoRestriction`)
+                    if (!debug) {
+                        // res.redirect(resultBlockSegments.lp)
+                        res.send(params)
+                        return
+                    } else {
+                        res.send(params)
+                        return
+                    }
+
+
+                } else {
+                    params.response.countryBan =  'No country Ban'
+                }
+
+            } else {
+                params.response.resolveGeo = 'There is no GEO restriction set up'
+            }
+
+
+            params.response.campaignInfo = campaignInfo
+            if (campaignInfo.targetRules) {
+                let resolveCampaignRules = await resolveRules(params, campaignInfo.targetRules)
+                // response.campaignrules = parseJson(campaignInfo.rules)
+                // response.campaignrules = 'uncomment this line'
+                if (resolveCampaignRules.length !== 0) {
+                    // params.FinalRedirection = 'I DON"T KNOW FOR NOW WILL FIGURE OUT'
+                    params.resplveCampaignTargetingRules = 'resplveCampaignTargetingRules'
+                    params.response.resolveCampaignRules = resolveCampaignRules
+
+                    params.response.campaignTargetRoulsFound = ` ***** FOUND CAMPAIGN TARGET RULES ****`
+
+                    let lidObj = lidOffer(req, params)
+                    createLidOffer(lidObj)
+                    params.response.lidObj = lidObj
+                    params.FinalRedirectionResolveCampaignRules = "CampaignsRulesUrlWillBeAddLater"
+
+                    metrics.influxdb(200, `offerCampaignRules`)
+                    if (!debug) {
+                        // res.redirect(resultBlockSegments.lp)
+                        params.willBERedirectCampaignTargetRules = 'willBERedirectCampaignTargetRules'
+                        res.send(params)
+                        return
+                    } else {
+                        res.send(params)
+                        return
+                    }
+
+                }
+
+            } else {
+                params.response.resolveCampaignRules = 'There is no campaign targetRules'
+            }
+
 
             let lidObj = lidOffer(req, params)
             createLidOffer(lidObj)
@@ -110,9 +194,18 @@ let offers = {
             params.endTime = new Date() - params.startTime
             params.response.lidObjOffer = lidObj
             params.response.endTime = params.endTime
-            metrics.influxdb(200, `offer`)
+            metrics.influxdb(200, `offerDefault`)
             console.log(` **** response lid { ${params.lid} } \n${JSON.stringify(params.response)}  \n `)
-            res.send(params)
+            params.default = `No condition (NO caps, GEORestriction, CustomLP)`
+            params.FinalRedirectionResolveDefault = params.landingPageUrl
+            if (!debug) {
+                // res.redirect(resultBlockSegments.lp)
+                res.send(params)
+                return
+            } else {
+                res.send(params)
+                return
+            }
 
         } catch (e) {
             catchHandler(e, 'offerError')
