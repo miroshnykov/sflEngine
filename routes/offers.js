@@ -67,33 +67,31 @@ let offers = {
             }
 
             // //
-            // if (offerInfo.capOverrideOfferId) {
-            //     params.cap = '*************** capOverride ************* '
-            //     params.landingPageIdOrigin = offerInfo.landingPageIdOrigin || 0
-            //     params.capOverrideOfferId = offerInfo.capOverrideOfferId || 0
-            //     let offerRedirectInfo = await getData(`offer-${offerInfo.capOverrideOfferId}`) || []
-            //     // console.log('offerRedirectInfo:',offerRedirectInfo)
-            //     params.FinalRedirectionResolveCaps = offerRedirectInfo.landingPageUrl
-            //     params.response.CapFound = ` ***** FOUND CAPS *****`
-            //     let lidObj = lidOffer(req, params)
-            //     createLidOffer(lidObj)
-            //     params.response.lidObj = lidObj
-            //
-            //
-            //     metrics.influxdb(200, `offerCaps`)
-            //
-            //
-            //     if (!debug) {
-            //         // res.redirect(resultBlockSegments.lp)
-            //         params.willBERedirect = 'willBERedirectCap'
-            //         res.send(params)
-            //         return
-            //     } else {
-            //         res.send(params)
-            //         return
-            //     }
-            //
-            // }
+            if (offerInfo.capOverrideOfferId) {
+                params.cap = '*************** capOverride ************* '
+                params.landingPageIdOrigin = offerInfo.landingPageIdOrigin || 0
+                params.capOverrideOfferId = offerInfo.capOverrideOfferId || 0
+                let offerRedirectInfo = await getData(`offer-${offerInfo.capOverrideOfferId}`) || []
+                // console.log('offerRedirectInfo:',offerRedirectInfo)
+                params.FinalRedirectionResolveCaps = offerRedirectInfo.landingPageUrl
+                params.response.CapFound = ` ***** FOUND CAPS *****`
+                let lidObj = lidOffer(req, params)
+                createLidOffer(lidObj)
+                params.response.lidObj = lidObj
+
+                metrics.influxdb(200, `offerCaps`)
+
+                if (!debug) {
+                    // res.redirect(resultBlockSegments.lp)
+                    params.willBERedirect = 'willBERedirectCap'
+                    res.send(params)
+                    return
+                } else {
+                    res.send(params)
+                    return
+                }
+
+            }
 
 
             // if (offerInfo.customLpRules) {
