@@ -52,9 +52,9 @@ let recipeData = {
             }
 
             if (segments) {
-                response.blockSegments = await getData(`blockSegments`) || []
-                response.standardSegments = await getData(`standardSegments`) || []
+                response.segmentsInfo = await getData(`segmentsInfo_`) || []
                 response.landingPages = await getData(`landingPages`) || []
+                response.targetingInfo = await getData(`targetingInfo_`) || []
                 response.blockedIp = await getData(`blockedIp_`) || []
             }
 

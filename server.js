@@ -301,6 +301,32 @@ if (cluster.isMaster) {
     setInterval(cronBlockedIp, 3000000) // 50min
     setTimeout(cronBlockedIp, 30000)
 
+    // ******************************************** targeting
+    socket.on('targetingInfo', async (targetingInfo) => {
+        try {
+            logger.info(`Set targetingInfo to redis:${JSON.stringify(targetingInfo)}`)
+            await setDataCache('targetingInfo_', targetingInfo)
+            metrics.influxdb(200, `setRedisTargetingInfo`)
+        } catch (e) {
+            logger.error(`targetingInfoError:`, e)
+            metrics.influxdb(500, `targetingInfoError-${computerName}`)
+        }
+
+    })
+
+    const cronTargetingInfo = async () => {
+        try {
+            let targetingInfo = await getDataCache('targetingInfo_') || []
+            logger.info(` *** checking targetingInfo data`)
+            socket.emit('targetingInfo', targetingInfo)
+        } catch (e) {
+            logger.error(`cronTargetingInfoError:`, e)
+        }
+
+    }
+    setInterval(cronTargetingInfo, 840000) // 840000 > 14 min
+    setTimeout(cronTargetingInfo, 30000)
+
 
     // ******************************************** segmentsInfo
     socket.on('segmentsInfo', async (segmentsInfo) => {
