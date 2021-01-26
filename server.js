@@ -8,7 +8,7 @@ const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const traffic = require(`./routes/signup`)
 const offers = require(`./routes/offers`)
 const recipeData = require(`./routes/recipeData`)
-const {setTargetingLocal} = require('./cache/local/targeting')
+// const {setTargetingLocal} = require('./cache/local/targeting')
 // const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
 const {
     setCampaigns,
@@ -444,29 +444,31 @@ if (cluster.isMaster) {
 
     }, config.sflOffer.timeOutSetRedis)
 
-    setInterval(async () => {
-        try {
-            if (config.env === 'development') return
-            let response = await setTargetingLocal()
-            if (!response) {
-                logger.info(` *CRON* setTargetingLocal getTargetingApi get errors`)
-                metrics.influxdb(500, `targetingDataApiError`)
-                return
-            }
-            if (response.length > 0) {
-                // logger.info(` *CRON* update targeting local redis successfully`)
-                metrics.influxdb(200, `targetingDataExists`)
-            } else {
-                logger.info(`  *CRON*  targeting local redis not updated { empty or some errors to get data  from sfl_cache } `)
-                metrics.influxdb(200, `targetingDataEmpty`)
-            }
-
-        } catch (e) {
-            logger.error(e)
-            metrics.influxdb(500, `targetingDataError`)
-        }
-
-    }, config.intervalUpdate)
+    //   ************ deprecated sfl-cache , getting data from sfl-offers
+    //
+    // setInterval(async () => {
+    //     try {
+    //         if (config.env === 'development') return
+    //         let response = await setTargetingLocal()
+    //         if (!response) {
+    //             logger.info(` *CRON* setTargetingLocal getTargetingApi get errors`)
+    //             metrics.influxdb(500, `targetingDataApiError`)
+    //             return
+    //         }
+    //         if (response.length > 0) {
+    //             // logger.info(` *CRON* update targeting local redis successfully`)
+    //             metrics.influxdb(200, `targetingDataExists`)
+    //         } else {
+    //             logger.info(`  *CRON*  targeting local redis not updated { empty or some errors to get data  from sfl_cache } `)
+    //             metrics.influxdb(200, `targetingDataEmpty`)
+    //         }
+    //
+    //     } catch (e) {
+    //         logger.error(e)
+    //         metrics.influxdb(500, `targetingDataError`)
+    //     }
+    //
+    // }, config.intervalUpdate)
 
 
     setInterval(async () => {
