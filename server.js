@@ -9,7 +9,7 @@ const traffic = require(`./routes/signup`)
 const offers = require(`./routes/offers`)
 const recipeData = require(`./routes/recipeData`)
 const {setTargetingLocal} = require('./cache/local/targeting')
-const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
+// const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
 const {
     setCampaigns,
     setOffers,
@@ -212,73 +212,6 @@ if (cluster.isMaster) {
         });
     });
 
-    // setInterval(async () => {
-    //     if (config.env === 'development') return
-    //     try {
-    //         logger.info(` **** setOffers to Redis`)
-    //         await setOffers()
-    //         // await setCampaigns()
-    //         // await setAffiliates()
-    //         // await setAffiliateWebsites()
-    //     } catch (e) {
-    //         logger.error(`setOffersError_:`, e)
-    //         metrics.influxdb(500, `setOffersError_`)
-    //     }
-    //
-    // }, config.sflOffer.intervalSetRedis)
-    //
-    // setInterval(async () => {
-    //     if (config.env === 'development') return
-    //     try {
-    //         logger.info(` **** setCampaigns to Redis`)
-    //         await setCampaigns()
-    //     } catch (e) {
-    //         logger.error(`setCampaignsError_:`, e)
-    //         metrics.influxdb(500, `setCampaignsError_`)
-    //     }
-    //
-    // }, config.sflOffer.intervalSetRedis + 30000)
-    //
-    // setInterval(async () => {
-    //     if (config.env === 'development') return
-    //     try {
-    //         logger.info(` **** setAffiliates to Redis`)
-    //         await setAffiliates()
-    //     } catch (e) {
-    //         logger.error(`setAffiliatesError_:`, e)
-    //         metrics.influxdb(500, `setAffiliatesError_`)
-    //     }
-    //
-    // }, config.sflOffer.intervalSetRedis + 40000)
-    //
-    //
-    // setInterval(async () => {
-    //     if (config.env === 'development') return
-    //     try {
-    //         logger.info(` **** setAffiliateWebsites to Redis`)
-    //         await setAffiliateWebsites()
-    //     } catch (e) {
-    //         logger.error(`setAffiliateWebsitesError_:`, e)
-    //         metrics.influxdb(500, `setAffiliateWebsitesError_`)
-    //     }
-    //
-    // }, config.sflOffer.intervalSetRedis + 50000)
-
-
-    // setInterval(async () => {
-    //     if (config.env === 'development') return
-    //     try {
-    //         socket.emit('sendFileCampaign')
-    //         socket.emit('sendFileOffer')
-    //         socket.emit('sendFileAffiliates')
-    //         socket.emit('sendFileAffiliateWebsites')
-    //     } catch (e) {
-    //         logger.error(`emitSendFilesTimeError:`, e)
-    //         metrics.influxdb(500, `emitSendFilesTimeError`)
-    //     }
-    //
-    // }, config.sflOffer.intervalGetRecipeFiles)
-
     socket.on('fileSizeInfo', async (fileSizeInfo) => {
 
         try {
@@ -327,25 +260,22 @@ if (cluster.isMaster) {
 
     })
 
-    // check file size in sfl-offers
-    setInterval(async () => {
+    const cronFileSizeInfo = async () => {
+        try {
+            let fileSizeInfo = await getDataCache('fileSizeInfo_') || []
+            logger.info(` *** checking fileSizeInfo data`)
+            socket.emit('fileSizeInfo', fileSizeInfo)
+        } catch (e) {
+            logger.error(`cronFileSizeInfoError:`, e)
+        }
 
-        let fileSizeInfo = await getDataCache('fileSizeInfo_') || []
-        logger.info(`check fileSizeInfo:${JSON.stringify(fileSizeInfo)}`)
-        socket.emit('fileSizeInfo', fileSizeInfo);
-    }, config.sflOffer.intervalGetRecipeFiles)
+    }
 
-    // run one time check file size in sfl-offers
-    setTimeout(async () => {
-
-        let fileSizeInfo = await getDataCache('fileSizeInfo_') || []
-        logger.info(`check fileSizeInfo:${JSON.stringify(fileSizeInfo)}`)
-        socket.emit('fileSizeInfo', fileSizeInfo);
-    }, 20000)
+    setInterval(cronFileSizeInfo, 330000) // 330000 -> 5.5min
+    setTimeout(cronFileSizeInfo, 20000)
 
 
-
-    // check blockedIp
+    // ******************************************** blockedIp
     socket.on('blockedIp', async (blockedIpInfo) => {
         try {
             logger.info(`Set blockedIp to redis:${JSON.stringify(blockedIpInfo)}`)
@@ -358,21 +288,86 @@ if (cluster.isMaster) {
 
     })
 
-    // check blockedIp
-    setInterval(async () => {
+    const cronBlockedIp = async () => {
+        try {
+            let blockedIpInfo = await getDataCache('blockedIp_') || []
+            logger.info(` *** checking blockedIpInfo data`)
+            socket.emit('blockedIp', blockedIpInfo)
+        } catch (e) {
+            logger.error(`cronBlockedIpError:`, e)
+        }
 
-        let blockedIpInfo = await getDataCache('blockedIp_') || []
-        logger.info(`check blockedIpInfo:${JSON.stringify(blockedIpInfo)}`)
-        socket.emit('blockedIp', blockedIpInfo)
-    }, config.sflOffer.intervalGetRecipeFiles + 30000)
+    }
+    setInterval(cronBlockedIp, 3000000) // 50min
+    setTimeout(cronBlockedIp, 30000)
 
-    // run one time  check blockedIp
-    setTimeout(async () => {
 
-        let blockedIpInfo = await getDataCache('blockedIp_') || []
-        logger.info(`check blockedIpInfo:${JSON.stringify(blockedIpInfo)}`)
-        socket.emit('blockedIp', blockedIpInfo)
-    }, 30000)
+    // ******************************************** segmentsInfo
+    socket.on('segmentsInfo', async (segmentsInfo) => {
+        try {
+            logger.info(`*** Set segmentInfo to redis:${JSON.stringify(segmentsInfo)}`)
+            await setDataCache('segmentsInfo_', segmentsInfo)
+            let blockSegments = segmentsInfo.filter(item => item.segmentType === 'block')
+
+            let standardSegments = segmentsInfo.filter(item => item.segmentType === 'standard')
+
+            if (blockSegments) {
+                await setDataCache('blockSegments', blockSegments)
+            }
+            if (standardSegments) {
+                await setDataCache('standardSegments', standardSegments)
+            }
+
+            metrics.influxdb(200, `setRedisSegmentsInfo`)
+
+        } catch (e) {
+            logger.error(`setSegmentsInfoError:`, e)
+            metrics.influxdb(500, `setRedisSegmentsInfoError-${computerName}`)
+        }
+
+    })
+
+    const cronSegmentsInfo = async () => {
+        try {
+            let segmentsInfo = await getDataCache('segmentsInfo_') || []
+            logger.info(` *** checking segmentsInfo data`)
+            socket.emit('segmentsInfo', segmentsInfo)
+        } catch (e) {
+            logger.error(`cronSegmentsInfoError:`, e)
+        }
+
+    }
+
+    setInterval(cronSegmentsInfo, 66000) // 66000 -> 1.1 min
+    setTimeout(cronSegmentsInfo, 20000)
+
+    // ******************************************** lpInfo
+    socket.on('lpInfo', async (lpInfo) => {
+        try {
+            logger.info(`*** Set lpInfo to redis:${JSON.stringify(lpInfo)}`)
+            await setDataCache('landingPages', lpInfo)
+            metrics.influxdb(200, `setRedisLpInfo`)
+
+        } catch (e) {
+            logger.error(`setlpInfoError:`, e)
+            metrics.influxdb(500, `setRedisLpInfoError-${computerName}`)
+        }
+
+    })
+
+    const cronLpInfo = async () => {
+        try {
+            let lpInfo = await getDataCache('landingPages') || []
+            logger.info(` *** checking lpInfo data`)
+            socket.emit('lpInfo', lpInfo)
+        } catch (e) {
+            logger.error(`cronLpInfoError:`, e)
+        }
+
+    }
+
+    setInterval(cronLpInfo, 66000) // 66000 -> 1.1 min
+    setTimeout(cronLpInfo, 20000)
 
     // run one time then instance initialize
     setTimeout(async () => {
@@ -447,65 +442,6 @@ if (cluster.isMaster) {
 
     }, config.intervalUpdate)
 
-    setInterval(async () => {
-        try {
-
-            let response = await setSegmentsLocal()
-            if (response) {
-                logger.info(` *CRON* setSegmentsLocal redis successfully, count:${response.length}`)
-                metrics.influxdb(200, `setSegmentsLocal`)
-            } else {
-                logger.info(` *CRON* setSegmentsLocal not updated { empty or some errors to get data  from sfl_cache } `)
-                metrics.influxdb(200, `setSegmentsLocalEmpty`)
-            }
-
-
-        } catch (e) {
-            logger.error(e)
-            metrics.influxdb(500, `setSegmentsLocalError`)
-        }
-
-    }, config.intervalUpdate)
-
-    setInterval(async () => {
-        try {
-
-            let response = await setLandingPagesLocal()
-            if (response) {
-                logger.info(` *CRON* setLandingPagesLocal redis successfully, count:${response.length}`)
-                metrics.influxdb(200, `setLandingPagesLocal`)
-            } else {
-                logger.info(` *CRON* setLandingPagesLocal not updated { empty or some errors to get data  from sfl_cache } `)
-                metrics.influxdb(200, `setLandingPagesLocalEmpty`)
-            }
-
-
-        } catch (e) {
-            logger.error(e)
-            metrics.influxdb(500, `setLandingPagesLocalError`)
-        }
-
-    }, config.intervalUpdate)
-
-    // setInterval(async () => {
-    //     try {
-    //
-    //         let response = await setProductsBucketsLocal()
-    //         if (response) {
-    //             logger.info(` *CRON* setProductsBucketsLocal redis successfully, count:${response.length}`)
-    //             metrics.influxdb(200, `setProductsBucketsLocal`)
-    //         } else {
-    //             logger.info(` *CRON* setProductsBucketsLocal not updated { empty or some errors to get data  from core-cache-engine } `)
-    //             metrics.influxdb(200, `setProductsBucketsLocalEmpty`)
-    //         }
-    //
-    //
-    //     } catch (e) {
-    //         console.log(e)
-    //         metrics.influxdb(500, `setProductsBucketsLocalError`)
-    //     }
-    //
-    // }, config.intervalUpdate)
 
     setInterval(async () => {
 
