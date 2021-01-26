@@ -77,11 +77,12 @@ let traffic = {
             // default
             let frlp = config.redirectFlowRotator.url + params.originalUrl
             params.response.FR = frlp
-            logger.info(` ****** Redirect to FR: ${JSON.stringify(params.response)} \n`)
             metrics.influxdb(200, `FRLP`)
             params.endTime = new Date() - params.startTime
             metrics.influxdb(200, `Speed-FR-${rangeSpeed(params.endTime)}`)
             params.FinalSolvedFlowRotatorUrl = frlp
+            logger.info(` ****** Redirect to FR: ${frlp}`)
+            logger.info(JSON.stringify(params))
 
             if (!debug) {
                 res.redirect(frlp)
