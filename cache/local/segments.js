@@ -24,31 +24,31 @@ const getStandardSegmentsLocal = async () => {
 }
 
 
-const setSegmentsLocal = async () => {
-
-    try {
-        let segments = await getSegmentsApi()
-
-        if (segments && segments.length !== 0) {
-            let blockSegments = segments.filter(item => item.segmentType === 'block')
-
-            let standardSegments = segments.filter(item => item.segmentType === 'standard')
-
-            if (blockSegments) {
-                await setDataCache('blockSegments', blockSegments)
-            }
-            if (standardSegments) {
-                await setDataCache('standardSegments', standardSegments)
-            }
-        }
-
-        return segments
-
-    } catch (e) {
-        catchHandler(e, 'setSegmentsLocalError')
-        metrics.influxdb(500, `setSegmentsLocalError`)
-    }
-}
+// const setSegmentsLocal = async () => {
+//
+//     try {
+//         let segments = await getSegmentsApi()
+//
+//         if (segments && segments.length !== 0) {
+//             let blockSegments = segments.filter(item => item.segmentType === 'block')
+//
+//             let standardSegments = segments.filter(item => item.segmentType === 'standard')
+//
+//             if (blockSegments) {
+//                 await setDataCache('blockSegments', blockSegments)
+//             }
+//             if (standardSegments) {
+//                 await setDataCache('standardSegments', standardSegments)
+//             }
+//         }
+//
+//         return segments
+//
+//     } catch (e) {
+//         catchHandler(e, 'setSegmentsLocalError')
+//         metrics.influxdb(500, `setSegmentsLocalError`)
+//     }
+// }
 
 const getLandingPagesLocal = async () => {
 
@@ -61,27 +61,27 @@ const getLandingPagesLocal = async () => {
 }
 
 
-const setLandingPagesLocal = async () => {
-
-    try {
-        let lps = await getLandingPagesApi()
-        // console.log(`setLandingPagesLocal lps:`, JSON.stringify(lps))
-        if (lps) {
-            await setDataCache('landingPages', lps)
-        }
-        return lps
-
-    } catch (e) {
-        catchHandler(e, 'setLandingPagesLocalError')
-        metrics.influxdb(500, `setLandingPagesLocalError`)
-    }
-}
+// const setLandingPagesLocal = async () => {
+//
+//     try {
+//         let lps = await getLandingPagesApi()
+//         // console.log(`setLandingPagesLocal lps:`, JSON.stringify(lps))
+//         if (lps) {
+//             await setDataCache('landingPages', lps)
+//         }
+//         return lps
+//
+//     } catch (e) {
+//         catchHandler(e, 'setLandingPagesLocalError')
+//         metrics.influxdb(500, `setLandingPagesLocalError`)
+//     }
+// }
 
 module.exports = {
     getBlockSegmentsLocal,
     getStandardSegmentsLocal,
     getLandingPagesLocal,
-    setSegmentsLocal,
-    setLandingPagesLocal
+    // setSegmentsLocal,
+    // setLandingPagesLocal
 }
 
