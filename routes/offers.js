@@ -3,6 +3,7 @@ const config = require('plain-config')()
 
 const {createLidOffer} = require('../lib/dynamoDb')
 const {geoRestrictions} = require('../lib/offers/geoRestrictions')
+const {customLP} = require('../lib/offers/customLp')
 const {resolveRules} = require('../lib/offers/rulesResolve')
 const {getOfferParams} = require('../lib/params')
 
@@ -15,6 +16,12 @@ const {catchHandler} = require('../middlewares/catchErr')
 
 // offer id 1
 // http://localhost:8088/ad?offer=415655028459403008171b3b20b12df8:fe6b8dd08c47a5d240747ecb28330b37e76ade3b203f8fb6fa166e1b573372348eb61217d27871856bc30306a57c07b2
+
+// offer 62  camp 51  LOCAL
+// http://localhost:8088/ad?offer=51d027447b3b9f2556bae568f7766a16:5f0a090841abd8fa94805b321fe821388791f64d19b8202329f19311c02ff11174ec22eeb96919756a0f21c0192d7837
+
+// offer 64  camp 52  LOCAL
+// http://localhost:8088/ad?offer=1ebea97fedca9d89eb4eec7f55a9fea1:6cb8a2174703bcaf94e088c93a728646a21f74d47b7448a532d1169c95a8d0613791dfe21b714b931442d0c992639eff
 
 // offer id 28 with cap
 // http://localhost:8088/ad?offer=d6a5c6885f46299bdc3df7402eff9132:78c249392e405e8d5f747c7d1aadb118afce7de44de6078f7a0c3026b6ddbe41beee2da1aea5ae5c2cebe79af15fba73
@@ -45,7 +52,6 @@ let offers = {
 
             let offerInfo = await getData(`offer-${decodedObj.offerId}`) || []
             let campaignInfo = await getData(`campaign-${decodedObj.campaignId}`) || []
-
 
 
             params.response.offerInfo = offerInfo
@@ -94,39 +100,47 @@ let offers = {
             }
 
 
-            // if (offerInfo.customLpRules) {
-            //     params.response.customLpRulesExists = '*************** customLpRules ************* '
-            //     let customLpRules = parseJson(offerInfo.customLpRules)
-            //     params.response.customLpRules = customLpRules
-            //     // console.log('resolveGeo:', resolveGeo)
-            //     // console.log('\nGeoRules:',geoRules)
-            //     // geoRules.geo.map(item=>{
-            //     //     console.log(item)
-            //     // } )
-            //     params.FinalRedirectionResolveCustomLpRules = 'addedLater'
-            //     metrics.influxdb(200, `offerGeoRestriction`)
-            //     if (!debug) {
-            //         // res.redirect(resultBlockSegments.lp)
-            //         params.willBERedirectcustomLpRules = 'willBERedirectcustomLpRules'
-            //         res.send(params)
-            //         return
-            //     } else {
-            //         res.send(params)
-            //         return
-            //     }
-            //
-            //
-            // } else {
-            //     params.response.customLpRules = 'There is no customLpRules  set up'
-            // }
+            if (offerInfo.customLpRules) {
+
+                let customLPRules = parseJson(offerInfo.customLpRules)
+                let resolveCustomLP = await customLP(params.country, customLPRules.customLPRules)
+                if (resolveCustomLP.length !== 0) {
+                    params.response.customLpRulesExists = '*************** customLpRules ************* '
+                    params.response.resolveCustomLP = resolveCustomLP
+                    params.FinalRedirectionResolveCustomLpRules = resolveCustomLP[0].lpUrl || 'https://customLPNOtDefineProperliUseDefault.com'
+                    metrics.influxdb(200, `offerGeoRestriction`)
+                    if (!debug) {
+                        // res.redirect(resultBlockSegments.lp)
+                        params.willBERedirectcustomLpRules = 'willBERedirectcustomLpRules'
+                        res.send(params)
+                        return
+                    } else {
+                        res.send(params)
+                        return
+                    }
+
+                } else {
+                    params.response.customLpRules = 'customLpRules not resolved'
+                }
+                //params.response.customLpRules = customLpRules
+                // console.log('resolveGeo:', resolveGeo)
+                // console.log('\nGeoRules:',geoRules)
+                // geoRules.geo.map(item=>{
+                //     console.log(item)
+                // } )
+
+
+            } else {
+                params.response.customLpRules = 'There is no customLpRules  set up'
+            }
 
             if (offerInfo.geoRules) {
                 let geoRules = parseJson(offerInfo.geoRules)
                 params.response.geoRules = geoRules
                 let resolveGeo = await geoRestrictions(params.country, geoRules.geo)
-                if (resolveGeo.length !==0){
+                if (resolveGeo.length !== 0) {
 
-                    params.response.countryBan =  resolveGeo
+                    params.response.countryBan = resolveGeo
                     params.response.geoRestictinFound = ` ***** FOUND GEO RESTICTIONS **** `
                     params.FinalRedirectionResolveGeo = 'I DON"T KNOW FOR NOW WILL FIGURE OUT'
 
@@ -145,7 +159,7 @@ let offers = {
 
 
                 } else {
-                    params.response.countryBan =  'No country Ban'
+                    params.response.countryBan = 'No country Ban'
                 }
 
             } else {
@@ -197,7 +211,7 @@ let offers = {
             metrics.influxdb(200, `offerDefault`)
             console.log(` **** response lid { ${params.lid} } \n${JSON.stringify(params.response)}  \n `)
             params.default = `No condition (NO caps, GEORestriction, CustomLP)`
-            params.FinalRedirectionResolveDefault = params.landingPageUrl
+            params.FinalRedirectionResolveDefault = params.landingPageUrl || 'https://deafultUrlSetupLater.com'
             if (!debug) {
                 // res.redirect(resultBlockSegments.lp)
                 res.send(params)
