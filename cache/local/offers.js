@@ -12,12 +12,15 @@ const {getFileSize} = require('./../../lib/utils')
 
 const sqsProcessing = async (message) => {
 
+    logger.info(`got SQS message: ${JSON.stringify(message)} `)
     try {
         if (message.action === 'insert') {
             await setData(`${message.type}-${message.id}`, message.body)
+            metrics.influxdb(200, `sqsMessage-insert`)
         }
         if (message.action === 'delete') {
             await delData(`${message.type}-${message.id}`)
+            metrics.influxdb(200, `sqsMessage-delete`)
         }
     } catch (e) {
         catchHandler(e, 'sqsProcessingError')
