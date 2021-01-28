@@ -12,6 +12,7 @@ const {getFileSize} = require('./../../lib/utils')
 
 const sqsProcessing = async (message) => {
 
+    logger.info(`got SQS message: ${JSON.stringify(message)} `)
     try {
         if (message.action === 'insert') {
             await setData(`${message.type}-${message.id}`, message.body)
