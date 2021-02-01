@@ -65,6 +65,7 @@ let offers = {
             params.campaignId = decodedObj.campaignId
             params.landingPageId = offerInfo.landingPageId
             params.landingPageUrl = offerInfo.landingPageUrl
+            params.conversionType = offerInfo.conversionType
 
             metrics.influxdb(200, `offerId-${params.offerId}`)
             metrics.influxdb(200, `campaignId-${params.campaignId}`)
@@ -111,6 +112,9 @@ let offers = {
                     params.response.resolveCustomLP = resolveCustomLP
                     params.FinalRedirectionResolveCustomLpRules = resolveCustomLP[0].lpUrl || 'https://customLPNOtDefineProperliUseDefault.com'
                     metrics.influxdb(200, `offerGeoRestriction`)
+                    let lidObj = lidOffer(req, params)
+                    createLidOffer(lidObj)
+                    params.response.lidObj = lidObj
                     if (!debug) {
                         // res.redirect(resultBlockSegments.lp)
                         params.willBERedirectcustomLpRules = 'willBERedirectcustomLpRules'
