@@ -8,8 +8,6 @@ const logger = require('bunyan-loader')(config.log).child({scope: 'server.js'})
 const traffic = require(`./routes/signup`)
 const offers = require(`./routes/offers`)
 const recipeData = require(`./routes/recipeData`)
-// const {setTargetingLocal} = require('./cache/local/targeting')
-// const {setSegmentsLocal, setLandingPagesLocal} = require('./cache/local/segments')
 const {
     setCampaigns,
     setOffers,
@@ -23,8 +21,6 @@ const {getFileSize} = require('./lib/utils')
 const {setAffiliates} = require('./cache/local/affiliates')
 const {setAffiliateWebsites} = require('./cache/local/affiliateWebsites')
 
-const {setProductsBucketsLocal} = require('./cache/local/productsBuckets')
-const {addClick} = require('./cache/api/traffic')
 const app = express()
 let logBuffer = {}
 let logBufferOffer = {}
@@ -228,25 +224,25 @@ if (cluster.isMaster) {
                 return
             }
             if (fileSizeInfoOld.campaign !== fileSizeInfo.campaign) {
-                logger.info(`!!!! fileSizeInfo change { campaigns } OLD: ${fileSizeInfoOld.campaign}, NEW ${fileSizeInfo.campaign}`)
+                logger.info(`!!!! FileSizeInfo change Campaigns,  OLD: ${fileSizeInfoOld.campaign}, NEW ${fileSizeInfo.campaign}`)
                 metrics.influxdb(200, `fileSizeInfoCampaignsDifferent-${computerName}`)
                 socket.emit('sendFileCampaign')
             }
 
             if (fileSizeInfoOld.offer !== fileSizeInfo.offer) {
-                logger.info(`!!!! fileSizeInfo change { offer } OLD: ${fileSizeInfoOld.campaign}, NEW ${fileSizeInfo.campaign}`)
+                logger.info(`!!!! FileSizeInfo change Offers, OLD: ${fileSizeInfoOld.campaign}, NEW ${fileSizeInfo.campaign}`)
                 metrics.influxdb(200, `fileSizeInfoOffersDifferent-${computerName}`)
                 socket.emit('sendFileOffer')
             }
 
             if (fileSizeInfoOld.affiliates !== fileSizeInfo.affiliates) {
-                logger.info(`!!!! fileSizeInfo change { AFFILIATES } OLD: ${fileSizeInfoOld.affiliates}, NEW ${fileSizeInfo.affiliates}`)
+                logger.info(`!!!! FileSizeInfo change AFFILIATES, OLD: ${fileSizeInfoOld.affiliates}, NEW ${fileSizeInfo.affiliates}`)
                 metrics.influxdb(200, `fileSizeInfoAffiliatesDifferent-${computerName}`)
                 socket.emit('sendFileAffiliates')
             }
 
             if (fileSizeInfoOld.affiliateWebsites !== fileSizeInfo.affiliateWebsites) {
-                logger.info(`!!!! fileSizeInfo change { AffiliateWebsites } OLD: ${fileSizeInfoOld.affiliateWebsites}, NEW ${fileSizeInfo.affiliateWebsites}`)
+                logger.info(`!!!! FileSizeInfo change AffiliateWebsites,  OLD: ${fileSizeInfoOld.affiliateWebsites}, NEW ${fileSizeInfo.affiliateWebsites}`)
                 metrics.influxdb(200, `fileSizeInfoAffiliateWebsitesDifferent-${computerName}`)
                 socket.emit('sendFileAffiliateWebsites')
             }
@@ -272,7 +268,7 @@ if (cluster.isMaster) {
     }
 
     setInterval(cronFileSizeInfo, 330000) // 330000 -> 5.5min
-    setTimeout(cronFileSizeInfo, 20000)
+    setTimeout(cronFileSizeInfo, 20000) // 20 sec, at application start
 
 
     // ******************************************** blockedIp
@@ -299,7 +295,7 @@ if (cluster.isMaster) {
 
     }
     setInterval(cronBlockedIp, 3000000) // 50min
-    setTimeout(cronBlockedIp, 30000)
+    setTimeout(cronBlockedIp, 30000) // 30 sec, at application start
 
     // ******************************************** targeting
     socket.on('targetingInfo', async (targetingInfo) => {
@@ -325,7 +321,7 @@ if (cluster.isMaster) {
 
     }
     setInterval(cronTargetingInfo, 840000) // 840000 > 14 min
-    setTimeout(cronTargetingInfo, 30000)
+    setTimeout(cronTargetingInfo, 30000)// 30 sec, at application start
 
 
     // ******************************************** segmentsInfo
@@ -365,7 +361,7 @@ if (cluster.isMaster) {
     }
 
     setInterval(cronSegmentsInfo, 66000) // 66000 -> 1.1 min
-    setTimeout(cronSegmentsInfo, 20000)
+    setTimeout(cronSegmentsInfo, 20000) // 20 sec, at application start
 
     // ******************************************** lpInfo
     socket.on('lpInfo', async (lpInfo) => {
@@ -393,7 +389,7 @@ if (cluster.isMaster) {
     }
 
     setInterval(cronLpInfo, 66000) // 66000 -> 1.1 min
-    setTimeout(cronLpInfo, 20000)
+    setTimeout(cronLpInfo, 20000) // 20 sec, at application start
 
     // run one time then instance initialize
     setTimeout(async () => {
@@ -444,33 +440,6 @@ if (cluster.isMaster) {
 
     }, config.sflOffer.timeOutSetRedis)
 
-    //   ************ deprecated sfl-cache , getting data from sfl-offers
-    //
-    // setInterval(async () => {
-    //     try {
-    //         if (config.env === 'development') return
-    //         let response = await setTargetingLocal()
-    //         if (!response) {
-    //             logger.info(` *CRON* setTargetingLocal getTargetingApi get errors`)
-    //             metrics.influxdb(500, `targetingDataApiError`)
-    //             return
-    //         }
-    //         if (response.length > 0) {
-    //             // logger.info(` *CRON* update targeting local redis successfully`)
-    //             metrics.influxdb(200, `targetingDataExists`)
-    //         } else {
-    //             logger.info(`  *CRON*  targeting local redis not updated { empty or some errors to get data  from sfl_cache } `)
-    //             metrics.influxdb(200, `targetingDataEmpty`)
-    //         }
-    //
-    //     } catch (e) {
-    //         logger.error(e)
-    //         metrics.influxdb(500, `targetingDataError`)
-    //     }
-    //
-    // }, config.intervalUpdate)
-
-
     setInterval(async () => {
 
         let timer = new Date();
@@ -486,7 +455,6 @@ if (cluster.isMaster) {
                 for (const j in logBuffer[index]) {
                     let statsData = logBuffer[index][j]
                     sendToAggr(statsData)
-                    // addClick(statsData.sflCampaignId, 1, statsData.sflTargetingCpc, statsData.lid)
 
                 }
                 delete logBuffer[index]
@@ -602,7 +570,6 @@ if (cluster.isMaster) {
             metrics.influxdb(200, `serverRunning`)
         }
     )
-
 
 }
 

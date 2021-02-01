@@ -14,6 +14,8 @@ const {lidOffer} = require('../lib/lid')
 
 const {catchHandler} = require('../middlewares/catchErr')
 
+const logger = require('bunyan-loader')(config.log).child({scope: 'offers.js'})
+
 // offer id 1
 // http://localhost:8088/ad?offer=415655028459403008171b3b20b12df8:fe6b8dd08c47a5d240747ecb28330b37e76ade3b203f8fb6fa166e1b573372348eb61217d27871856bc30306a57c07b2
 
@@ -209,7 +211,7 @@ let offers = {
             params.response.lidObjOffer = lidObj
             params.response.endTime = params.endTime
             metrics.influxdb(200, `offerDefault`)
-            console.log(` **** response lid { ${params.lid} } \n${JSON.stringify(params.response)}  \n `)
+            logger.info(` **** response lid { ${params.lid} } ${JSON.stringify(params.response)}`)
             params.default = `No condition (NO caps, GEORestriction, CustomLP)`
             params.FinalRedirectionResolveDefault = params.landingPageUrl || 'https://deafultUrlSetupLater.com'
             if (!debug) {

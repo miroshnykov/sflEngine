@@ -83,11 +83,6 @@ config = {
         host: 'localhost',
         port: 6379
     },
-    cacheEngine: {
-        host: 'https://sfl-stash.surge.systems/',
-        path: 'getTargeting',
-        port: 8089
-    },
     log: {
         name: `sfl-engine`,
         streams: [{
