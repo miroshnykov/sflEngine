@@ -81,10 +81,10 @@ let offers = {
                 params.landingPageIdOrigin = offerInfo.landingPageIdOrigin || 0
                 params.capOverrideOfferId = offerInfo.capOverrideOfferId || 0
                 let offerRedirectInfo = await getData(`offer-${offerInfo.capOverrideOfferId}`) || []
-                // console.log('offerRedirectInfo:',offerRedirectInfo)
-                params.FinalRedirectionResolveCaps = offerRedirectInfo.landingPageUrl
                 params.response.CapFound = ` ***** FOUND CAPS *****`
                 let lidObj = lidOffer(req, params)
+                params.lid = lidObj.lid
+                params.FinalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
                 createLidOffer(lidObj)
                 params.response.lidObj = lidObj
 
@@ -110,11 +110,13 @@ let offers = {
                 if (resolveCustomLP.length !== 0) {
                     params.response.customLpRulesExists = '*************** customLpRules ************* '
                     params.response.resolveCustomLP = resolveCustomLP
-                    params.FinalRedirectionResolveCustomLpRules = resolveCustomLP[0].lpUrl || 'https://customLPNOtDefineProperliUseDefault.com'
+
                     metrics.influxdb(200, `offerGeoRestriction`)
                     let lidObj = lidOffer(req, params)
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
+                    params.lid = lidObj.lid
+                    params.FinalRedirectionResolveCustomLpRules = redirectUrl(resolveCustomLP[0].lpUrl, params) || 'https://customLPNOtDefineProperliUseDefault.com'
                     if (!debug) {
                         // res.redirect(resultBlockSegments.lp)
                         params.willBERedirectcustomLpRules = 'willBERedirectcustomLpRules'
@@ -148,11 +150,12 @@ let offers = {
 
                     params.response.countryBan = resolveGeo
                     params.response.geoRestictinFound = ` ***** FOUND GEO RESTICTIONS **** `
-                    params.FinalRedirectionResolveGeo = 'I DON"T KNOW FOR NOW WILL FIGURE OUT'
-
                     let lidObj = lidOffer(req, params)
+
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
+                    params.lid = lidObj.lid
+                    params.FinalRedirectionResolveGeo = redirectUrl(params.landingPageUrl, params) || 'I DON"T KNOW FOR NOW WILL FIGURE OUT'
                     metrics.influxdb(200, `offerGeoRestriction`)
                     if (!debug) {
                         // res.redirect(resultBlockSegments.lp)
@@ -210,14 +213,15 @@ let offers = {
 
             let lidObj = lidOffer(req, params)
             createLidOffer(lidObj)
-
+            params.lid = lidObj.lid
             params.endTime = new Date() - params.startTime
             params.response.lidObjOffer = lidObj
             params.response.endTime = params.endTime
             metrics.influxdb(200, `offerDefault`)
             logger.info(` **** response lid { ${params.lid} } ${JSON.stringify(params.response)}`)
             params.default = `No condition (NO caps, GEORestriction, CustomLP)`
-            params.FinalRedirectionResolveDefault = params.landingPageUrl || 'https://deafultUrlSetupLater.com'
+
+            params.FinalRedirectionResolveDefault = redirectUrl(params.landingPageUrl, params)
             if (!debug) {
                 // res.redirect(resultBlockSegments.lp)
                 res.send(params)
@@ -238,6 +242,28 @@ let offers = {
 
 }
 
+
+const url = require('url')
+
+const redirectUrl = (lp, params) => {
+
+    lp = lp && lp || 'https://deafultUrlSetupLater.com/'
+    let urlToRedirect = lp + url.format({
+        query: {
+            'offer_id': params.offerId || 0,
+            'campaign_id': params.campaignId || 0,
+            'lid': params.lid || '',
+        }
+    })
+
+    let prefix = 'http'
+
+    if (urlToRedirect.substr(0, prefix.length) !== prefix) {
+        urlToRedirect = prefix + '://' + urlToRedirect
+    }
+
+    return urlToRedirect
+}
 
 const parseJson = (data) => {
     try {
