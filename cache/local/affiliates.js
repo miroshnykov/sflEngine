@@ -17,7 +17,7 @@ const setAffiliates = async () => {
         let file = config.recipe.affiliates
         let fileSizeInfo_ = await getDataCache('fileSizeInfo_')
         if (!fileSizeInfo_) {
-            logger.info(`Affiliates not define size in redis`)
+            logger.info(`Affiliates not define size in redis `)
             return
         }
         let size = getFileSize(file) || 0
