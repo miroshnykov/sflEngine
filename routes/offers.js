@@ -247,6 +247,7 @@ const url = require('url')
 
 const redirectUrl = (lp, params) => {
 
+    // default
     lp = lp && lp || 'https://deafultUrlSetupLater.com/'
     let urlToRedirect = lp + url.format({
         query: {
