@@ -7,6 +7,8 @@ const JSONStream = require("JSONStream")
 const config = require('plain-config')()
 const {getFileSize} = require('./../../lib/utils')
 const logger = require('bunyan-loader')(config.log).child({scope: 'affiliates.js'})
+const os = require('os')
+const computerName = os.hostname()
 
 const setAffiliates = async () => {
 
@@ -24,7 +26,7 @@ const setAffiliates = async () => {
             logger.info(`Size of affiliates the same lets add to redis  `)
         } else {
             logger.info(`Size of recipe file affiliates is different, need to reSend file from sfl-offer`)
-            metrics.influxdb(200, `FileDifferentAffiliates-${hostname}`)
+            metrics.influxdb(200, `FileDifferentAffiliates-${computerName}`)
             return
         }
 
