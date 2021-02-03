@@ -83,6 +83,7 @@ let offers = {
                 params.capOverrideOfferId = offerInfo.capOverrideOfferId || 0
                 let offerRedirectInfo = await getData(`offer-${offerInfo.capOverrideOfferId}`) || []
                 params.response.CapFound = ` ***** FOUND CAPS *****`
+                params.response.CapRedirectOfferInfo = offerRedirectInfo
                 let lidObj = lidOffer(req, params)
                 params.lid = lidObj.lid
                 let finalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
