@@ -85,16 +85,17 @@ let offers = {
                 params.response.CapFound = ` ***** FOUND CAPS *****`
                 let lidObj = lidOffer(req, params)
                 params.lid = lidObj.lid
-                params.FinalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
+                let finalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
+                params.FinalRedirectionResolveCaps = finalRedirectionResolveCaps
                 createLidOffer(lidObj)
                 params.response.lidObj = lidObj
 
                 metrics.influxdb(200, `offerCaps`)
 
                 if (!debug) {
-                    // res.redirect(resultBlockSegments.lp)
-                    params.willBERedirect = 'willBERedirectCap'
-                    res.send(params)
+                    res.redirect(finalRedirectionResolveCaps)
+                    // params.willBERedirect = 'willBERedirectCap'
+                    // res.send(params)
                     return
                 } else {
                     res.send(params)
@@ -117,11 +118,12 @@ let offers = {
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
                     params.lid = lidObj.lid
-                    params.FinalRedirectionResolveCustomLpRules = redirectUrl(resolveCustomLP[0].lpUrl, params) || 'https://customLPNOtDefineProperliUseDefault.com'
+                    let finalRedirectionResolveCustomLpRules = redirectUrl(resolveCustomLP[0].lpUrl, params) || 'https://customLPNOtDefineProperliUseDefault.com'
+                    params.FinalRedirectionResolveCustomLpRules = finalRedirectionResolveCustomLpRules
                     if (!debug) {
-                        // res.redirect(resultBlockSegments.lp)
-                        params.willBERedirectcustomLpRules = 'willBERedirectcustomLpRules'
-                        res.send(params)
+                        res.redirect(finalRedirectionResolveCustomLpRules)
+                        // params.willBERedirectcustomLpRules = 'willBERedirectcustomLpRules'
+                        // res.send(params)
                         return
                     } else {
                         res.send(params)
@@ -156,11 +158,12 @@ let offers = {
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
                     params.lid = lidObj.lid
-                    params.FinalRedirectionResolveGeo = redirectUrl(params.landingPageUrl, params) || 'I DON"T KNOW FOR NOW WILL FIGURE OUT'
+                    let finalRedirectionResolveGeo = redirectUrl(params.landingPageUrl, params) || 'https://I_DON_T_KNOW_FOR_NOW_WILL_FIGURE_OUT_.com'
+                    params.FinalRedirectionResolveGeo = finalRedirectionResolveGeo
                     metrics.influxdb(200, `offerGeoRestriction`)
                     if (!debug) {
-                        // res.redirect(resultBlockSegments.lp)
-                        res.send(params)
+                        res.redirect(finalRedirectionResolveGeo)
+                        // res.send(params)
                         return
                     } else {
                         res.send(params)
@@ -192,13 +195,14 @@ let offers = {
                     let lidObj = lidOffer(req, params)
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
-                    params.FinalRedirectionResolveCampaignRules = "CampaignsRulesUrlWillBeAddLater"
+                    let finalRedirectionResolveCampaignRules = "https://CampaignsRulesUrlWillBeAddLater.com"
+                    params.FinalRedirectionResolveCampaignRules = finalRedirectionResolveCampaignRules
 
                     metrics.influxdb(200, `offerCampaignRules`)
                     if (!debug) {
-                        // res.redirect(resultBlockSegments.lp)
-                        params.willBERedirectCampaignTargetRules = 'willBERedirectCampaignTargetRules'
-                        res.send(params)
+                        res.redirect(finalRedirectionResolveCampaignRules)
+                        // params.willBERedirectCampaignTargetRules = 'willBERedirectCampaignTargetRules'
+                        // res.send(params)
                         return
                     } else {
                         res.send(params)
@@ -222,10 +226,11 @@ let offers = {
             logger.info(` **** response lid { ${params.lid} } ${JSON.stringify(params.response)}`)
             params.default = `No condition (NO caps, GEORestriction, CustomLP)`
 
-            params.FinalRedirectionResolveDefault = redirectUrl(params.landingPageUrl, params)
+            let finalRedirectionResolveDefault = redirectUrl(params.landingPageUrl, params)
+            params.FinalRedirectionResolveDefault = finalRedirectionResolveDefault
             if (!debug) {
-                // res.redirect(resultBlockSegments.lp)
-                res.send(params)
+                res.redirect(finalRedirectionResolveDefault)
+                // res.send(params)
                 return
             } else {
                 res.send(params)
