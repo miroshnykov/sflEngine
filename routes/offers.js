@@ -67,6 +67,7 @@ let offers = {
             params.landingPageUrl = offerInfo.landingPageUrl
             params.conversionType = offerInfo.conversionType
             params.verticals = offerInfo.verticals
+            params.advertiser = offerInfo.advertiser
 
             metrics.influxdb(200, `offerId-${params.offerId}`)
             metrics.influxdb(200, `campaignId-${params.campaignId}`)
