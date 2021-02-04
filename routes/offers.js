@@ -86,6 +86,7 @@ let offers = {
                 params.response.CapRedirectOfferInfo = offerRedirectInfo
                 let lidObj = lidOffer(req, params)
                 params.lid = lidObj.lid
+                logger.info(`CapsOfferRedirectInfo:${JSON.stringify(offerRedirectInfo)}`)
                 let finalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
                 params.FinalRedirectionResolveCaps = finalRedirectionResolveCaps
                 createLidOffer(lidObj)
