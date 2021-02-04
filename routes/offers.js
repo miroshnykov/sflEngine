@@ -67,6 +67,7 @@ let offers = {
             params.landingPageUrl = offerInfo.landingPageUrl
             params.conversionType = offerInfo.conversionType
             params.verticals = offerInfo.verticals
+            params.advertiser = offerInfo.advertiser
 
             metrics.influxdb(200, `offerId-${params.offerId}`)
             metrics.influxdb(200, `campaignId-${params.campaignId}`)
@@ -86,6 +87,7 @@ let offers = {
                 params.response.CapRedirectOfferInfo = offerRedirectInfo
                 let lidObj = lidOffer(req, params)
                 params.lid = lidObj.lid
+                logger.info(`CapsOfferRedirectInfo:${JSON.stringify(offerRedirectInfo)}`)
                 let finalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
                 params.FinalRedirectionResolveCaps = finalRedirectionResolveCaps
                 createLidOffer(lidObj)
