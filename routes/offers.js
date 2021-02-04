@@ -88,6 +88,7 @@ let offers = {
                 let lidObj = lidOffer(req, params)
                 params.lid = lidObj.lid
                 logger.info(`CapsOfferRedirectInfo:${JSON.stringify(offerRedirectInfo)}`)
+                params.redirectType = 'typeCaps'
                 let finalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
                 params.FinalRedirectionResolveCaps = finalRedirectionResolveCaps
                 createLidOffer(lidObj)
@@ -121,6 +122,7 @@ let offers = {
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
                     params.lid = lidObj.lid
+                    params.redirectType = 'typeCustomLandingPages'
                     let finalRedirectionResolveCustomLpRules = redirectUrl(resolveCustomLP[0].lpUrl, params) || 'https://customLPNOtDefineProperliUseDefault.com'
                     params.FinalRedirectionResolveCustomLpRules = finalRedirectionResolveCustomLpRules
                     if (!debug) {
@@ -161,6 +163,7 @@ let offers = {
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
                     params.lid = lidObj.lid
+                    params.redirectType = 'typeGeoRules'
                     let finalRedirectionResolveGeo = redirectUrl(params.landingPageUrl, params) || 'https://I_DON_T_KNOW_FOR_NOW_WILL_FIGURE_OUT_.com'
                     params.FinalRedirectionResolveGeo = finalRedirectionResolveGeo
                     metrics.influxdb(200, `offerGeoRestriction`)
@@ -229,6 +232,7 @@ let offers = {
             logger.info(` **** response lid { ${params.lid} } ${JSON.stringify(params.response)}`)
             params.default = `No condition (NO caps, GEORestriction, CustomLP)`
 
+            params.redirectType = 'typeDefault'
             let finalRedirectionResolveDefault = redirectUrl(params.landingPageUrl, params)
             params.FinalRedirectionResolveDefault = finalRedirectionResolveDefault
             if (!debug) {
@@ -257,7 +261,7 @@ const url = require('url')
 const redirectUrl = (lp, params) => {
 
     // default
-    lp = lp && lp || 'https://deafultUrlSetupLater.com/'
+    lp = lp && lp || `https://no-Landing-pages-found-set-this-like-default-type-${params.redirectType}.com/`
     let urlToRedirect = lp + url.format({
         query: {
             'offer_id': params.offerId || 0,
