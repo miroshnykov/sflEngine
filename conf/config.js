@@ -99,9 +99,10 @@ config = {
         database: ''
     },
     aws: {
-        key: '',
+        secret_key: '',
         access_key: '',
-        region: ''
+        region: '',
+        queue_url: ''
     },
     influxdb: {
         host: 'https://influx.surge.systems/influxdb',
