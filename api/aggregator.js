@@ -87,7 +87,7 @@ const sendToAggrStats = async (stats) => {
             data: obj
         }
 
-        logger.info(`send to aggr stats before send, data: ${JSON.stringify(params)}`)
+        // logger.info(`send to aggr stats before send, data: ${JSON.stringify(params)}`)
         const {data} = await aggrRequest(params)
         metrics.influxdb(200, `aggregatorSflStats`)
         return data

@@ -1,7 +1,7 @@
 const config = require('plain-config')()
 
 let AWS = require('aws-sdk')
-console.log('config.aws:',config.aws)
+// console.log('config.aws:',config.aws)
 let sqs = new AWS.SQS({
     accessKeyId: config.aws.access_key,
     secretAccessKey: config.aws.secret_key,
@@ -9,7 +9,7 @@ let sqs = new AWS.SQS({
 })
 
 // let queueUrl = 'https://sqs.us-east-1.amazonaws.com/511376436002/sfl-offers-events-staging.fifo'
-let queueUrl = config.aws.queue_url
+let queueUrl = config.aws.sqs.url
 const sendMessageToQueue = async (body) => {
 
     let params = {

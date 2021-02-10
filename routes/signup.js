@@ -23,6 +23,7 @@ let traffic = {
             let params = await getParams(req)
             const debug = params.debugging === `debugging` && true || false
 
+            params.debug = debug
             if (debug) {
                 params.response.headers = req.headers
                 params.response.ip = req.ip
@@ -30,7 +31,7 @@ let traffic = {
 
             let resultBlockSegments = await blockSegmentsHandle(req, res, params)
             if (resultBlockSegments && resultBlockSegments.success) {
-                logger.info(`***************** ResolveBlockSegments, LP:${resultBlockSegments.lp}`)
+                logger.info(`Resolve BLOCK Segments, LP:${resultBlockSegments.lp}`)
                 params.FinalSolvedBlockedUrl = resultBlockSegments
                 if (!debug) {
                     res.redirect(resultBlockSegments.lp)
@@ -45,7 +46,7 @@ let traffic = {
 
             let resultStandardSegments = await standardSegmentsHandle(req, res, params)
             if (resultStandardSegments && resultStandardSegments.success) {
-                logger.info(`***************** ResolveStandardSegments, LP:${resultStandardSegments.lp}`)
+                logger.info(`Resolve STANDARD Segments, LP:${resultStandardSegments.lp}`)
                 params.FinalSolvedStandardUrl = resultStandardSegments
                 if (!debug) {
                     res.redirect(resultStandardSegments.lp)
@@ -61,7 +62,7 @@ let traffic = {
             let resultSflTargeting = await sflTargetingHandle(req, res, params)
 
             if (resultSflTargeting && resultSflTargeting.success) {
-                logger.info(`***************** Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
+                logger.info(`Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
                 params.FinalSolvedTargetingUrl = resultSflTargeting
                 if (!debug) {
 
@@ -81,8 +82,8 @@ let traffic = {
             params.endTime = new Date() - params.startTime
             metrics.influxdb(200, `Speed-FR-${rangeSpeed(params.endTime)}`)
             params.FinalSolvedFlowRotatorUrl = frlp
-            logger.info(` ****** Redirect to FR: ${frlp}`)
-            logger.info(JSON.stringify(params))
+            logger.info(`Resolve FLOW ROTATOR, LP: ${frlp}`)
+            // logger.info(JSON.stringify(params))
 
             if (!debug) {
                 res.redirect(frlp)
