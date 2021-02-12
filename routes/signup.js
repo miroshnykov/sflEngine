@@ -77,7 +77,7 @@ let traffic = {
 
             // default
             let frlp = config.redirectFlowRotator.url + params.originalUrl
-            params.response.FR = frlp
+            // params.flowRotatorUrl = frlp
             metrics.influxdb(200, `FRLP`)
             params.endTime = new Date() - params.startTime
             metrics.influxdb(200, `Speed-FR-${rangeSpeed(params.endTime)}`)
