@@ -259,7 +259,7 @@ if (cluster.isMaster) {
     const cronFileSizeInfo = async () => {
         try {
             let fileSizeInfo = await getDataCache('fileSizeInfo_') || []
-            logger.info(` *** checking fileSizeInfo data`)
+            // logger.info(` *** checking fileSizeInfo data`)
             socket.emit('fileSizeInfo', fileSizeInfo)
         } catch (e) {
             logger.error(`cronFileSizeInfoError:`, e)
@@ -287,7 +287,7 @@ if (cluster.isMaster) {
     const cronBlockedIp = async () => {
         try {
             let blockedIpInfo = await getDataCache('blockedIp_') || []
-            logger.info(` *** checking blockedIpInfo data`)
+            // logger.info(` *** checking blockedIpInfo data`)
             socket.emit('blockedIp', blockedIpInfo)
         } catch (e) {
             logger.error(`cronBlockedIpError:`, e)
@@ -313,7 +313,7 @@ if (cluster.isMaster) {
     const cronTargetingInfo = async () => {
         try {
             let targetingInfo = await getDataCache('targetingInfo_') || []
-            logger.info(` *** checking targetingInfo data`)
+            // logger.info(` *** checking targetingInfo data`)
             socket.emit('targetingInfo', targetingInfo)
         } catch (e) {
             logger.error(`cronTargetingInfoError:`, e)
@@ -352,7 +352,7 @@ if (cluster.isMaster) {
     const cronSegmentsInfo = async () => {
         try {
             let segmentsInfo = await getDataCache('segmentsInfo_') || []
-            logger.info(` *** checking segmentsInfo data`)
+            // logger.info(` *** checking segmentsInfo data`)
             socket.emit('segmentsInfo', segmentsInfo)
         } catch (e) {
             logger.error(`cronSegmentsInfoError:`, e)
@@ -380,7 +380,7 @@ if (cluster.isMaster) {
     const cronLpInfo = async () => {
         try {
             let lpInfo = await getDataCache('landingPages') || []
-            logger.info(` *** checking lpInfo data`)
+            // logger.info(` *** checking lpInfo data`)
             socket.emit('lpInfo', lpInfo)
         } catch (e) {
             logger.error(`cronLpInfoError:`, e)

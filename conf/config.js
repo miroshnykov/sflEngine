@@ -17,13 +17,6 @@ config = {
         // url: 'https://titan.infra.systems'
         url: 'https://flow.concord.systems'
     },
-    dynamodb: {
-        region: "us-west-2",
-        endpoint: 'dynamodb.us-west-2.amazonaws.com',
-        tableName: 'prod-flow-rotator-lid',
-        accessKeyId: '',
-        secretAccessKey: ''
-    },
     affiliateApi: {
         host: 'http://affiliate-api.ad-center.com'
     },
@@ -99,9 +92,18 @@ config = {
         database: ''
     },
     aws: {
-        key: '',
+        secret_key: '',
         access_key: '',
-        region: ''
+        region: '',
+        // queue_url: '',
+        sqs:{
+            url:''
+        },
+        dynamodb: {
+            region: "us-west-2",
+            endpoint: 'dynamodb.us-west-2.amazonaws.com',
+            tableName: 'prod-flow-rotator-lid',
+        },
     },
     influxdb: {
         host: 'https://influx.surge.systems/influxdb',

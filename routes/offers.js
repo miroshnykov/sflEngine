@@ -11,13 +11,14 @@ const {v4} = require('uuid')
 const metrics = require('../metrics')
 const {decrypt} = require('../lib/offers/decrypt')
 const {lidOffer} = require('../lib/lid')
+const {sendMessageToQueue} = require('../sqs/sqs')
 
 const {catchHandler} = require('../middlewares/catchErr')
 
 const logger = require('bunyan-loader')(config.log).child({scope: 'offers.js'})
 
 // offer id 1
-// http://localhost:8088/ad?offer=415655028459403008171b3b20b12df8:fe6b8dd08c47a5d240747ecb28330b37e76ade3b203f8fb6fa166e1b573372348eb61217d27871856bc30306a57c07b2
+// http://localhost:8088/ad?offer=415655028459403008171b3b20b12df8:fe6b8dd08c47a5d240747ecb28330b37e76ade3b203f8fb6fa166e1b573372348eb61217d27871856bc30306a57c07b2&debugging=debugging
 
 // offer 62  camp 51  LOCAL
 // http://localhost:8088/ad?offer=51d027447b3b9f2556bae568f7766a16:5f0a090841abd8fa94805b321fe821388791f64d19b8202329f19311c02ff11174ec22eeb96919756a0f21c0192d7837
@@ -57,7 +58,7 @@ let offers = {
 
 
             params.response.offerInfo = offerInfo
-            params.response.redirectUrl = offerInfo.landingPageUrl || ''
+            params.response.campaignInfo = campaignInfo
             params.lid = v4()
 
             params.offerId = decodedObj.offerId
@@ -66,6 +67,8 @@ let offers = {
             params.landingPageId = offerInfo.landingPageId
             params.landingPageUrl = offerInfo.landingPageUrl
             params.conversionType = offerInfo.conversionType
+            params.payoutPercent = offerInfo.payoutPercent
+            params.isCpmOptionEnabled = offerInfo.isCpmOptionEnabled
             params.verticals = offerInfo.verticals
             params.advertiser = offerInfo.advertiser
 
@@ -89,7 +92,7 @@ let offers = {
                 params.lid = lidObj.lid
                 logger.info(`CapsOfferRedirectInfo:${JSON.stringify(offerRedirectInfo)}`)
                 params.redirectType = 'typeCaps'
-                let finalRedirectionResolveCaps = redirectUrl(offerRedirectInfo.landingPageUrl, params)
+                let finalRedirectionResolveCaps = await redirectUrl(offerRedirectInfo.landingPageUrl, params)
                 params.FinalRedirectionResolveCaps = finalRedirectionResolveCaps
                 createLidOffer(lidObj)
                 params.response.lidObj = lidObj
@@ -123,7 +126,7 @@ let offers = {
                     params.response.lidObj = lidObj
                     params.lid = lidObj.lid
                     params.redirectType = 'typeCustomLandingPages'
-                    let finalRedirectionResolveCustomLpRules = redirectUrl(resolveCustomLP[0].lpUrl, params) || 'https://customLPNOtDefineProperliUseDefault.com'
+                    let finalRedirectionResolveCustomLpRules = await redirectUrl(resolveCustomLP[0].lpUrl, params)
                     params.FinalRedirectionResolveCustomLpRules = finalRedirectionResolveCustomLpRules
                     if (!debug) {
                         res.redirect(finalRedirectionResolveCustomLpRules)
@@ -164,7 +167,7 @@ let offers = {
                     params.response.lidObj = lidObj
                     params.lid = lidObj.lid
                     params.redirectType = 'typeGeoRules'
-                    let finalRedirectionResolveGeo = redirectUrl(params.landingPageUrl, params) || 'https://I_DON_T_KNOW_FOR_NOW_WILL_FIGURE_OUT_.com'
+                    let finalRedirectionResolveGeo = await redirectUrl(params.landingPageUrl, params)
                     params.FinalRedirectionResolveGeo = finalRedirectionResolveGeo
                     metrics.influxdb(200, `offerGeoRestriction`)
                     if (!debug) {
@@ -201,12 +204,15 @@ let offers = {
                     let lidObj = lidOffer(req, params)
                     createLidOffer(lidObj)
                     params.response.lidObj = lidObj
-                    let finalRedirectionResolveCampaignRules = "https://CampaignsRulesUrlWillBeAddLater.com"
-                    params.FinalRedirectionResolveCampaignRules = finalRedirectionResolveCampaignRules
+                    let finalRedirectionResolveCampaignTargetRules = await redirectUrl(params.landingPageUrl, params)
+                    params.finalRedirectionResolveCampaignTargetRules = finalRedirectionResolveCampaignTargetRules
+
+                    // let finalRedirectionResolveCampaignRules = "https://CampaignsRulesUrlWillBeAddLater.com"
+                    // params.FinalRedirectionResolveCampaignRules = finalRedirectionResolveCampaignRules
 
                     metrics.influxdb(200, `offerCampaignRules`)
                     if (!debug) {
-                        res.redirect(finalRedirectionResolveCampaignRules)
+                        res.redirect(finalRedirectionResolveCampaignTargetRules)
                         // params.willBERedirectCampaignTargetRules = 'willBERedirectCampaignTargetRules'
                         // res.send(params)
                         return
@@ -233,7 +239,7 @@ let offers = {
             params.default = `No condition (NO caps, GEORestriction, CustomLP)`
 
             params.redirectType = 'typeDefault'
-            let finalRedirectionResolveDefault = redirectUrl(params.landingPageUrl, params)
+            let finalRedirectionResolveDefault = await redirectUrl(params.landingPageUrl, params)
             params.FinalRedirectionResolveDefault = finalRedirectionResolveDefault
             if (!debug) {
                 res.redirect(finalRedirectionResolveDefault)
@@ -258,7 +264,7 @@ let offers = {
 
 const url = require('url')
 
-const redirectUrl = (lp, params) => {
+const redirectUrl = async (lp, params) => {
 
     // default
     lp = lp && lp || `https://no-Landing-pages-found-set-this-like-default-type-${params.redirectType}.com/`
@@ -276,7 +282,43 @@ const redirectUrl = (lp, params) => {
         urlToRedirect = prefix + '://' + urlToRedirect
     }
 
+    if (params.conversionType === 'cpm') {
+        await sqsConversionTypeCmp(params)
+    }
+
+
     return urlToRedirect
+}
+
+const sqsConversionTypeCmp = async (params) => {
+
+    let conversionTypeCpmBody = {}
+    conversionTypeCpmBody.lid = params.lid
+    conversionTypeCpmBody.offerId = params.response.offerInfo.offerId
+    conversionTypeCpmBody.name = params.response.offerInfo.name
+    conversionTypeCpmBody.advertiser = params.response.offerInfo.advertiser
+    conversionTypeCpmBody.verticals = params.response.offerInfo.verticals
+    conversionTypeCpmBody.conversionType = params.response.offerInfo.conversionType
+    conversionTypeCpmBody.status = params.response.offerInfo.status
+    conversionTypeCpmBody.payin = params.response.offerInfo.payin
+    conversionTypeCpmBody.payout = params.response.offerInfo.payout
+    conversionTypeCpmBody.landingPageId = params.response.offerInfo.landingPageId
+    conversionTypeCpmBody.landingPageUrl = params.response.offerInfo.landingPageUrl
+    conversionTypeCpmBody.campaignId = params.response.campaignInfo.campaignId
+    conversionTypeCpmBody.affiliateId = params.response.campaignInfo.affiliateId
+
+    let obj = {}
+    obj._comments = 'conversion type cpm'
+    obj.type = 'offer_conversion_type_cpm'
+    obj.id = params.response.offerInfo.offerId
+    obj.action = 'update'
+    obj.body = `${JSON.stringify(conversionTypeCpmBody)}`
+
+    // console.log(obj)
+    logger.info(`Added to SQS Conversion Type Cmp, Body:${JSON.stringify(obj)}`)
+    let sqsData = await sendMessageToQueue(obj)
+    // console.log(`Added update to redis sqs:${JSON.stringify(sqsData)}`)
+
 }
 
 const parseJson = (data) => {
