@@ -95,7 +95,7 @@ config = {
         secret_key: '',
         access_key: '',
         region: '',
-        queue_url: '',
+        sqs_url: '',
         dynamodb_region: 'us-west-2',
         dynamodb_endpoint: 'dynamodb.us-west-2.amazonaws.com',
         dynamodb_tableName: 'prod-flow-rotator-lid',
