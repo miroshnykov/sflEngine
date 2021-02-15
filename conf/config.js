@@ -95,15 +95,10 @@ config = {
         secret_key: '',
         access_key: '',
         region: '',
-        // queue_url: '',
-        sqs:{
-            url:''
-        },
-        dynamodb: {
-            region: "us-west-2",
-            endpoint: 'dynamodb.us-west-2.amazonaws.com',
-            tableName: 'prod-flow-rotator-lid',
-        },
+        queue_url: '',
+        dynamodb_region: 'us-west-2',
+        dynamodb_endpoint: 'dynamodb.us-west-2.amazonaws.com',
+        dynamodb_tableName: 'prod-flow-rotator-lid',
     },
     influxdb: {
         host: 'https://influx.surge.systems/influxdb',
