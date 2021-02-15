@@ -573,4 +573,14 @@ if (cluster.isMaster) {
 
 }
 
+process
+    .on('unhandledRejection', (reason, p) => {
+        logger.error(reason, 'Unhandled Rejection at Promise', p)
+        metrics.influxdb(500, `unhandledRejection`)
+    })
+    .on('uncaughtException', err => {
+        logger.error(err, 'Uncaught Exception thrown')
+        metrics.influxdb(500, `uncaughtException`)
+        process.exit(1)
+    })
 
