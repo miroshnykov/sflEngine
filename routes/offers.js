@@ -231,7 +231,7 @@ let offers = {
             let lidObj = lidOffer(req, params)
             createLidOffer(lidObj)
             params.lid = lidObj.lid
-            params.endTime = new Date() - params.startTime
+            // params.endTime = new Date() - params.startTime
             params.response.lidObjOffer = lidObj
             params.response.endTime = params.endTime
             metrics.influxdb(200, `offerDefault`)
