@@ -1,7 +1,7 @@
 const config = require('plain-config')()
 
 let AWS = require('aws-sdk')
-console.log('config.aws:',config.aws)
+//console.log('config.aws:',config.aws)
 let sqs = new AWS.SQS({
     accessKeyId: config.aws.access_key,
     secretAccessKey: config.aws.secret_key,
