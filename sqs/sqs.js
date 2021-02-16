@@ -16,7 +16,7 @@ const sendMessageToQueue = async (body) => {
         QueueUrl: queueUrl,
     };
 
-    console.log('sendMessageToQueue PARAMS:', JSON.stringify(params))
+    console.log('SendMessageToQueue PARAMS:', JSON.stringify(params))
     return sqs.sendMessage(params).promise()
         .then(data => {
             return data
