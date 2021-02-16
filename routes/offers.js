@@ -317,6 +317,8 @@ const sqsConversionTypeCmp = async (params) => {
     // console.log(obj)
     logger.info(`Added to SQS Conversion Type Cmp, Body:${JSON.stringify(obj)}`)
     let sqsData = await sendMessageToQueue(obj)
+    params.sendTOSQS = sqsData
+    params.sendTOSQSBody = obj
     // console.log(`Added update to redis sqs:${JSON.stringify(sqsData)}`)
 
 }
