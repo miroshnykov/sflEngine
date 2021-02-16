@@ -8,7 +8,6 @@ let sqs = new AWS.SQS({
     region: config.aws.region
 })
 
-// let queueUrl = 'https://sqs.us-east-1.amazonaws.com/511376436002/sfl-offers-events-staging.fifo'
 let queueUrl = config.aws.sqs_url
 const sendMessageToQueue = async (body) => {
 
@@ -17,7 +16,7 @@ const sendMessageToQueue = async (body) => {
         QueueUrl: queueUrl,
     };
 
-    // console.log('sendMessageToQueue PARAMS:', JSON.stringify(params))
+    console.log('sendMessageToQueue PARAMS:', JSON.stringify(params))
     return sqs.sendMessage(params).promise()
         .then(data => {
             return data
