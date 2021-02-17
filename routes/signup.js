@@ -46,7 +46,7 @@ let traffic = {
 
             let resultStandardSegments = await standardSegmentsHandle(req, res, params)
             if (resultStandardSegments && resultStandardSegments.success) {
-                logger.info(`Resolve STANDARD Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultStandardSegments.lp}`)
+                logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
                 params.FinalSolvedStandardUrl = resultStandardSegments
                 if (!debug) {
                     res.redirect(resultStandardSegments.lp)

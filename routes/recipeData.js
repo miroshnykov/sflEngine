@@ -2,10 +2,16 @@ const {getData} = require('../cache/local/offers')
 const config = require('plain-config')()
 const os = require('os')
 const {catchHandler} = require('../middlewares/catchErr')
+const {
+    getBlockSegmentsEvent,
+    getStandardSegmentsEvent,
+    getTargetingEvent,
+    getLandingPagesEvent
+} = require('../cache/localCache')
 
-// http://localhost:8088/getRecipeData?offerId=2
+// http://localhost:8088/getRecipeData?offerId=2&debugging=debugging
 // http://localhost:8088/getRecipeData?campaignId=2
-// http://localhost:8088/getRecipeData?segments=segments
+// http://localhost:8088/getRecipeData?segments=segments&debugging=debugging
 
 // https://sfl-engin-staging.surge.systems/getRecipeData?campaignId=86&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6&debugging=debugging
@@ -53,10 +59,12 @@ let recipeData = {
             }
 
             if (segments) {
-                response.segmentsInfo = await getData(`segmentsInfo_`) || []
-                response.landingPages = await getData(`landingPages`) || []
-                response.targetingInfo = await getData(`targetingInfo_`) || []
+                response.segmentsBlockInfo = await getBlockSegmentsEvent()
+                response.segmentsStandardInfo = await getStandardSegmentsEvent()
+                response.targetingInfo = await getTargetingEvent()
+                response.landingPages = await getLandingPagesEvent()
                 response.blockedIp = await getData(`blockedIp_`) || []
+                response.processPid = process.pid || 0
             }
 
             const computerName = os.hostname()
@@ -65,8 +73,6 @@ let recipeData = {
             // const release = os.release()
             response.computerName = computerName || 0
             response.freemem = freemem || 0
-            // response.userInfo = userInfo || 0
-            // response.release = release || 0
 
             res.send(response)
 
