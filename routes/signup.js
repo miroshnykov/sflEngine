@@ -32,6 +32,7 @@ let traffic = {
             let resultBlockSegments = await blockSegmentsHandle(req, res, params)
             if (resultBlockSegments && resultBlockSegments.success) {
                 logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
+                metrics.influxdb(200, `blockSegments`)
                 params.FinalSolvedBlockedUrl = resultBlockSegments
                 if (!debug) {
                     res.redirect(resultBlockSegments.lp)
@@ -47,6 +48,7 @@ let traffic = {
             let resultStandardSegments = await standardSegmentsHandle(req, res, params)
             if (resultStandardSegments && resultStandardSegments.success) {
                 logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
+                metrics.influxdb(200, `standardSegments`)
                 params.FinalSolvedStandardUrl = resultStandardSegments
                 if (!debug) {
                     res.redirect(resultStandardSegments.lp)
@@ -63,6 +65,7 @@ let traffic = {
 
             if (resultSflTargeting && resultSflTargeting.success) {
                 logger.info(`Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
+                metrics.influxdb(200, `targeting`)
                 params.FinalSolvedTargetingUrl = resultSflTargeting
                 if (!debug) {
 
@@ -78,7 +81,7 @@ let traffic = {
             // default
             let frlp = config.redirectFlowRotator.url + params.originalUrl
             // params.flowRotatorUrl = frlp
-            metrics.influxdb(200, `FRLP`)
+            metrics.influxdb(200, `flowRotator`)
             // params.endTime = new Date() - params.startTime
             // metrics.influxdb(200, `Speed-FR-${rangeSpeed(params.endTime)}`)
             params.FinalSolvedFlowRotatorUrl = frlp
