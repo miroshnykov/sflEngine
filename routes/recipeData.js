@@ -18,7 +18,8 @@ const {
 // https://sfl-engin-staging.surge.systems/getRecipeData?segments=segments&debugging=debugging
 
 
-// https://sfl-engin.surge.systems/getRecipeData?offerId=6
+// https://sfl-engin.surge.systems/getRecipeData?offerId=6&debugging=debugging
+// https://sfl-engin.surge.systems/getRecipeData?campaignId=6&debugging=debugging
 // https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
 
 let recipeData = {
