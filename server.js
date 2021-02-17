@@ -57,6 +57,10 @@ let campaignsFile = config.recipe.campaigns
 let offersFile = config.recipe.offers
 let affiliatesFile = config.recipe.affiliates
 let affiliateWebsitesFile = config.recipe.affiliateWebsites
+let segmentsBlockMaster = []
+let segmentsStandardMaster = []
+let targetingMaster = []
+let landingPagesMaster = []
 
 if (cluster.isMaster) {
 
@@ -93,6 +97,53 @@ if (cluster.isMaster) {
         }
         if (msg.type === "clickAggrStats") {
             addToBufferAggrStats(logBufferAggrStats, t, msg.stats);
+        }
+        if (msg.type === 'blockSegments') {
+            segmentsBlockMaster = JSON.parse(msg.stats)
+        }
+
+        if (msg.type === 'blockSegmentsWorker') {
+            worker.send({
+                type: 'blockSegmentsWorker',
+                getBlockSegmentsEvent: "getBlockSegmentsEvent",
+                segmentsBlockData: segmentsBlockMaster
+            })
+        }
+        if (msg.type === 'standardSegments') {
+            segmentsStandardMaster = JSON.parse(msg.stats)
+        }
+
+        if (msg.type === 'standardSegmentsWorker') {
+            worker.send({
+                type: 'standardSegmentsWorker',
+                getStandardSegmentsEvent: "getStandardSegmentsEvent",
+                segmentsStandardData: segmentsStandardMaster
+            })
+        }
+
+        if (msg.type === 'targeting') {
+            targetingMaster = JSON.parse(msg.stats)
+        }
+
+
+        if (msg.type === 'targetingWorker') {
+            worker.send({
+                type: 'targetingWorker',
+                getTargetingEvent: "getTargetingEvent",
+                targetingData: targetingMaster
+            })
+        }
+
+        if (msg.type === 'landingPages') {
+            landingPagesMaster = JSON.parse(msg.stats)
+        }
+
+        if (msg.type === 'landingPagesWorker') {
+            worker.send({
+                type: 'landingPagesWorker',
+                getLandingPagesEvent: "getLandingPagesEvent",
+                landingPagesData: landingPagesMaster
+            })
         }
 
     })
@@ -302,6 +353,7 @@ if (cluster.isMaster) {
         try {
             logger.info(`Set targetingInfo to redis:${JSON.stringify(targetingInfo)}`)
             await setDataCache('targetingInfo_', targetingInfo)
+            targetingMaster = targetingInfo
             metrics.influxdb(200, `setRedisTargetingInfo`)
         } catch (e) {
             logger.error(`targetingInfoError:`, e)
@@ -335,9 +387,12 @@ if (cluster.isMaster) {
 
             if (blockSegments) {
                 await setDataCache('blockSegments', blockSegments)
+                segmentsBlockMaster = blockSegments
+
             }
             if (standardSegments) {
                 await setDataCache('standardSegments', standardSegments)
+                segmentsStandardMaster = standardSegments
             }
 
             metrics.influxdb(200, `setRedisSegmentsInfo`)
@@ -348,6 +403,41 @@ if (cluster.isMaster) {
         }
 
     })
+    const syncSegmentsLocalWithRedis = async () => {
+        try {
+            let segmentsInfo = await getDataCache('segmentsInfo_') || []
+            let blockSegments = segmentsInfo.filter(item => item.segmentType === 'block')
+            if (JSON.stringify(blockSegments) !== JSON.stringify(segmentsBlockMaster)) {
+                logger.info(` *** syncSegmentsBlockLocalWithRedis done ***`)
+                segmentsBlockMaster = blockSegments
+            }
+
+            let standardSegments = segmentsInfo.filter(item => item.segmentType === 'standard')
+            if (JSON.stringify(standardSegments) !== JSON.stringify(segmentsStandardMaster)) {
+                logger.info(` *** syncSegmentsStandardLocalWithRedis done ***`)
+                segmentsStandardMaster = standardSegments
+            }
+
+            let targetingInfo = await getDataCache('targetingInfo_') || []
+            if (JSON.stringify(targetingInfo) !== JSON.stringify(targetingMaster)) {
+                logger.info(` *** syncTargetingLocalWithRedis done ***`)
+                targetingMaster = targetingInfo
+            }
+
+            let lpInfo = await getDataCache('landingPages') || []
+            if (JSON.stringify(lpInfo) !== JSON.stringify(landingPagesMaster)) {
+                logger.info(` *** syncLandingPagesLocalWithRedis done ***`)
+                landingPagesMaster = lpInfo
+            }
+
+
+        } catch (e) {
+            logger.error(`syncSegmentsLocalWithRedisError:`, e)
+        }
+
+    }
+    setTimeout(syncSegmentsLocalWithRedis, 20000) // 20 sec, at application start
+    setInterval(syncSegmentsLocalWithRedis, 60000) // 60000 -> 1 min
 
     const cronSegmentsInfo = async () => {
         try {
@@ -368,6 +458,7 @@ if (cluster.isMaster) {
         try {
             logger.info(`*** Set lpInfo to redis:${JSON.stringify(lpInfo)}`)
             await setDataCache('landingPages', lpInfo)
+            landingPagesMaster = lpInfo
             metrics.influxdb(200, `setRedisLpInfo`)
 
         } catch (e) {
