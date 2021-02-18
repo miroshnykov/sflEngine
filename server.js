@@ -62,6 +62,11 @@ let segmentsStandardMaster = []
 let targetingMaster = []
 let landingPagesMaster = []
 
+const {
+    getAffiliatesWebsitesWorker,
+    getAffiliatesWebsitesWorkerById
+} = require('./cache/local/affiliateWebsites')
+
 if (cluster.isMaster) {
 
     // let host = 'https://sfl-offers.surge.systems/'
@@ -144,6 +149,24 @@ if (cluster.isMaster) {
                 getLandingPagesEvent: "getLandingPagesEvent",
                 landingPagesData: landingPagesMaster
             })
+        }
+
+        if (msg.type ===`affiliateWebsitesWorker`) {
+            worker.send({
+                type: 'affiliateWebsitesWorker',
+                getAffiliatesWebsitesEvent: "getAffiliatesWebsitesEvent",
+                affiliatesWebsites: getAffiliatesWebsitesWorker()
+            })
+
+        }
+
+        if (msg.type ===`affiliateWebsitesWorkerById` && msg.affiliateId) {
+            worker.send({
+                type: 'affiliateWebsitesWorkerBiId',
+                getAffiliatesWebsitesByIdEvent: "getAffiliatesWebsitesByIdEvent",
+                affiliatesWebsites: getAffiliatesWebsitesWorkerById(msg.affiliateId)
+            })
+
         }
 
     })

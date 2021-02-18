@@ -9,7 +9,14 @@ const {
     getLandingPagesEvent
 } = require('../cache/localCache')
 
+const {
+    getAffiliatesWebsitesEvent,
+    getAffiliatesWebsitesByIdEvent
+} = require('../cache/localCache')
+
 // http://localhost:8088/getRecipeData?offerId=2&debugging=debugging
+// http://localhost:8088/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
+// http://localhost:8088/getRecipeData?affilaitesWebsitesLocalById=3721&debugging=debugging
 // http://localhost:8088/getRecipeData?campaignId=2
 // http://localhost:8088/getRecipeData?segments=segments&debugging=debugging
 
@@ -28,6 +35,8 @@ let recipeData = {
             let offerId = req.query.offerId
             let campaignId = req.query.campaignId
             let affiliateWebsites = req.query.affiliateWebsites
+            let affilaitesWebsitesLocal = req.query.affilaitesWebsitesLocal
+            let affilaitesWebsitesLocalById = req.query.affilaitesWebsitesLocalById
             let affiliateId = req.query.affiliateId
             let segments = req.query.segments
             let debugging = req.query.debugging
@@ -66,6 +75,14 @@ let recipeData = {
                 response.landingPages = await getLandingPagesEvent()
                 response.blockedIp = await getData(`blockedIp_`) || []
                 response.processPid = process.pid || 0
+            }
+            if (affilaitesWebsitesLocal){
+                let affWebsites = await getAffiliatesWebsitesEvent()
+                response.affilaitesWebsitesObjectCount =  Object.keys(affWebsites).length
+            }
+            if (affilaitesWebsitesLocalById){
+                response.affilaitesWebsitesLocalById =  await getAffiliatesWebsitesByIdEvent(affilaitesWebsitesLocalById)
+                response.affiliateWebsitesInfo = await getData(`affiliateWebsites-${affilaitesWebsitesLocalById}`) || []
             }
 
             const computerName = os.hostname()

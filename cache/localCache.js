@@ -59,9 +59,42 @@ const getLandingPagesEvent = () => {
     })
 }
 
+const getAffiliatesWebsitesEvent = () => {
+    return new Promise((resolve) => {
+        process.send({
+            type: `affiliateWebsitesWorker`,
+            getAffiliatesWebsitesEvent: "getAffiliatesWebsitesEvent",
+        });
+        process.once('message', (msg) => {
+            if (msg.getAffiliatesWebsitesEvent) {
+                resolve(msg.affiliatesWebsites || null)
+            }
+        });
+
+    })
+}
+
+const getAffiliatesWebsitesByIdEvent = (affiliateId) => {
+    return new Promise((resolve) => {
+        process.send({
+            type: `affiliateWebsitesWorkerById`,
+            getAffiliatesWebsitesByIdEvent: "getAffiliatesWebsitesByIdEvent",
+            affiliateId: affiliateId,
+        });
+        process.once('message', (msg) => {
+            if (msg.getAffiliatesWebsitesByIdEvent) {
+                resolve(msg.affiliatesWebsites || null)
+            }
+        });
+
+    })
+}
+
 module.exports = {
     getBlockSegmentsEvent,
     getStandardSegmentsEvent,
     getTargetingEvent,
-    getLandingPagesEvent
+    getLandingPagesEvent,
+    getAffiliatesWebsitesEvent,
+    getAffiliatesWebsitesByIdEvent
 }
