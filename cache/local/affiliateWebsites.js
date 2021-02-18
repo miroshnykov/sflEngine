@@ -12,6 +12,15 @@ const hostname = os.hostname()
 const {getFileSize} = require('./../../lib/utils')
 const logger = require('bunyan-loader')(config.log).child({scope: 'affiliateWebsites.js'})
 
+let affiliateWebsitesWorker = {}
+
+const getAffiliatesWebsitesWorker = () => {
+    return affiliateWebsitesWorker
+}
+const getAffiliatesWebsitesWorkerById = (affiliateId) => {
+    return affiliateWebsitesWorker && affiliateWebsitesWorker[affiliateId]
+}
+
 const setAffiliateWebsites = async () => {
 
     try {
@@ -41,6 +50,7 @@ const setAffiliateWebsites = async () => {
 
         let stream = fs.createReadStream(file)
         let jsonStream = JSONStream.parse('*')
+        affiliateWebsitesWorker = {}
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
             if (!item.affiliateId) {
@@ -48,6 +58,8 @@ const setAffiliateWebsites = async () => {
                 return
             }
             await setDataCache(`affiliateWebsites-${item.affiliateId}`, item)
+            affiliateWebsitesWorker[item.affiliateId] = JSON.parse(item.sites)
+            // console.log('affiliateWebsitesWorker:', affiliateWebsitesWorker)
         })
 
     } catch (e) {
@@ -58,6 +70,8 @@ const setAffiliateWebsites = async () => {
 
 
 module.exports = {
-    setAffiliateWebsites
+    setAffiliateWebsites,
+    getAffiliatesWebsitesWorker,
+    getAffiliatesWebsitesWorkerById
 }
 
