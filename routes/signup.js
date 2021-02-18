@@ -12,12 +12,13 @@ const {rangeSpeed} = require('../lib/utils')
 // https://engin.actio.systems/signup?prod=3&ref=5199744&debugging=debugging
 
 // https://sfl-engin-staging.surge.systems/signup?prod=1&ref=5204378&debugging=debugging
-
+const {performance} = require('perf_hooks')
 
 let traffic = {
     signup: async (req, res, next) => {
         try {
-
+            let startTimeSegmentProcessing = performance.now()
+            let timeSegmentProcessing
             metrics.influxdb(200, `signup`)
 
             let params = await getParams(req)
@@ -34,6 +35,11 @@ let traffic = {
                 logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
                 metrics.influxdb(200, `blockSegments`)
                 params.FinalSolvedBlockedUrl = resultBlockSegments
+                timeSegmentProcessing = performance.now()
+                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+                if (rangeSpeed(totalTime) > 600) {
+                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+                }
                 if (!debug) {
                     res.redirect(resultBlockSegments.lp)
                     //res.send(params)
@@ -50,6 +56,11 @@ let traffic = {
                 logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
                 metrics.influxdb(200, `standardSegments`)
                 params.FinalSolvedStandardUrl = resultStandardSegments
+                timeSegmentProcessing = performance.now()
+                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+                if (rangeSpeed(totalTime) > 600) {
+                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+                }
                 if (!debug) {
                     res.redirect(resultStandardSegments.lp)
                     // res.send(params)
@@ -67,6 +78,11 @@ let traffic = {
                 logger.info(`Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
                 metrics.influxdb(200, `targeting`)
                 params.FinalSolvedTargetingUrl = resultSflTargeting
+                timeSegmentProcessing = performance.now()
+                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+                if (rangeSpeed(totalTime) > 600) {
+                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+                }
                 if (!debug) {
 
                     res.redirect(resultSflTargeting.lp)
@@ -83,11 +99,15 @@ let traffic = {
             // params.flowRotatorUrl = frlp
             metrics.influxdb(200, `flowRotator`)
             // params.endTime = new Date() - params.startTime
-            // metrics.influxdb(200, `Speed-FR-${rangeSpeed(params.endTime)}`)
+
             params.FinalSolvedFlowRotatorUrl = frlp
             logger.info(`Resolve FLOW ROTATOR, LP: ${frlp}`)
             // logger.info(JSON.stringify(params))
-
+            timeSegmentProcessing = performance.now()
+            let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+            if (rangeSpeed(totalTime) > 600) {
+                metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+            }
             if (!debug) {
                 res.redirect(frlp)
                 return
