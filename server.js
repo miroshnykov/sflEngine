@@ -498,23 +498,23 @@ if (cluster.isMaster) {
 
     }, config.sflOffer.timeOutGetRecipeFiles)
 
-    // setInterval(async () => {
-    //     if (config.env === 'development') return
-    //     try {
-    //         let offers = await getKeysCache('offer-*')
-    //         let campaigns = await getKeysCache('campaign-*')
-    //         let affiliates = await getKeysCache('affiliate-*')
-    //         let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
-    //         let dbSizeCache = await getDbSizeCache()
-    //         metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}-affiliates-${affiliates.length}-affiliateWebsites-${affiliateWebsites.length}`)
-    //         metrics.influxdb(200, `computerName-${computerName}-redisRecords-${dbSizeCache}`)
-    //
-    //     } catch (e) {
-    //         logger.error(`recipeDataError:`, e)
-    //         metrics.influxdb(500, `recipeDataError`)
-    //     }
-    //
-    // }, 450000) // 7.5 min
+    setInterval(async () => {
+        if (config.env === 'development') return
+        try {
+            let offers = await getKeysCache('offer-*')
+            let campaigns = await getKeysCache('campaign-*')
+            let affiliates = await getKeysCache('affiliate-*')
+            let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
+            let dbSizeCache = await getDbSizeCache()
+            metrics.influxdb(200, `recipeData-${computerName}-offers-${offers.length}-campaigns-${campaigns.length}-affiliates-${affiliates.length}-affiliateWebsites-${affiliateWebsites.length}`)
+            metrics.influxdb(200, `computerName-${computerName}-redisRecords-${dbSizeCache}`)
+
+        } catch (e) {
+            logger.error(`recipeDataError:`, e)
+            metrics.influxdb(500, `recipeDataError`)
+        }
+
+    }, 450000) // 7.5 min
 
     setTimeout(async () => {
         if (config.env === 'development') return
