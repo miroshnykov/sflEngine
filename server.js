@@ -67,6 +67,11 @@ const {
     getAffiliatesWebsitesWorkerById
 } = require('./cache/local/affiliateWebsites')
 
+const {
+    getAffiliatesWorker,
+    getAffiliatesWorkerById
+} = require('./cache/local/affiliates')
+
 if (cluster.isMaster) {
 
     // let host = 'https://sfl-offers.surge.systems/'
@@ -165,6 +170,24 @@ if (cluster.isMaster) {
                 type: 'affiliateWebsitesWorkerBiId',
                 getAffiliatesWebsitesByIdEvent: "getAffiliatesWebsitesByIdEvent",
                 affiliatesWebsites: getAffiliatesWebsitesWorkerById(msg.affiliateId)
+            })
+
+        }
+
+        if (msg.type ===`affiliatesWorker`) {
+            worker.send({
+                type: 'affiliatesWorker',
+                getAffiliatesEvent: "getAffiliatesEvent",
+                affiliates: getAffiliatesWorker()
+            })
+
+        }
+
+        if (msg.type ===`affiliatesWorkerById` && msg.affiliateId) {
+            worker.send({
+                type: 'affiliatesWorkerBiId',
+                getAffiliatesByIdEvent: "getAffiliatesByIdEvent",
+                affiliates: getAffiliatesWorkerById(msg.affiliateId)
             })
 
         }

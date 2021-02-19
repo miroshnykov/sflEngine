@@ -10,6 +10,7 @@ const {
 } = require('../cache/localCache')
 
 const {
+    getAffiliatesEvent,
     getAffiliatesWebsitesEvent,
     getAffiliatesWebsitesByIdEvent
 } = require('../cache/localCache')
@@ -20,11 +21,13 @@ const {
 // http://localhost:8088/getRecipeData?campaignId=2
 // http://localhost:8088/getRecipeData?segments=segments&debugging=debugging
 
+// https://sfl-engin-staging.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?campaignId=86&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?segments=segments&debugging=debugging
 
 
+// https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?offerId=6&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?campaignId=6&debugging=debugging
 // https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
@@ -78,7 +81,9 @@ let recipeData = {
             }
             if (affilaitesWebsitesLocal){
                 let affWebsites = await getAffiliatesWebsitesEvent()
+                let affiliates = await getAffiliatesEvent()
                 response.affilaitesWebsitesObjectCount =  Object.keys(affWebsites).length
+                response.affiliatesObjectCount =  Object.keys(affiliates).length
             }
             if (affilaitesWebsitesLocalById){
                 response.affilaitesWebsitesLocalById =  await getAffiliatesWebsitesByIdEvent(affilaitesWebsitesLocalById)
