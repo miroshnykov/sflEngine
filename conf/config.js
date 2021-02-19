@@ -48,8 +48,8 @@ config = {
         decryptionKey: '',
         intervalGetRecipeFiles: 330000, // 330000 -> 5.5min
         intervalSetRedis: 360000, // 360000 -> 6min
-        timeOutGetRecipeFiles: 20000, // 20000 -> 20sec
-        timeOutSetRedis: 40000 // 40000 -> 40sec
+        timeOutGetRecipeFiles: 10000, // 10000 -> 10sec
+        timeOutSetRedis: 20000 // 20000 -> 20sec
     },
     recipe: {
         offers:'/tmp/recipe_sfl/offers.json.gz',
