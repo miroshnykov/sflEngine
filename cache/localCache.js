@@ -90,11 +90,44 @@ const getAffiliatesWebsitesByIdEvent = (affiliateId) => {
     })
 }
 
+const getAffiliatesEvent = () => {
+    return new Promise((resolve) => {
+        process.send({
+            type: `affiliatesWorker`,
+            getAffiliatesEvent: "getAffiliatesEvent",
+        })
+        process.once('message', (msg) => {
+            if (msg.getAffiliatesEvent) {
+                resolve(msg.affiliates || null)
+            }
+        })
+
+    })
+}
+
+const getAffiliatesByIdEvent = (affiliateId) => {
+    return new Promise((resolve) => {
+        process.send({
+            type: `affiliatesWorkerById`,
+            getAffiliatesByIdEvent: "getAffiliatesByIdEvent",
+            affiliateId: affiliateId,
+        })
+        process.once('message', (msg) => {
+            if (msg.getAffiliatesByIdEvent) {
+                resolve(msg.affiliates || null)
+            }
+        })
+
+    })
+}
+
 module.exports = {
     getBlockSegmentsEvent,
     getStandardSegmentsEvent,
     getTargetingEvent,
     getLandingPagesEvent,
+    getAffiliatesEvent,
+    getAffiliatesByIdEvent,
     getAffiliatesWebsitesEvent,
     getAffiliatesWebsitesByIdEvent
 }

@@ -10,6 +10,15 @@ const logger = require('bunyan-loader')(config.log).child({scope: 'affiliates.js
 const os = require('os')
 const computerName = os.hostname()
 
+let affiliatesWorker = {}
+
+const getAffiliatesWorker = () => {
+    return affiliatesWorker
+}
+const getAffiliatesWorkerById = (affiliateId) => {
+    return affiliatesWorker && affiliatesWorker[affiliateId]
+}
+
 const setAffiliates = async () => {
 
     try {
@@ -40,6 +49,7 @@ const setAffiliates = async () => {
 
         let stream = fs.createReadStream(file)
         // console.log('file:', file)
+        affiliatesWorker = {}
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
@@ -48,6 +58,7 @@ const setAffiliates = async () => {
                 return
             }
             await setDataCache(`affiliate-${item.id}`, item)
+            affiliatesWorker[item.id] = item
         })
 
     } catch (e) {
@@ -57,6 +68,8 @@ const setAffiliates = async () => {
 }
 
 module.exports = {
-    setAffiliates
+    setAffiliates,
+    getAffiliatesWorker,
+    getAffiliatesWorkerById
 }
 
