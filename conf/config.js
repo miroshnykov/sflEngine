@@ -15,7 +15,8 @@ config = {
     affiliateIdHashSalt : 0xCAAAF,
     redirectFlowRotator: {
         // url: 'https://titan.infra.systems'
-        url: 'https://flow.concord.systems'
+        // url: 'https://flow.concord.systems',
+        url: 'https://swish.actios.systems'
     },
     affiliateApi: {
         host: 'http://affiliate-api.ad-center.com'
