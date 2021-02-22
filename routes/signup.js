@@ -37,7 +37,7 @@ let traffic = {
                 params.FinalSolvedBlockedUrl = resultBlockSegments
                 timeSegmentProcessing = performance.now()
                 let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-                if (rangeSpeed(totalTime) > 600) {
+                if (rangeSpeed(totalTime) > 900) {
                     metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
                 }
                 if (!debug) {
@@ -58,7 +58,7 @@ let traffic = {
                 params.FinalSolvedStandardUrl = resultStandardSegments
                 timeSegmentProcessing = performance.now()
                 let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-                if (rangeSpeed(totalTime) > 600) {
+                if (rangeSpeed(totalTime) > 900) {
                     metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
                 }
                 if (!debug) {
@@ -80,7 +80,7 @@ let traffic = {
                 params.FinalSolvedTargetingUrl = resultSflTargeting
                 timeSegmentProcessing = performance.now()
                 let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-                if (rangeSpeed(totalTime) > 600) {
+                if (rangeSpeed(totalTime) > 900) {
                     metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
                 }
                 if (!debug) {
@@ -105,7 +105,7 @@ let traffic = {
             // logger.info(JSON.stringify(params))
             timeSegmentProcessing = performance.now()
             let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-            if (rangeSpeed(totalTime) > 600) {
+            if (rangeSpeed(totalTime) > 900) {
                 metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
             }
             if (!debug) {
