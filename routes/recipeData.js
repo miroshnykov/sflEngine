@@ -29,6 +29,7 @@ const {
 
 // https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?offerId=6&debugging=debugging
+// https://sfl-engin.surge.systems/getRecipeData?affiliateId=181750&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?campaignId=6&debugging=debugging
 // https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
 
@@ -46,13 +47,15 @@ let recipeData = {
             // response.params = params
             // response.originalUrl = originalUrl
             let response = {}
-
+            let sites = ['oneSIte', 'twoSite', '3site', '4Site']
+            let site = sites[Math.floor(Math.random() * sites.length)]
             if (debugging !== 'debugging') {
                 res.send(response)
                 return
             }
 
             response.offerId = offerId || 0
+            // response.site = site || 0
             response.campaignId = campaignId || 0
             response.affiliateWebsites = affiliateWebsites || 0
             response.affiliateId = affiliateId || 0
@@ -79,14 +82,14 @@ let recipeData = {
                 response.blockedIp = await getData(`blockedIp_`) || []
                 response.processPid = process.pid || 0
             }
-            if (affilaitesWebsitesLocal){
+            if (affilaitesWebsitesLocal) {
                 let affWebsites = await getAffiliatesWebsitesEvent()
                 let affiliates = await getAffiliatesEvent()
-                response.affilaitesWebsitesObjectCount =  Object.keys(affWebsites).length
-                response.affiliatesObjectCount =  Object.keys(affiliates).length
+                response.affilaitesWebsitesObjectCount = Object.keys(affWebsites).length
+                response.affiliatesObjectCount = Object.keys(affiliates).length
             }
-            if (affilaitesWebsitesLocalById){
-                response.affilaitesWebsitesLocalById =  await getAffiliatesWebsitesByIdEvent(affilaitesWebsitesLocalById)
+            if (affilaitesWebsitesLocalById) {
+                response.affilaitesWebsitesLocalById = await getAffiliatesWebsitesByIdEvent(affilaitesWebsitesLocalById)
                 response.affiliateWebsitesInfo = await getData(`affiliateWebsites-${affilaitesWebsitesLocalById}`) || []
             }
 
