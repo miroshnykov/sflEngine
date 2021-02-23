@@ -276,7 +276,7 @@ if (cluster.isMaster) {
                     metrics.influxdb(500, `setRedisAffiliatesError-${computerName}`)
                 }
 
-            }, 10000) // 10 sec
+            }, 60000) // 60 sec
 
             metrics.influxdb(200, `fileReceivedAffiliates-size-${size}`)
         })
@@ -300,7 +300,7 @@ if (cluster.isMaster) {
                     metrics.influxdb(500, `setRedisAffiliateWebsitesError-${computerName}`)
                 }
 
-            }, 20000) // 20 sec
+            }, 90000) // 90 sec
 
         });
     });
