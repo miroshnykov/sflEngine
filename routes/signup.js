@@ -30,47 +30,47 @@ let traffic = {
                 params.response.ip = req.ip
             }
 
-            let resultBlockSegments = await blockSegmentsHandle(req, res, params)
-            if (resultBlockSegments && resultBlockSegments.success) {
-                logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
-                metrics.influxdb(200, `blockSegments`)
-                params.FinalSolvedBlockedUrl = resultBlockSegments
-                timeSegmentProcessing = performance.now()
-                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-                if (rangeSpeed(totalTime) > 900) {
-                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-                }
-                if (!debug) {
-                    res.redirect(resultBlockSegments.lp)
-                    //res.send(params)
-                    return
-                } else {
-                    res.send(params)
-                    return
-                }
-
-            }
-
-            let resultStandardSegments = await standardSegmentsHandle(req, res, params)
-            if (resultStandardSegments && resultStandardSegments.success) {
-                logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
-                metrics.influxdb(200, `standardSegments`)
-                params.FinalSolvedStandardUrl = resultStandardSegments
-                timeSegmentProcessing = performance.now()
-                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-                if (rangeSpeed(totalTime) > 900) {
-                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-                }
-                if (!debug) {
-                    res.redirect(resultStandardSegments.lp)
-                    // res.send(params)
-                    return
-                } else {
-                    res.send(params)
-                    return
-                }
-
-            }
+            // let resultBlockSegments = await blockSegmentsHandle(req, res, params)
+            // if (resultBlockSegments && resultBlockSegments.success) {
+            //     logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
+            //     metrics.influxdb(200, `blockSegments`)
+            //     params.FinalSolvedBlockedUrl = resultBlockSegments
+            //     timeSegmentProcessing = performance.now()
+            //     let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+            //     if (rangeSpeed(totalTime) > 900) {
+            //         metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+            //     }
+            //     if (!debug) {
+            //         res.redirect(resultBlockSegments.lp)
+            //         //res.send(params)
+            //         return
+            //     } else {
+            //         res.send(params)
+            //         return
+            //     }
+            //
+            // }
+            //
+            // let resultStandardSegments = await standardSegmentsHandle(req, res, params)
+            // if (resultStandardSegments && resultStandardSegments.success) {
+            //     logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
+            //     metrics.influxdb(200, `standardSegments`)
+            //     params.FinalSolvedStandardUrl = resultStandardSegments
+            //     timeSegmentProcessing = performance.now()
+            //     let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+            //     if (rangeSpeed(totalTime) > 900) {
+            //         metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+            //     }
+            //     if (!debug) {
+            //         res.redirect(resultStandardSegments.lp)
+            //         // res.send(params)
+            //         return
+            //     } else {
+            //         res.send(params)
+            //         return
+            //     }
+            //
+            // }
 
             let resultSflTargeting = await sflTargetingHandle(req, res, params)
 
