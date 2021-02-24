@@ -17,8 +17,8 @@ const {performance} = require('perf_hooks')
 let traffic = {
     signup: async (req, res, next) => {
         try {
-            let startTimeSegmentProcessing = performance.now()
-            let timeSegmentProcessing
+            // let startTimeSegmentProcessing = performance.now()
+            // let timeSegmentProcessing
             metrics.influxdb(200, `signup`)
 
             let params = await getParams(req)
@@ -103,11 +103,11 @@ let traffic = {
             params.FinalSolvedFlowRotatorUrl = frlp
             logger.info(`Resolve FLOW ROTATOR, LP: ${frlp}`)
             // logger.info(JSON.stringify(params))
-            timeSegmentProcessing = performance.now()
-            let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-            if (rangeSpeed(totalTime) > 900) {
-                metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-            }
+            // timeSegmentProcessing = performance.now()
+            // let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+            // if (rangeSpeed(totalTime) > 900) {
+            //     metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+            // }
             if (!debug) {
                 res.redirect(frlp)
                 return
