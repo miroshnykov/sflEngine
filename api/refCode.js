@@ -5,6 +5,7 @@ const metrics = require('../metrics')
 
 const refCodeRequest = axios.create({
     baseURL: config.affiliateApi.host,
+    timeout: 10000
 })
 
 const getRefCodeInfo = async (refCode) => {
