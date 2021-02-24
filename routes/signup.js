@@ -72,27 +72,27 @@ let traffic = {
             //
             // }
 
-            let resultSflTargeting = await sflTargetingHandle(req, res, params)
-
-            if (resultSflTargeting && resultSflTargeting.success) {
-                logger.info(`Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
-                metrics.influxdb(200, `targeting`)
-                params.FinalSolvedTargetingUrl = resultSflTargeting
-                timeSegmentProcessing = performance.now()
-                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-                if (rangeSpeed(totalTime) > 900) {
-                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-                }
-                if (!debug) {
-
-                    res.redirect(resultSflTargeting.lp)
-                    // res.send(params)
-                    return
-                } else {
-                    res.send(params)
-                    return
-                }
-            }
+            // let resultSflTargeting = await sflTargetingHandle(req, res, params)
+            //
+            // if (resultSflTargeting && resultSflTargeting.success) {
+            //     logger.info(`Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
+            //     metrics.influxdb(200, `targeting`)
+            //     params.FinalSolvedTargetingUrl = resultSflTargeting
+            //     timeSegmentProcessing = performance.now()
+            //     let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+            //     if (rangeSpeed(totalTime) > 900) {
+            //         metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+            //     }
+            //     if (!debug) {
+            //
+            //         res.redirect(resultSflTargeting.lp)
+            //         // res.send(params)
+            //         return
+            //     } else {
+            //         res.send(params)
+            //         return
+            //     }
+            // }
 
             // default
             let frlp = config.redirectFlowRotator.url + params.originalUrl
