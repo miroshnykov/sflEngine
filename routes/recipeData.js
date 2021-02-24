@@ -31,6 +31,7 @@ const {
 // https://sfl-engin.surge.systems/getRecipeData?offerId=6&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?affiliateId=181750&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?campaignId=6&debugging=debugging
+// https://sfl-engin.surge.systems/getRecipeData?segments=segments&debugging=debugging
 // https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
 
 let recipeData = {

@@ -216,9 +216,9 @@ if (cluster.isMaster) {
     ss(socket).on('sendingCampaigns', (stream) => {
         stream.pipe(fs.createWriteStream(campaignsFile))
         stream.on('end', () => {
-            let size = getFileSize(campaignsFile) || 0
-            logger.info(`campaigns file received, ${campaignsFile}, size:${size}`)
-            metrics.influxdb(200, `fileReceivedCampaigns-size-${size}`)
+            // let size = getFileSize(campaignsFile) || 0
+            // logger.info(`campaigns file received, ${campaignsFile}, size:${size}`)
+            // metrics.influxdb(200, `fileReceivedCampaigns-size-${size}`)
             setTimeout(async () => {
                 if (config.env === 'development') return
                 try {
@@ -238,9 +238,9 @@ if (cluster.isMaster) {
     ss(socket).on('sendingOffers', (stream) => {
         stream.pipe(fs.createWriteStream(offersFile))
         stream.on('end', () => {
-            let size = getFileSize(offersFile) || 0
-            logger.info(`offers file received, ${offersFile}, size:${size}`)
-            metrics.influxdb(200, `fileReceivedOffers-size-${size}`)
+            // let size = getFileSize(offersFile) || 0
+            // logger.info(`offers file received, ${offersFile}, size:${size}`)
+            // metrics.influxdb(200, `fileReceivedOffers-size-${size}`)
 
             setTimeout(async () => {
                 if (config.env === 'development') return
@@ -262,8 +262,8 @@ if (cluster.isMaster) {
     ss(socket).on('sendingAffiliates', (stream) => {
         stream.pipe(fs.createWriteStream(affiliatesFile))
         stream.on('end', () => {
-            let size = getFileSize(affiliatesFile) || 0
-            logger.info(`affiliates file received, ${affiliatesFile}, size:${size}`)
+            // let size = getFileSize(affiliatesFile) || 0
+            // logger.info(`affiliates file received, ${affiliatesFile}, size:${size}`)
 
             setTimeout(async () => {
                 if (config.env === 'development') return
@@ -278,7 +278,7 @@ if (cluster.isMaster) {
 
             }, 60000) // 60 sec
 
-            metrics.influxdb(200, `fileReceivedAffiliates-size-${size}`)
+            // metrics.influxdb(200, `fileReceivedAffiliates-size-${size}`)
         })
     })
 
@@ -286,9 +286,9 @@ if (cluster.isMaster) {
     ss(socket).on('sendingAffiliateWebsites', (stream) => {
         stream.pipe(fs.createWriteStream(affiliateWebsitesFile))
         stream.on('end', () => {
-            let size = getFileSize(affiliateWebsitesFile) || 0
-            logger.info(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${size}`)
-            metrics.influxdb(200, `fileReceivedAffiliateWebsites-size-${size}`)
+            // let size = getFileSize(affiliateWebsitesFile) || 0
+            // logger.info(`affiliateWebsites file received, ${affiliateWebsitesFile}, size:${size}`)
+            // metrics.influxdb(200, `fileReceivedAffiliateWebsites-size-${size}`)
             setTimeout(async () => {
                 if (config.env === 'development') return
                 try {
@@ -669,7 +669,8 @@ if (cluster.isMaster) {
     const {getClientIp} = require('request-ip')
 
     app.use(async (req, res, next) => {
-        let blockedIp = await getDataCache('blockedIp_') || []
+        // let blockedIp = await getDataCache('blockedIp_') || []
+        let blockedIp = config.blockedIp
 
         if (blockedIp.length === 0) {
             blockedIp = config.blockedIp
