@@ -21,7 +21,7 @@ let traffic = {
             // let timeSegmentProcessing
             metrics.influxdb(200, `signup`)
 
-            let params = await getParams(req)
+            let params = getParams(req)
             const debug = params.debugging === `debugging` && true || false
 
             params.debug = debug
