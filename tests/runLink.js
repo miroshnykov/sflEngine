@@ -5,6 +5,9 @@ const runLink = async () => {
     let errors = 0
     for (let i = 0; i < 100; i++) {
         try {
+
+            // while true; do curl https://o.actio.systems/health; sleep 1; done
+
             //local
             // const respone = await axios.get('http://localhost:8088/signup?prod=650&ref=5204378&source_type=Sweepstakes&platform=Android&debugging=debugging');
 
