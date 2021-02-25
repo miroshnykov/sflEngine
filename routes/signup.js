@@ -17,11 +17,11 @@ const {performance} = require('perf_hooks')
 let traffic = {
     signup: async (req, res, next) => {
         try {
-            // let startTimeSegmentProcessing = performance.now()
-            // let timeSegmentProcessing
+            let startTimeSegmentProcessing = performance.now()
+            let timeSegmentProcessing
             metrics.influxdb(200, `signup`)
 
-            let params = getParams(req)
+            let params = await getParams(req)
             const debug = params.debugging === `debugging` && true || false
 
             params.debug = debug
@@ -30,69 +30,69 @@ let traffic = {
                 params.response.ip = req.ip
             }
 
-            // let resultBlockSegments = await blockSegmentsHandle(req, res, params)
-            // if (resultBlockSegments && resultBlockSegments.success) {
-            //     logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
-            //     metrics.influxdb(200, `blockSegments`)
-            //     params.FinalSolvedBlockedUrl = resultBlockSegments
-            //     timeSegmentProcessing = performance.now()
-            //     let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-            //     if (rangeSpeed(totalTime) > 900) {
-            //         metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-            //     }
-            //     if (!debug) {
-            //         res.redirect(resultBlockSegments.lp)
-            //         //res.send(params)
-            //         return
-            //     } else {
-            //         res.send(params)
-            //         return
-            //     }
-            //
-            // }
-            //
-            // let resultStandardSegments = await standardSegmentsHandle(req, res, params)
-            // if (resultStandardSegments && resultStandardSegments.success) {
-            //     logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
-            //     metrics.influxdb(200, `standardSegments`)
-            //     params.FinalSolvedStandardUrl = resultStandardSegments
-            //     timeSegmentProcessing = performance.now()
-            //     let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-            //     if (rangeSpeed(totalTime) > 900) {
-            //         metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-            //     }
-            //     if (!debug) {
-            //         res.redirect(resultStandardSegments.lp)
-            //         // res.send(params)
-            //         return
-            //     } else {
-            //         res.send(params)
-            //         return
-            //     }
-            //
-            // }
+            let resultBlockSegments = await blockSegmentsHandle(req, res, params)
+            if (resultBlockSegments && resultBlockSegments.success) {
+                logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
+                metrics.influxdb(200, `blockSegments`)
+                params.FinalSolvedBlockedUrl = resultBlockSegments
+                timeSegmentProcessing = performance.now()
+                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+                if (rangeSpeed(totalTime) > 900) {
+                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+                }
+                if (!debug) {
+                    res.redirect(resultBlockSegments.lp)
+                    //res.send(params)
+                    return
+                } else {
+                    res.send(params)
+                    return
+                }
 
-            // let resultSflTargeting = await sflTargetingHandle(req, res, params)
-            //
-            // if (resultSflTargeting && resultSflTargeting.success) {
-            //     logger.info(`Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
-            //     metrics.influxdb(200, `targeting`)
-            //     params.FinalSolvedTargetingUrl = resultSflTargeting
-            //     timeSegmentProcessing = performance.now()
-            //     let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-            //     if (rangeSpeed(totalTime) > 900) {
-            //         metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-            //     }
-            //     if (!debug) {
-            //
-            //         res.redirect(resultSflTargeting.lp)
-            //         // res.send(params)
-            //         return
-            //     } else {
-            //         res.send(params)
-            //         return
-            //     }
-            // }
+            }
+
+            let resultStandardSegments = await standardSegmentsHandle(req, res, params)
+            if (resultStandardSegments && resultStandardSegments.success) {
+                logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
+                metrics.influxdb(200, `standardSegments`)
+                params.FinalSolvedStandardUrl = resultStandardSegments
+                timeSegmentProcessing = performance.now()
+                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+                if (rangeSpeed(totalTime) > 900) {
+                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+                }
+                if (!debug) {
+                    res.redirect(resultStandardSegments.lp)
+                    // res.send(params)
+                    return
+                } else {
+                    res.send(params)
+                    return
+                }
+
+            }
+
+            let resultSflTargeting = await sflTargetingHandle(req, res, params)
+
+            if (resultSflTargeting && resultSflTargeting.success) {
+                logger.info(`Resolve SflTargeting, LP:${resultSflTargeting.lp} `)
+                metrics.influxdb(200, `targeting`)
+                params.FinalSolvedTargetingUrl = resultSflTargeting
+                timeSegmentProcessing = performance.now()
+                let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+                if (rangeSpeed(totalTime) > 900) {
+                    metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+                }
+                if (!debug) {
+
+                    res.redirect(resultSflTargeting.lp)
+                    // res.send(params)
+                    return
+                } else {
+                    res.send(params)
+                    return
+                }
+            }
 
             // default
             let frlp = config.redirectFlowRotator.url + params.originalUrl
@@ -103,11 +103,11 @@ let traffic = {
             params.FinalSolvedFlowRotatorUrl = frlp
             logger.info(`Resolve FLOW ROTATOR, LP: ${frlp}`)
             // logger.info(JSON.stringify(params))
-            // timeSegmentProcessing = performance.now()
-            // let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
-            // if (rangeSpeed(totalTime) > 900) {
-            //     metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
-            // }
+            timeSegmentProcessing = performance.now()
+            let totalTime = timeSegmentProcessing - startTimeSegmentProcessing
+            if (rangeSpeed(totalTime) > 900) {
+                metrics.influxdb(200, `Speed-${rangeSpeed(totalTime)}`)
+            }
             if (!debug) {
                 res.redirect(frlp)
                 return

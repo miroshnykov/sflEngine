@@ -156,7 +156,7 @@ if (cluster.isMaster) {
             })
         }
 
-        if (msg.type ===`affiliateWebsitesWorker`) {
+        if (msg.type === `affiliateWebsitesWorker`) {
             worker.send({
                 type: 'affiliateWebsitesWorker',
                 getAffiliatesWebsitesEvent: "getAffiliatesWebsitesEvent",
@@ -165,7 +165,7 @@ if (cluster.isMaster) {
 
         }
 
-        if (msg.type ===`affiliateWebsitesWorkerById` && msg.affiliateId) {
+        if (msg.type === `affiliateWebsitesWorkerById` && msg.affiliateId) {
             worker.send({
                 type: 'affiliateWebsitesWorkerBiId',
                 getAffiliatesWebsitesByIdEvent: "getAffiliatesWebsitesByIdEvent",
@@ -174,7 +174,7 @@ if (cluster.isMaster) {
 
         }
 
-        if (msg.type ===`affiliatesWorker`) {
+        if (msg.type === `affiliatesWorker`) {
             worker.send({
                 type: 'affiliatesWorker',
                 getAffiliatesEvent: "getAffiliatesEvent",
@@ -183,7 +183,7 @@ if (cluster.isMaster) {
 
         }
 
-        if (msg.type ===`affiliatesWorkerById` && msg.affiliateId) {
+        if (msg.type === `affiliatesWorkerById` && msg.affiliateId) {
             worker.send({
                 type: 'affiliatesWorkerBiId',
                 getAffiliatesByIdEvent: "getAffiliatesByIdEvent",
@@ -364,8 +364,8 @@ if (cluster.isMaster) {
 
     }
 
-    // setInterval(cronFileSizeInfo, 330000) // 330000 -> 5.5min
-    // setTimeout(cronFileSizeInfo, 20000) // 20 sec, at application start
+    setInterval(cronFileSizeInfo, 330000) // 330000 -> 5.5min
+    setTimeout(cronFileSizeInfo, 20000) // 20 sec, at application start
 
 
     // ******************************************** blockedIp
@@ -391,8 +391,8 @@ if (cluster.isMaster) {
         }
 
     }
-    // setInterval(cronBlockedIp, 3000000) // 50min
-    // setTimeout(cronBlockedIp, 30000) // 30 sec, at application start
+    setInterval(cronBlockedIp, 3000000) // 50min
+    setTimeout(cronBlockedIp, 30000) // 30 sec, at application start
 
     // ******************************************** targeting
     socket.on('targetingInfo', async (targetingInfo) => {
@@ -418,8 +418,8 @@ if (cluster.isMaster) {
         }
 
     }
-    // setInterval(cronTargetingInfo, 840000) // 840000 > 14 min
-    // setTimeout(cronTargetingInfo, 30000)// 30 sec, at application start
+    setInterval(cronTargetingInfo, 840000) // 840000 > 14 min
+    setTimeout(cronTargetingInfo, 30000)// 30 sec, at application start
 
 
     // ******************************************** segmentsInfo
@@ -482,8 +482,8 @@ if (cluster.isMaster) {
         }
 
     }
-    // setTimeout(syncSegmentsLocalWithRedis, 20000) // 20 sec, at application start
-    // setInterval(syncSegmentsLocalWithRedis, 60000) // 60000 -> 1 min
+    setTimeout(syncSegmentsLocalWithRedis, 20000) // 20 sec, at application start
+    setInterval(syncSegmentsLocalWithRedis, 60000) // 60000 -> 1 min
 
     const cronSegmentsInfo = async () => {
         try {
@@ -496,8 +496,8 @@ if (cluster.isMaster) {
 
     }
 
-    // setInterval(cronSegmentsInfo, 66000) // 66000 -> 1.1 min
-    // setTimeout(cronSegmentsInfo, 20000) // 20 sec, at application start
+    setInterval(cronSegmentsInfo, 66000) // 66000 -> 1.1 min
+    setTimeout(cronSegmentsInfo, 20000) // 20 sec, at application start
 
     // ******************************************** lpInfo
     socket.on('lpInfo', async (lpInfo) => {
@@ -525,8 +525,8 @@ if (cluster.isMaster) {
 
     }
 
-    // setInterval(cronLpInfo, 66000) // 66000 -> 1.1 min
-    // setTimeout(cronLpInfo, 20000) // 20 sec, at application start
+    setInterval(cronLpInfo, 66000) // 66000 -> 1.1 min
+    setTimeout(cronLpInfo, 20000) // 20 sec, at application start
 
     // run one time then instance initialize
     setTimeout(async () => {
@@ -562,20 +562,20 @@ if (cluster.isMaster) {
     //
     // }, 450000) // 7.5 min
 
-    // setTimeout(async () => {
-    //     if (config.env === 'development') return
-    //     logger.info('One time set local redis')
-    //     try {
-    //         await setOffers()
-    //         await setCampaigns()
-    //         await setAffiliates()
-    //         await setAffiliateWebsites()
-    //     } catch (e) {
-    //         logger.error(`setOffersCampaignsOneTimeError:`, e)
-    //         metrics.influxdb(500, `setOffersCampaignsOneTimeError`)
-    //     }
-    //
-    // }, config.sflOffer.timeOutSetRedis)
+    setTimeout(async () => {
+        if (config.env === 'development') return
+        logger.info('One time set local redis')
+        try {
+            await setOffers()
+            await setCampaigns()
+            await setAffiliates()
+            await setAffiliateWebsites()
+        } catch (e) {
+            logger.error(`setOffersCampaignsOneTimeError:`, e)
+            metrics.influxdb(500, `setOffersCampaignsOneTimeError`)
+        }
+
+    }, config.sflOffer.timeOutSetRedis)
 
     setInterval(async () => {
 
