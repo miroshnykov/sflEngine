@@ -20,6 +20,7 @@ const {
 // http://localhost:8088/getRecipeData?affilaitesWebsitesLocalById=3721&debugging=debugging
 // http://localhost:8088/getRecipeData?campaignId=2
 // http://localhost:8088/getRecipeData?segments=segments&debugging=debugging
+// http://localhost:8088/getRecipeData?segmentsCount=segmentsCount&debugging=debugging
 
 // https://sfl-engin-staging.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?campaignId=86&debugging=debugging
@@ -44,6 +45,7 @@ let recipeData = {
             let affilaitesWebsitesLocalById = req.query.affilaitesWebsitesLocalById
             let affiliateId = req.query.affiliateId
             let segments = req.query.segments
+            let segmentsCount = req.query.segmentsCount
             let debugging = req.query.debugging
             // response.params = params
             // response.originalUrl = originalUrl
@@ -83,6 +85,17 @@ let recipeData = {
                 response.blockedIp = await getData(`blockedIp_`) || []
                 response.processPid = process.pid || 0
             }
+            if (segmentsCount) {
+                let segmentsBlockInfoCount = await getBlockSegmentsEvent()
+                response.segmentsBlockInfoCount = segmentsBlockInfoCount.length || 0
+
+                let segmentsStandardInfoCount = await getStandardSegmentsEvent()
+                response.segmentsStandardInfoCount = segmentsStandardInfoCount.length || 0
+
+                let landingPagesCount = await getLandingPagesEvent()
+                response.landingPagesCount = landingPagesCount.length || 0
+            }
+
             if (affilaitesWebsitesLocal) {
                 let affWebsites = await getAffiliatesWebsitesEvent()
                 let affiliates = await getAffiliatesEvent()
