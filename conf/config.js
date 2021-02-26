@@ -52,6 +52,10 @@ config = {
         timeOutGetRecipeFiles: 10000, // 10000 -> 10sec
         timeOutSetRedis: 20000 // 20000 -> 20sec
     },
+    fraudSegments:{
+        segmentBlockWebsite :106,
+        segmentBlockCampaign :104
+    },
     recipe: {
         offers:'/tmp/recipe_sfl/offers.json.gz',
         campaigns:'/tmp/recipe_sfl/campaigns.json.gz',
