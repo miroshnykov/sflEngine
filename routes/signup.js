@@ -33,6 +33,7 @@ let traffic = {
             let resultBlockSegments = await blockSegmentsHandle(req, res, params)
             if (resultBlockSegments && resultBlockSegments.success) {
                 logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
+                metrics.influxdb(200, `blockSegments`)
                 metrics.influxdb(200, `blockSegmentId-${resultBlockSegments.segmentId}`)
                 params.FinalSolvedBlockedUrl = resultBlockSegments
                 timeSegmentProcessing = performance.now()
@@ -54,6 +55,7 @@ let traffic = {
             let resultStandardSegments = await standardSegmentsHandle(req, res, params)
             if (resultStandardSegments && resultStandardSegments.success) {
                 logger.info(`Resolve STANDARD Segments, segmentId:${resultStandardSegments.segmentId}, LP:${resultStandardSegments.lp}`)
+                metrics.influxdb(200, `standardSegments`)
                 metrics.influxdb(200, `standardSegmentId-${resultStandardSegments.segmentId}`)
                 params.FinalSolvedStandardUrl = resultStandardSegments
                 timeSegmentProcessing = performance.now()
