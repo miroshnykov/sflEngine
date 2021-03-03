@@ -38,6 +38,8 @@ const {
 // https://sfl-engin.surge.systems/getRecipeData?segments=segments&debugging=debugging
 // https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
 
+// https://engin.actio.systems/getRecipeData?advertiserByProdId=1&debugging=debugging
+
 // https://sfl-engin.surge.systems/getRecipeData?segmentsCount=segmentsCount&debugging=debugging
 
 let recipeData = {
