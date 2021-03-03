@@ -61,6 +61,11 @@ let segmentsBlockMaster = []
 let segmentsStandardMaster = []
 let targetingMaster = []
 let landingPagesMaster = []
+let advertisersMaster = {}
+
+const getAdvertisersMasterById = (prodId) => {
+    return prodId && advertisersMaster[prodId] || advertisersMaster
+}
 
 const {
     getAffiliatesWebsitesWorker,
@@ -191,6 +196,15 @@ if (cluster.isMaster) {
             })
 
         }
+
+        if (msg.type === 'advertisersByProdIdWorker') {
+            worker.send({
+                type: 'advertisersWorker',
+                getAdvertisersByProdIdEvent: "getAdvertisersByProdIdEvent",
+                advertisersData: getAdvertisersMasterById(msg.prodId)
+            })
+        }
+
 
     })
 
@@ -476,6 +490,12 @@ if (cluster.isMaster) {
                 landingPagesMaster = lpInfo
             }
 
+            if (Object.keys(advertisersMaster).length === 0) {
+                let advertisersInfo = await getDataCache('advertisersInfo_') || []
+                advertisersInfo.forEach(item => {
+                    advertisersMaster[item.advertiserProductId] = item
+                })
+            }
 
         } catch (e) {
             logger.error(`syncSegmentsLocalWithRedisError:`, e)
@@ -527,6 +547,39 @@ if (cluster.isMaster) {
 
     setInterval(cronLpInfo, 66000) // 66000 -> 1.1 min
     setTimeout(cronLpInfo, 20000) // 20 sec, at application start
+
+    // ******************************************** advertisersInfo
+    socket.on('advertisersInfo', async (advertisersInfo) => {
+        try {
+            // logger.info(`*** Set advertisersInfo to redis:${JSON.stringify(advertisersInfo)}`)
+            logger.info(`*** Set advertisersInfo to redis:${advertisersInfo.length}`)
+            await setDataCache('advertisersInfo_', advertisersInfo)
+
+            advertisersInfo.forEach(item => {
+                advertisersMaster[item.advertiserProductId] = item
+            })
+            metrics.influxdb(200, `setRedisAdvertisersInfo`)
+
+        } catch (e) {
+            logger.error(`setlpInfoError:`, e)
+            metrics.influxdb(500, `setRedisLpInfoError-${computerName}`)
+        }
+
+    })
+
+    const cronAdvertisersInfo = async () => {
+        try {
+            let advertisersInfo = await getDataCache('advertisersInfo_') || []
+            // logger.info(` *** checking lpInfo data`)
+            socket.emit('advertisersInfo', advertisersInfo)
+        } catch (e) {
+            logger.error(`cronAdvertisersInfoError:`, e)
+        }
+
+    }
+
+    setInterval(cronAdvertisersInfo, 66000) // 66000 -> 1.1 min
+    setTimeout(cronAdvertisersInfo, 20000) // 20 sec, at application start
 
     // run one time then instance initialize
     setTimeout(async () => {
