@@ -59,6 +59,22 @@ const getLandingPagesEvent = () => {
     })
 }
 
+const getAdvertisersByProdIdEvent = (prodId) => {
+    return new Promise((resolve) => {
+        process.send({
+            type: `advertisersByProdIdWorker`,
+            getAdvertisersByProdIdEvent: "getAdvertisersByProdIdEvent",
+            prodId: prodId,
+        });
+        process.once('message', (msg) => {
+            if (msg.getAdvertisersByProdIdEvent) {
+                resolve(msg.advertisersData || null)
+            }
+        });
+
+    })
+}
+
 const getAffiliatesWebsitesEvent = () => {
     return new Promise((resolve) => {
         process.send({
@@ -129,5 +145,6 @@ module.exports = {
     getAffiliatesEvent,
     getAffiliatesByIdEvent,
     getAffiliatesWebsitesEvent,
-    getAffiliatesWebsitesByIdEvent
+    getAffiliatesWebsitesByIdEvent,
+    getAdvertisersByProdIdEvent
 }

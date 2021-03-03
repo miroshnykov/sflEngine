@@ -6,7 +6,8 @@ const {
     getBlockSegmentsEvent,
     getStandardSegmentsEvent,
     getTargetingEvent,
-    getLandingPagesEvent
+    getLandingPagesEvent,
+    getAdvertisersByProdIdEvent,
 } = require('../cache/localCache')
 
 const {
@@ -21,11 +22,13 @@ const {
 // http://localhost:8088/getRecipeData?campaignId=2
 // http://localhost:8088/getRecipeData?segments=segments&debugging=debugging
 // http://localhost:8088/getRecipeData?segmentsCount=segmentsCount&debugging=debugging
+// http://localhost:8088/getRecipeData?advertiserByProdId=1&debugging=debugging
 
 // https://sfl-engin-staging.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?campaignId=86&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?segments=segments&debugging=debugging
+// https://sfl-engin-staging.surge.systems/getRecipeData?advertiserByProdId=1&debugging=debugging
 
 
 // https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
@@ -45,6 +48,7 @@ let recipeData = {
             let affiliateWebsites = req.query.affiliateWebsites
             let affilaitesWebsitesLocal = req.query.affilaitesWebsitesLocal
             let affilaitesWebsitesLocalById = req.query.affilaitesWebsitesLocalById
+            let advertiserByProdId = req.query.advertiserByProdId
             let affiliateId = req.query.affiliateId
             let segments = req.query.segments
             let segmentsCount = req.query.segmentsCount
@@ -96,6 +100,20 @@ let recipeData = {
 
                 let landingPagesCount = await getLandingPagesEvent()
                 response.landingPagesCount = landingPagesCount.length || 0
+                let adv = await getAdvertisersByProdIdEvent()
+                // let advitem = await getAdvertisersByProdIdEvent(440)
+                response.advertisersCount = Object.keys(adv).length
+                // response.advertisersadvitem = advitem
+
+
+            }
+
+            if (advertiserByProdId){
+                let advAll= await getAdvertisersByProdIdEvent()
+                let adv = await getAdvertisersByProdIdEvent(advertiserByProdId)
+                // let advitem = await getAdvertisersByProdIdEvent(440)
+                response.advertisersCount = Object.keys(advAll).length
+                response.advertisersById = adv
             }
 
             if (affilaitesWebsitesLocal) {
