@@ -98,6 +98,9 @@ let traffic = {
 
             // default
             let frlp = config.redirectFlowRotator.url + params.originalUrl
+            let forRemoveReferStr = frlp.substr(frlp.indexOf('&referer') + 9, frlp.indexOf('|'))
+            frlp = frlp.replace(forRemoveReferStr, '')
+            // frlp.replace(referer)
             // params.flowRotatorUrl = frlp
             metrics.influxdb(200, `flowRotator`)
             // params.endTime = new Date() - params.startTime
