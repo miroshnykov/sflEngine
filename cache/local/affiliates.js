@@ -29,15 +29,15 @@ const setAffiliates = async () => {
             logger.info(`Affiliates not define size in redis `)
             return
         }
-        // let size = getFileSize(file) || 0
-        // logger.info(`fileSizeInfo_.affiliates:${fileSizeInfo_.affiliates}, Size from file affiliates:${size}`)
-        // if (size === fileSizeInfo_.affiliates) {
-        //     logger.info(`Size of affiliates the same lets add to redis  `)
-        // } else {
-        //     logger.info(`Size of recipe file affiliates is different, need to reSend file from sfl-offer`)
-        //     metrics.influxdb(200, `FileDifferentAffiliates-${computerName}`)
-        //     return
-        // }
+        let size = getFileSize(file) || 0
+        logger.info(`fileSizeInfo_.affiliates:${fileSizeInfo_.affiliates}, Size from file affiliates:${size}`)
+        if (size === fileSizeInfo_.affiliates) {
+            logger.info(`Size of affiliates the same lets add to redis  `)
+        } else {
+            logger.info(`Size of recipe file affiliates is different, need to reSend file from sfl-offer`)
+            metrics.influxdb(200, `FileDifferentAffiliates-${computerName}`)
+            return
+        }
 
         let affiliates = await getKeysCache('affiliate-*')
         // console.log('affiliates count:',affiliates.length)
