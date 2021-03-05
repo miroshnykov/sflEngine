@@ -581,6 +581,24 @@ if (cluster.isMaster) {
     setInterval(cronAdvertisersInfo, 66000) // 66000 -> 1.1 min
     setTimeout(cronAdvertisersInfo, 20000) // 20 sec, at application start
 
+    const checkAffiliatesEmptyRedis = async () => {
+        try {
+
+            let affiliates = await getKeysCache('affiliate-*')
+
+            if (affiliates.length === 0) {
+                metrics.influxdb(500, `affiliatesRedisEmpty${computerName}`)
+                await setAffiliates()
+                logger.info(`affiliatesRedisEmpty`)
+            }
+        } catch (e) {
+            logger.error(`checkAffiliatesEmptyRedisError:`, e)
+        }
+
+    }
+
+    setInterval(checkAffiliatesEmptyRedis, 200000) // 200000 -> 3.3 min
+
     // run one time then instance initialize
     setTimeout(async () => {
         if (config.env === 'development') return
