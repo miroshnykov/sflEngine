@@ -38,16 +38,16 @@ const setOffers = async () => {
             logger.info(`Offer not define size in redis`)
             return
         }
-        // let size = getFileSize(file) || 0
-        // logger.info(`fileSizeInfo_.offer:${fileSizeInfo_.offer}, Size from file Offers:${size}`)
-        //
-        // if (size === fileSizeInfo_.offer) {
-        //     logger.info(`Size of OFFERS the same lets add to redis  `)
-        // } else {
-        //     logger.info(`Size of recipe file OFFERS is different, need to reSend file from sfl-offer`)
-        //     metrics.influxdb(200, `fileDifferentOffer_-${hostname}`)
-        //     return
-        // }
+        let size = getFileSize(file) || 0
+        logger.info(`fileSizeInfo_.offer:${fileSizeInfo_.offer}, Size from file Offers:${size}`)
+
+        if (size === fileSizeInfo_.offer) {
+            logger.info(`Size of OFFERS the same lets add to redis  `)
+        } else {
+            logger.info(`Size of recipe file OFFERS is different, need to reSend file from sfl-offer`)
+            metrics.influxdb(200, `fileDifferentOffer_-${hostname}`)
+            return
+        }
 
         let offers = await getKeysCache('offer-*')
         // console.log('offers count:',offers.length)
@@ -132,16 +132,16 @@ const setCampaigns = async () => {
             logger.info(`Campaign not define size in redis`)
             return
         }
-        // let size = getFileSize(file) || 0
-        //
-        // logger.info(`fileSizeInfo_campaigns:${fileSizeInfo_.campaign}, Size from file Campaigns:${size}`)
-        // if (size === fileSizeInfo_.campaign) {
-        //     logger.info(`Size the same lets add to redis  `)
-        // } else {
-        //     logger.info(`Size of recipe file campaigns is different , need to reSend file from sfl-offer`)
-        //     metrics.influxdb(200, `fileDifferentCampaigns_-${hostname}`)
-        //     return
-        // }
+        let size = getFileSize(file) || 0
+
+        logger.info(`fileSizeInfo_campaigns:${fileSizeInfo_.campaign}, Size from file Campaigns:${size}`)
+        if (size === fileSizeInfo_.campaign) {
+            logger.info(`Size the same lets add to redis  `)
+        } else {
+            logger.info(`Size of recipe file campaigns is different , need to reSend file from sfl-offer`)
+            metrics.influxdb(200, `fileDifferentCampaigns_-${hostname}`)
+            return
+        }
 
         let campaigns = await getKeysCache('campaign-*')
         // console.log('campaigns count:',campaigns.length)

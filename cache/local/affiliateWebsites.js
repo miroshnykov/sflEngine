@@ -30,15 +30,15 @@ const setAffiliateWebsites = async () => {
             logger.info(`affiliateWebsites not define size in redis`)
             return
         }
-        // let size = getFileSize(file) || 0
-        // logger.info(`fileSizeInfo_.affiliateWebsitesr:${fileSizeInfo_.affiliateWebsites}, Size from file affiliateWebsites:${size}`)
-        // if (size === fileSizeInfo_.affiliateWebsites) {
-        //     logger.info(`Size of affiliateWebsites the same lets add to redis  `)
-        // } else {
-        //     logger.info(`Size of recipe file affiliateWebsites is different, need to reSend file from sfl-offer`)
-        //     metrics.influxdb(200, `FileDifferentAffiliateWebsites-${hostname}`)
-        //     return
-        // }
+        let size = getFileSize(file) || 0
+        logger.info(`fileSizeInfo_.affiliateWebsitesr:${fileSizeInfo_.affiliateWebsites}, Size from file affiliateWebsites:${size}`)
+        if (size === fileSizeInfo_.affiliateWebsites) {
+            logger.info(`Size of affiliateWebsites the same lets add to redis  `)
+        } else {
+            logger.info(`Size of recipe file affiliateWebsites is different, need to reSend file from sfl-offer`)
+            metrics.influxdb(200, `FileDifferentAffiliateWebsites-${hostname}`)
+            return
+        }
 
         let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
         // console.log('affiliateWebsites count:',affiliateWebsites.length)
