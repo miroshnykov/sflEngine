@@ -599,6 +599,24 @@ if (cluster.isMaster) {
 
     setInterval(checkAffiliatesEmptyRedis, 200000) // 200000 -> 3.3 min
 
+    const checkAffiliateWebsitesEmptyRedis = async () => {
+        try {
+
+            let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
+
+            if (affiliateWebsites.length === 0) {
+                metrics.influxdb(500, `affiliateWebsitesRedisEmpty${computerName}`)
+                logger.info(`affiliateWebsites RedisEmpty Resend File From sfl-offer`)
+                socket.emit('sendFileAffiliateWebsites')
+            }
+        } catch (e) {
+            logger.error(`checkAffiliateWebsitesEmptyRedisError:`, e)
+        }
+
+    }
+
+    setInterval(checkAffiliateWebsitesEmptyRedis, 200000) // 200000 -> 3.3 min
+
     // run one time then instance initialize
     setTimeout(async () => {
         if (config.env === 'development') return

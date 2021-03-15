@@ -55,6 +55,7 @@ config = {
     fraudSegments:{
         segmentBlockWebsite :106,
         segmentBlockCampaign :104,
+        segmentBlockAWSComplaints :46,
         segmentBlockWebsiteTest :164
     },
     recipe: {
