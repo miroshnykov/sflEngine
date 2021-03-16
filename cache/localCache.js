@@ -59,6 +59,22 @@ const getLandingPagesEvent = () => {
     })
 }
 
+
+const getRandomSitesEvent = () => {
+    return new Promise((resolve) => {
+        process.send({
+            type: `randomSitesWorker`,
+            getRandomSitesEvent: "getRandomSitesEvent",
+        });
+        process.once('message', (msg) => {
+            if (msg.getRandomSitesEvent) {
+                resolve(msg.randomSitesData || null)
+            }
+        });
+
+    })
+}
+
 const getAdvertisersByProdIdEvent = (prodId) => {
     return new Promise((resolve) => {
         process.send({
@@ -146,5 +162,6 @@ module.exports = {
     getAffiliatesByIdEvent,
     getAffiliatesWebsitesEvent,
     getAffiliatesWebsitesByIdEvent,
-    getAdvertisersByProdIdEvent
+    getAdvertisersByProdIdEvent,
+    getRandomSitesEvent
 }
