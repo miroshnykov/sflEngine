@@ -61,6 +61,7 @@ let segmentsBlockMaster = []
 let segmentsStandardMaster = []
 let targetingMaster = []
 let landingPagesMaster = []
+let randomSitesMaster = []
 let advertisersMaster = {}
 
 const getAdvertisersMasterById = (prodId) => {
@@ -158,6 +159,14 @@ if (cluster.isMaster) {
                 type: 'landingPagesWorker',
                 getLandingPagesEvent: "getLandingPagesEvent",
                 landingPagesData: landingPagesMaster
+            })
+        }
+
+        if (msg.type === 'randomSitesWorker') {
+            worker.send({
+                type: 'randomSitesWorker',
+                getRandomSitesEvent: "getRandomSitesEvent",
+                randomSitesData: randomSitesMaster
             })
         }
 
@@ -490,6 +499,12 @@ if (cluster.isMaster) {
                 landingPagesMaster = lpInfo
             }
 
+            let randomSitesInfo = await getDataCache('randomSitesInfo') || []
+            if (JSON.stringify(randomSitesInfo) !== JSON.stringify(landingPagesMaster)) {
+                logger.info(` *** syncRandomSitesInfoLocalWithRedis done ***`)
+                randomSitesMaster = randomSitesInfo
+            }
+
             if (Object.keys(advertisersMaster).length === 0) {
                 let advertisersInfo = await getDataCache('advertisersInfo_') || []
                 advertisersInfo.forEach(item => {
@@ -547,6 +562,35 @@ if (cluster.isMaster) {
 
     setInterval(cronLpInfo, 66000) // 66000 -> 1.1 min
     setTimeout(cronLpInfo, 20000) // 20 sec, at application start
+
+    // ******************************************** lpInfo
+    socket.on('randomSites', async (randomSites) => {
+        try {
+            logger.info(`*** Set randomSites to redis count:${randomSites.length}`)
+            await setDataCache('randomSitesInfo', randomSites)
+            randomSitesMaster = randomSites
+            metrics.influxdb(200, `setRedisRandomSites`)
+
+        } catch (e) {
+            logger.error(`setRedisRandomSitesError:`, e)
+            metrics.influxdb(500, `setRedisRandomSitesError-${computerName}`)
+        }
+
+    })
+
+    const cronRedisRandomSitesInfo = async () => {
+        try {
+            let randomSitesInfo = await getDataCache('randomSitesInfo') || []
+            // logger.info(` *** checking lpInfo data`)
+            socket.emit('randomSites', randomSitesInfo)
+        } catch (e) {
+            logger.error(`cronRedisRandomSitesInfoError:`, e)
+        }
+
+    }
+
+    setInterval(cronRedisRandomSitesInfo, 900000) // 900000 -> 15 min
+    setTimeout(cronRedisRandomSitesInfo, 5000) // 45000 ->45 sec, at application start
 
     // ******************************************** advertisersInfo
     socket.on('advertisersInfo', async (advertisersInfo) => {

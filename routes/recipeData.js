@@ -7,8 +7,13 @@ const {
     getStandardSegmentsEvent,
     getTargetingEvent,
     getLandingPagesEvent,
+    getRandomSitesEvent,
     getAdvertisersByProdIdEvent,
 } = require('../cache/localCache')
+
+const {
+    pickRandomSites
+} = require('../lib/utils')
 
 const {
     getAffiliatesEvent,
@@ -26,20 +31,22 @@ const {
 
 // https://sfl-engin-staging.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?campaignId=86&debugging=debugging
-// https://sfl-engin-staging.surge.systems/getRecipeData?offerId=6&debugging=debugging
+// https://sfl-engin-staging.surge.systems/getRecipeData?offerId=34206&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?segments=segments&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?advertiserByProdId=1&debugging=debugging
+// https://sfl-engin-staging.surge.systems/getRecipeData?affiliateId=181750&debugging=debugging
 
 
 // https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
-// https://sfl-engin.surge.systems/getRecipeData?offerId=6&debugging=debugging
+// https://sfl-engin.surge.systems/getRecipeData?offerId=166&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?affiliateId=181750&debugging=debugging
-// https://sfl-engin.surge.systems/getRecipeData?campaignId=6&debugging=debugging
+// https://sfl-engin.surge.systems/getRecipeData?campaignId=506&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?segments=segments&debugging=debugging
 // https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
 // https://engin.actio.systems/getRecipeData?advertiserByProdId=1&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?segmentsCount=segmentsCount&debugging=debugging
 
+// https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 
 let recipeData = {
@@ -86,6 +93,12 @@ let recipeData = {
             }
 
             if (segments) {
+                let rs = await getData(`randomSitesInfo`) || []
+                let randomSites = await getRandomSitesEvent()
+                response.randomSite = pickRandomSites(randomSites)
+                response.randomSiteCount = randomSites.length
+                response.randomSiteCountRedis = rs.length
+
                 response.segmentsBlockInfo = await getBlockSegmentsEvent()
                 response.segmentsStandardInfo = await getStandardSegmentsEvent()
                 response.targetingInfo = await getTargetingEvent()
