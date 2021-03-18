@@ -299,7 +299,7 @@ if (cluster.isMaster) {
                     metrics.influxdb(500, `setRedisAffiliatesError-${computerName}`)
                 }
 
-            }, 60000) // 60 sec
+            }, 30000) // 30 sec
 
             // metrics.influxdb(200, `fileReceivedAffiliates-size-${size}`)
         })
