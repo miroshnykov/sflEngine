@@ -34,7 +34,7 @@
     "performance": "^1.4.0",
     "pino": "^6.3.2",
     "plain-config": "^0.1.3",
-    "platform": "^1.3.5",
+    "platform": "^1.3.6",
     "request-ip": "^2.1.3",
     "socket.io-client": "^2.3.0",
     "socket.io-stream": "^0.9.1",
