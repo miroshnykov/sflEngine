@@ -8,3 +8,5 @@ node_modules
 /.idea
 .idea/
 conf/config-local.js
+.DS_Store
+dump.rdb
