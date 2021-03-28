@@ -12,7 +12,7 @@ config = {
     maxmind: {
         path: '/home/conf/GeoIP/GeoIP2-City.mmdb'
     },
-    affiliateIdHashSalt : 0xCAAAF,
+    affiliateIdHashSalt: 0xCAAAF,
     redirectFlowRotator: {
         // url: 'https://titan.infra.systems'
         // url: 'https://flow.concord.systems',
@@ -21,7 +21,11 @@ config = {
     affiliateApi: {
         host: 'http://affiliate-api.ad-center.com'
     },
-    blockedIp:  [
+    sflApi: {
+        host: '',
+        secret: ''
+    },
+    blockedIp: [
         '104.27.178.12',
         '104.27.179.12',
         '13.224.196.125',
@@ -52,15 +56,15 @@ config = {
         timeOutGetRecipeFiles: 10000, // 10000 -> 10sec
         timeOutSetRedis: 20000 // 20000 -> 20sec
     },
-    fraudSegments:{
-        segmentBlockWebsite :106,
-        segmentBlockCampaign :104,
-        segmentBlockAWSComplaints :46,
-        segmentBlockWebsiteTest :164
+    fraudSegments: {
+        segmentBlockWebsite: 106,
+        segmentBlockCampaign: 104,
+        segmentBlockAWSComplaints: 46,
+        segmentBlockWebsiteTest: 164
     },
     recipe: {
-        offers:'/tmp/recipe_sfl/offers.json.gz',
-        campaigns:'/tmp/recipe_sfl/campaigns.json.gz',
+        offers: '/tmp/recipe_sfl/offers.json.gz',
+        campaigns: '/tmp/recipe_sfl/campaigns.json.gz',
         affiliates: '/tmp/recipe_sfl/affiliates.json.gz',
         affiliateWebsites: '/tmp/recipe_sfl/affiliateWebsites.json.gz',
     },
@@ -90,6 +94,7 @@ config = {
             stream: process.stdout
         }]
     },
+
     host: '',
     mysql: {
         host: '',
