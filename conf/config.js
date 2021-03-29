@@ -25,6 +25,21 @@ config = {
         host: '',
         secret: ''
     },
+    refCodeDefault: {
+        affiliateId: 4391,
+        affiliateName: "Banktan Trax",
+        accountExecutiveId: 0,
+        accountExecutiveName: '',
+        accountManagerId: 0,
+        accountManagerName: '',
+        affiliateStatus: "active",
+        affiliateType: "external",
+        isLockPayment: 0,
+        isTrafficBlocked: 0,
+        campaignId: 5134236,
+        programId: 410,
+        productId: 0
+    },
     blockedIp: [
         '104.27.178.12',
         '104.27.179.12',
