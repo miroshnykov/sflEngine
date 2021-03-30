@@ -22,8 +22,8 @@ config = {
         host: 'http://affiliate-api.ad-center.com'
     },
     sflApi: {
-        host: '',
-        secret: ''
+        host: 'https://sfl-api-stage1.surge.systems/',
+        secret: 'XXX'
     },
     refCodeDefault: {
         affiliateId: 4391,
@@ -117,10 +117,6 @@ config = {
         user: '',
         password: '',
         database: ''
-    },
-    sflApi:{
-        secret = 'XXX',     
-        host = 'https://sfl-api-stage1.surge.systems/'
     },
     aws: {
         secret_key: '',
