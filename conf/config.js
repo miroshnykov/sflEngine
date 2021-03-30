@@ -118,6 +118,10 @@ config = {
         password: '',
         database: ''
     },
+    sflApi:{
+        secret = 'XXX',     
+        host = 'https://sfl-api-stage1.surge.systems/'
+    },
     aws: {
         secret_key: '',
         access_key: '',
