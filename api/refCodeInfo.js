@@ -16,7 +16,10 @@ const getRefCodeInfo_ = async (apiInputData) => {
     let hash = md5(`${timestamp}|${secret}`)
 
     try {
-        let {data} = await refCodeInfoRequest.get( `/refcode?ref=${apiInputData.ref}&prod=${apiInputData.prod}&timestamp=${timestamp}&hash=${hash}`)
+        let url = `/refcode?ref=${apiInputData.ref}&prod=${apiInputData.prod}&timestamp=${timestamp}&hash=${hash}`
+        let {data} = await refCodeInfoRequest.get(url)
+
+        console.log(url)
         // console.log('data:',data)
         return data
 
