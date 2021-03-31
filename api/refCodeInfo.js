@@ -19,7 +19,7 @@ const getRefCodeInfo_ = async (apiInputData) => {
         let url = `/refcode?ref=${apiInputData.ref}&prod=${apiInputData.prod}&timestamp=${timestamp}&hash=${hash}`
         let {data} = await refCodeInfoRequest.get(url)
 
-        console.log(url)
+        // console.log(url)
         // console.log('data:',data)
         return data
 
