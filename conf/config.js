@@ -26,7 +26,7 @@ config = {
         secret: 'XXX'
     },
     refCodeDefault: {
-        affiliateId: 4391,
+        affiliateId: "4391",
         affiliateName: "Banktan Trax",
         accountExecutiveId: 0,
         accountExecutiveName: '',
@@ -36,8 +36,8 @@ config = {
         affiliateType: "external",
         isLockPayment: 0,
         isTrafficBlocked: 0,
-        campaignId: 5134236,
-        programId: 410,
+        campaignId: "5134236",
+        programId: "410",
         productId: 0
     },
     blockedIp: [
