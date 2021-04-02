@@ -24,7 +24,7 @@ const getRefCodeInfo_ = async (apiInputData) => {
         return data
 
     } catch(e) {
-        console.log('*** Not able to parse refCodeInfo from sfl-api, use default ')
+        console.log('*** Not able to parse refCodeInfo from sfl-api, use default', e)
         metrics.influxdb(500, `getRefCodeInfoError`)
     }
 }
