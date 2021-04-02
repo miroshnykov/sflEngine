@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "dev": "node server.js --conf=./conf/config-local.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prod": "node server.js --conf=/run/secrets/sfl-engine-prod.js",
     "stage1": "node server.js --conf=/run/secrets/sfl-engine-stage1.js"
@@ -28,6 +29,7 @@
     "http-errors": "^1.7.3",
     "influxdb-nodejs": "^3.1.0",
     "js-base64": "^2.5.2",
+    "md5": "^2.3.0",
     "mmdb-reader": "^1.2.0",
     "os": "^0.1.1",
     "path": "^0.12.7",
