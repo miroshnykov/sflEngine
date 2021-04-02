@@ -22,7 +22,7 @@ config = {
         host: 'http://affiliate-api.ad-center.com'
     },
     sflApi: {
-        host: 'https://sfl-api.surge.systems',
+        host: 'http://sfl-api-prod:8097',
         secret: ''
     },
     refCodeDefault: {
