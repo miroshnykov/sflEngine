@@ -6,7 +6,7 @@ const metrics = require('../metrics')
 
 const refCodeInfoRequest = axios.create({
     baseURL: config.sflApi.host,
-    timeout: 2000
+    timeout: 10000
 })
 
 const getRefCodeInfo_ = async (apiInputData) => {
