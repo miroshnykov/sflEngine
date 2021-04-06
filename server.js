@@ -65,7 +65,7 @@ let randomSitesMaster = []
 let advertisersMaster = {}
 
 const getAdvertisersMasterById = (prodId) => {
-    return prodId && advertisersMaster[prodId] || advertisersMaster
+    return prodId && advertisersMaster[prodId] || {}
 }
 
 const {
