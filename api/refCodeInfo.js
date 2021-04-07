@@ -8,6 +8,7 @@ const refCodeInfoRequest = axios.create({
     baseURL: config.sflApi.host,
     timeout: 10000
 })
+const {catchHandler} = require('../middlewares/catchErr')
 
 const getRefCodeInfo_ = async (apiInputData) => {
 
@@ -24,7 +25,8 @@ const getRefCodeInfo_ = async (apiInputData) => {
         return data
 
     } catch(e) {
-        console.log('*** Not able to parse refCodeInfo from sfl-api, use default', e)
+        // console.log('*** Not able to parse refCodeInfo from sfl-api, use default', e)
+        catchHandler(e, 'Not able to parse refCodeInfo from sfl-api, use default')
         metrics.influxdb(500, `getRefCodeInfoError`)
     }
 }
