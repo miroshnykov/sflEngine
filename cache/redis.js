@@ -20,6 +20,8 @@ redisClient.on('error', (err) => {
 
 const setRedis = async (key, value) => (await redisClient.set(key, value))
 
+const setRedisEx = async (key, value) => (await redisClient.set(key, value, "EX", 3600)) //3600s ->  60m
+
 const getRedis = async (value) => (await redisClient.get(value))
 
 const getKeys = async (value) => (await redisClient.keys(value))
@@ -36,6 +38,18 @@ const setDataCache = async (key, data) => {
     } catch (e) {
         metrics.influxdb(500, `setDataCacheError`)
         catchHandler(e, 'setDataCache')
+    }
+}
+
+const setDataCacheEx = async (key, data) => {
+
+    try {
+        await setRedisEx(key, JSON.stringify(data))
+        // console.log(`*** Redis SET { ${key} } \n`)
+
+    } catch (e) {
+        metrics.influxdb(500, `setDataCacheExError`)
+        catchHandler(e, 'setDataCacheExError')
     }
 }
 
@@ -92,5 +106,6 @@ module.exports = {
     setDataCache,
     delDataCache,
     getKeysCache,
-    getDbSizeCache
+    getDbSizeCache,
+    setDataCacheEx
 }
