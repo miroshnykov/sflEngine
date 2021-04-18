@@ -38,7 +38,7 @@ const setOffers = async () => {
             logger.info(`Offer not define size in redis`)
             return
         }
-        let size = getFileSize(file) || 0
+        let size = await getFileSize(file) || 0
         logger.info(`fileSizeInfo_.offer:${fileSizeInfo_.offer}, Size from file Offers:${size}`)
 
         if (size === fileSizeInfo_.offer) {
@@ -132,7 +132,7 @@ const setCampaigns = async () => {
             logger.info(`Campaign not define size in redis`)
             return
         }
-        let size = getFileSize(file) || 0
+        let size = await getFileSize(file) || 0
 
         logger.info(`fileSizeInfo_campaigns:${fileSizeInfo_.campaign}, Size from file Campaigns:${size}`)
         if (size === fileSizeInfo_.campaign) {
