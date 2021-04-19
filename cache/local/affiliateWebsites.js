@@ -30,7 +30,7 @@ const setAffiliateWebsites = async () => {
             logger.info(`affiliateWebsites not define size in redis`)
             return
         }
-        let size = getFileSize(file) || 0
+        let size = await getFileSize(file) || 0
         logger.info(`fileSizeInfo_.affiliateWebsitesr:${fileSizeInfo_.affiliateWebsites}, Size from file affiliateWebsites:${size}`)
         if (size === fileSizeInfo_.affiliateWebsites) {
             logger.info(`Size of affiliateWebsites the same lets add to redis  `)
