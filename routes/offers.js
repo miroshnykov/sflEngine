@@ -70,7 +70,8 @@ let offers = {
             params.payoutPercent = offerInfo.payoutPercent
             params.isCpmOptionEnabled = offerInfo.isCpmOptionEnabled
             params.verticals = offerInfo.verticals
-            params.advertiser = offerInfo.advertiser
+            params.advertiserId = offerInfo.advertiserId
+            params.advertiserName = offerInfo.advertiserName
 
             metrics.influxdb(200, `offerId-${params.offerId}`)
             metrics.influxdb(200, `campaignId-${params.campaignId}`)
