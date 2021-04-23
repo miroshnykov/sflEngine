@@ -517,7 +517,7 @@ if (cluster.isMaster) {
         }
 
     }
-    setTimeout(syncSegmentsLocalWithRedis, 20000) // 20 sec, at application start
+    setTimeout(syncSegmentsLocalWithRedis, 10000) // 10 sec, at application start
     setInterval(syncSegmentsLocalWithRedis, 60000) // 60000 -> 1 min
 
     const cronSegmentsInfo = async () => {
@@ -532,7 +532,7 @@ if (cluster.isMaster) {
     }
 
     setInterval(cronSegmentsInfo, 66000) // 66000 -> 1.1 min
-    setTimeout(cronSegmentsInfo, 20000) // 20 sec, at application start
+    setTimeout(cronSegmentsInfo, 5000) // 5 sec, at application start
 
     // ******************************************** lpInfo
     socket.on('lpInfo', async (lpInfo) => {
@@ -561,7 +561,7 @@ if (cluster.isMaster) {
     }
 
     setInterval(cronLpInfo, 66000) // 66000 -> 1.1 min
-    setTimeout(cronLpInfo, 20000) // 20 sec, at application start
+    setTimeout(cronLpInfo, 6000) // 6 sec, at application start
 
     // ******************************************** lpInfo
     socket.on('randomSites', async (randomSites) => {
@@ -590,7 +590,7 @@ if (cluster.isMaster) {
     }
 
     setInterval(cronRedisRandomSitesInfo, 900000) // 900000 -> 15 min
-    setTimeout(cronRedisRandomSitesInfo, 5000) // 45000 ->45 sec, at application start
+    setTimeout(cronRedisRandomSitesInfo, 45000) // 45000 ->45 sec, at application start
 
     // ******************************************** advertisersInfo
     socket.on('advertisersInfo', async (advertisersInfo) => {
