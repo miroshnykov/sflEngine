@@ -17,8 +17,8 @@ const {catchHandler} = require('../middlewares/catchErr')
 
 const logger = require('bunyan-loader')(config.log).child({scope: 'offers.js'})
 
-// offer id 1
-// http://localhost:8088/ad?offer=415655028459403008171b3b20b12df8:fe6b8dd08c47a5d240747ecb28330b37e76ade3b203f8fb6fa166e1b573372348eb61217d27871856bc30306a57c07b2&debugging=debugging
+// offer id 1050
+// http://localhost:8088/ad?offer=aa566134b0f8dd96fd45976c643a97f7:250c33eb1c03786ae743230cea1a520567b7d16c558f2728ffcf3b055159b20544f5d82dad91e54c110c2ba4193d0253&debugging=debugging
 
 // offer 62  camp 51  LOCAL
 // http://localhost:8088/ad?offer=51d027447b3b9f2556bae568f7766a16:5f0a090841abd8fa94805b321fe821388791f64d19b8202329f19311c02ff11174ec22eeb96919756a0f21c0192d7837
@@ -30,7 +30,7 @@ const logger = require('bunyan-loader')(config.log).child({scope: 'offers.js'})
 // http://localhost:8088/ad?offer=d6a5c6885f46299bdc3df7402eff9132:78c249392e405e8d5f747c7d1aadb118afce7de44de6078f7a0c3026b6ddbe41beee2da1aea5ae5c2cebe79af15fba73
 
 // offer 6 stage
-// https://sfl-engin-staging.surge.systems/ad?offer=29152edc3f320183afa799a07c16709c:5f52073798d7b90a8812f5b50673897848074900f0db47eb1ca65022b92dfc7bdb845e16d6b966c7fef63e33204bf025
+// https://sfl-engin-staging.surge.systems/ad?offer=29152edc3f320183afa799a07c16709c:5f52073798d7b90a8812f5b50673897848074900f0db47eb1ca65022b92dfc7bdb845e16d6b966c7fef63e33204bf025&debugging=debugging
 
 // offer 2  camp 2 stage
 // https://sfl-engin.surge.systems/ad?offer=d0889832773b232bf51cafd7e0f0dea9:f19fa31d3df0bbf2a6d14be452d5413f2d4fb6e39ae270e8e839739641a523b93fd6acdbaf3c61e46eec326200a54e56
@@ -72,6 +72,7 @@ let offers = {
             params.verticals = offerInfo.verticals
             params.advertiserId = offerInfo.advertiserId
             params.advertiserName = offerInfo.advertiserName
+            params.verticalId = offerInfo.verticalId
 
             metrics.influxdb(200, `offerId-${params.offerId}`)
             metrics.influxdb(200, `campaignId-${params.campaignId}`)
