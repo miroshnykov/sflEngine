@@ -17,8 +17,8 @@ const {catchHandler} = require('../middlewares/catchErr')
 
 const logger = require('bunyan-loader')(config.log).child({scope: 'offers.js'})
 
-// offer id 1
-// http://localhost:8088/ad?offer=415655028459403008171b3b20b12df8:fe6b8dd08c47a5d240747ecb28330b37e76ade3b203f8fb6fa166e1b573372348eb61217d27871856bc30306a57c07b2&debugging=debugging
+// offer id 1050
+// http://localhost:8088/ad?offer=aa566134b0f8dd96fd45976c643a97f7:250c33eb1c03786ae743230cea1a520567b7d16c558f2728ffcf3b055159b20544f5d82dad91e54c110c2ba4193d0253&debugging=debugging
 
 // offer 62  camp 51  LOCAL
 // http://localhost:8088/ad?offer=51d027447b3b9f2556bae568f7766a16:5f0a090841abd8fa94805b321fe821388791f64d19b8202329f19311c02ff11174ec22eeb96919756a0f21c0192d7837
