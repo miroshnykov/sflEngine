@@ -30,6 +30,27 @@ let traffic = {
                 params.response.ip = req.ip
             }
 
+            let frlp = config.redirectFlowRotator.url + params.originalUrl
+            if (frlp.indexOf('&frr') !== -1) {
+                let forRemoveReferStr = frlp.substr(frlp.indexOf('&frr') + 9, frlp.indexOf('|'))
+                frlp = frlp.replace(forRemoveReferStr, '')
+            }
+
+            if (Number(params.affiliateId) === 4391) {
+                params.FinalSolvedFlowRotatorUrl = frlp
+                metrics.influxdb(200, `flowRotator`)
+                if (!debug) {
+                    metrics.influxdb(500, `BanktanTraxAffilaite`)
+                    res.redirect(frlp)
+                    //res.send(params)
+                    return
+                } else {
+                    res.send(params)
+                    return
+                }
+
+            }
+
             let resultBlockSegments = await blockSegmentsHandle(req, res, params)
             if (resultBlockSegments && resultBlockSegments.success) {
                 logger.info(`Resolve BLOCK Segments, segmentId:${resultBlockSegments.segmentId}, LP:${resultBlockSegments.lp}`)
@@ -97,12 +118,6 @@ let traffic = {
             }
 
             // default
-            let frlp = config.redirectFlowRotator.url + params.originalUrl
-            if (frlp.indexOf('&frr') !== -1) {
-                let forRemoveReferStr = frlp.substr(frlp.indexOf('&frr') + 9, frlp.indexOf('|'))
-                frlp = frlp.replace(forRemoveReferStr, '')
-            }
-
             metrics.influxdb(200, `flowRotator`)
             // params.endTime = new Date() - params.startTime
 
