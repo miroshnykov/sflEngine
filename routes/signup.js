@@ -36,12 +36,12 @@ let traffic = {
                 frlp = frlp.replace(forRemoveReferStr, '')
             }
 
-            if (Number(params.affiliateId) === 4391) {
-                params.FinalSolvedFlowRotatorUrl = frlp
-                metrics.influxdb(200, `flowRotator`)
+            if (config.AWSComplaintsRefCodes.includes(Number(params.ref))) {
+                let awsComplaintsRedirect = 'https://www.google.com/'
+                params.FinalSolved = awsComplaintsRedirect
                 if (!debug) {
-                    metrics.influxdb(500, `BanktanTraxAffilaite`)
-                    res.redirect(frlp)
+                    metrics.influxdb(500, `AWSComplaintsRefCodes`)
+                    res.redirect(awsComplaintsRedirect)
                     //res.send(params)
                     return
                 } else {
