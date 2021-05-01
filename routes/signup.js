@@ -30,12 +30,6 @@ let traffic = {
                 params.response.ip = req.ip
             }
 
-            let frlp = config.redirectFlowRotator.url + params.originalUrl
-            if (frlp.indexOf('&frr') !== -1) {
-                let forRemoveReferStr = frlp.substr(frlp.indexOf('&frr') + 9, frlp.indexOf('|'))
-                frlp = frlp.replace(forRemoveReferStr, '')
-            }
-
             if (config.AWSComplaintsRefCodes.includes(Number(params.ref))) {
                 let awsComplaintsRedirect = 'https://www.google.com/'
                 params.FinalSolved = awsComplaintsRedirect
@@ -118,6 +112,11 @@ let traffic = {
             }
 
             // default
+            let frlp = config.redirectFlowRotator.url + params.originalUrl
+            if (frlp.indexOf('&frr') !== -1) {
+                let forRemoveReferStr = frlp.substr(frlp.indexOf('&frr') + 9, frlp.indexOf('|'))
+                frlp = frlp.replace(forRemoveReferStr, '')
+            }
             metrics.influxdb(200, `flowRotator`)
             // params.endTime = new Date() - params.startTime
 
