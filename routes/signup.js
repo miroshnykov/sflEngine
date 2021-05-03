@@ -14,6 +14,8 @@ const {rangeSpeed} = require('../lib/utils')
 // https://sfl-engin-staging.surge.systems/signup?prod=1&ref=5204378&debugging=debugging
 const {performance} = require('perf_hooks')
 
+const {getDataCache} = require('../cache/redis')
+
 let traffic = {
     signup: async (req, res, next) => {
         try {
@@ -30,7 +32,9 @@ let traffic = {
                 params.response.ip = req.ip
             }
 
-            if (config.AWSComplaintsRefCodes.includes(Number(params.ref))) {
+            let awsComplaintsRefCodesCacheInfo = await getDataCache('awsComplaintsRefCodes_')
+            awsComplaintsRefCodesCacheInfo = awsComplaintsRefCodesCacheInfo || config.AWSComplaintsRefCodes
+            if (awsComplaintsRefCodesCacheInfo.includes(Number(params.ref))) {
                 let awsComplaintsRedirect = 'https://www.google.com/'
                 params.FinalSolved = awsComplaintsRedirect
                 if (!debug) {

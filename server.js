@@ -417,6 +417,34 @@ if (cluster.isMaster) {
     setInterval(cronBlockedIp, 3000000) // 50min
     setTimeout(cronBlockedIp, 30000) // 30 sec, at application start
 
+
+    // ******************************************** awsComplaintsRefCodes
+    socket.on('awsComplaintsRefCodes', async (awsComplaintsRefCodes) => {
+        try {
+            logger.info(`Set awsComplaintsRefCodes to redis:${JSON.stringify(awsComplaintsRefCodes)}`)
+            await setDataCache('awsComplaintsRefCodes_', awsComplaintsRefCodes)
+
+        } catch (e) {
+            logger.error(`awsComplaintsRefCodesError:`, e)
+            metrics.influxdb(500, `awsComplaintsRefCodesError-${computerName}`)
+        }
+
+    })
+
+    const cronAwsComplaintsRefCodes = async () => {
+        try {
+            let awsComplaintsRefCodesInfo = await getDataCache('awsComplaintsRefCodes_') || []
+            console.log('awsComplaintsRefCodes_:', awsComplaintsRefCodesInfo)
+            // logger.info(` *** checking blockedIpInfo data`)
+            socket.emit('awsComplaintsRefCodes', awsComplaintsRefCodesInfo)
+        } catch (e) {
+            logger.error(`awsComplaintsRefCodesError:`, e)
+        }
+
+    }
+    setInterval(cronAwsComplaintsRefCodes, 840000) // > 14 min
+    setTimeout(cronAwsComplaintsRefCodes, 30000) //  30000 -> 30 sec, at application start
+
     // ******************************************** targeting
     socket.on('targetingInfo', async (targetingInfo) => {
         try {
