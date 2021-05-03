@@ -11,6 +11,8 @@ const {
     getAdvertisersByProdIdEvent,
 } = require('../cache/localCache')
 
+const {getDataCache} = require('../cache/redis')
+
 const {
     pickRandomSites
 } = require('../lib/utils')
@@ -28,10 +30,11 @@ const {
 // http://localhost:8088/getRecipeData?segments=segments&debugging=debugging
 // http://localhost:8088/getRecipeData?segmentsCount=segmentsCount&debugging=debugging
 // http://localhost:8088/getRecipeData?advertiserByProdId=1&debugging=debugging
+// http://localhost:8088/getRecipeData?awsComplaintsRefCodesCache=awsComplaintsRefCodesCache&debugging=debugging
 
 // https://sfl-engin-staging.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?campaignId=86&debugging=debugging
-// https://sfl-engin-staging.surge.systems/getRecipeData?offerId=34206&debugging=debugging
+// https://sfl-engin-staging.surge.systems/getRecipeData?offerId=35694&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?segments=segments&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?advertiserByProdId=1&debugging=debugging
 // https://sfl-engin-staging.surge.systems/getRecipeData?affiliateId=181750&debugging=debugging
@@ -40,7 +43,7 @@ const {
 // https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?offerId=166&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?affiliateId=181750&debugging=debugging
-// https://sfl-engin.surge.systems/getRecipeData?campaignId=506&debugging=debugging
+// https://sfl-engin.surge.systems/getRecipeData?campaignId=970500&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?segments=segments&debugging=debugging
 // https://engin.actio.systems/getRecipeData?offerId=6&debugging=debugging
 // https://engin.actio.systems/getRecipeData?advertiserByProdId=1&debugging=debugging
@@ -58,6 +61,7 @@ let recipeData = {
             let affilaitesWebsitesLocal = req.query.affilaitesWebsitesLocal
             let affilaitesWebsitesLocalById = req.query.affilaitesWebsitesLocalById
             let advertiserByProdId = req.query.advertiserByProdId
+            let awsComplaintsRefCodesCache = req.query.awsComplaintsRefCodesCache
             let affiliateId = req.query.affiliateId
             let segments = req.query.segments
             let segmentsCount = req.query.segmentsCount
@@ -123,12 +127,17 @@ let recipeData = {
 
             }
 
-            if (advertiserByProdId){
-                let advAll= await getAdvertisersByProdIdEvent()
+            if (advertiserByProdId) {
+                let advAll = await getAdvertisersByProdIdEvent()
                 let adv = await getAdvertisersByProdIdEvent(advertiserByProdId)
                 // let advitem = await getAdvertisersByProdIdEvent(440)
                 response.advertisersCount = Object.keys(advAll).length
                 response.advertisersById = adv
+            }
+
+            if (awsComplaintsRefCodesCache) {
+                let awsComplaintsRefCodesCacheInfo = await getDataCache('awsComplaintsRefCodes_')
+                response.awsComplaintsRefCodesCache = awsComplaintsRefCodesCacheInfo
             }
 
             if (affilaitesWebsitesLocal) {

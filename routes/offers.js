@@ -36,7 +36,7 @@ const logger = require('bunyan-loader')(config.log).child({scope: 'offers.js'})
 // https://sfl-engin.surge.systems/ad?offer=d0889832773b232bf51cafd7e0f0dea9:f19fa31d3df0bbf2a6d14be452d5413f2d4fb6e39ae270e8e839739641a523b93fd6acdbaf3c61e46eec326200a54e56
 
 // offer 2  camp 4 stage
-// https://sfl-engin.surge.systems/ad?offer=2b4dec88c6269685cddeedaf6f2f938e:914ea3efb89e3bec7daaeb5cae74995ccc436e514c8d5884b0748fd01a0814ed7cff3d4d8f774e891e57a5e86daabc7f
+// https://sfl-engin.surge.systems/ad?offer=2b4dec88c6269685cddeedaf6f2f938e:914ea3efb89e3bec7daaeb5cae74995ccc436e514c8d5884b0748fd01a0814ed7cff3d4d8f774e891e57a5e86daabc7f&debugging=debugging
 
 let offers = {
     ad: async (req, res, next) => {
