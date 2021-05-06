@@ -1,4 +1,3 @@
 include:
-  - project: 'ActionMediaInc/adcenter/am-devops-toolbox'
-    file: 'pipelines/.gitlab-ci.yml'
-
+  - project: 'ActionMediaInc/adcenter/cicd-toolbox'
+    file: 'gitlab-ci/.gitlab-ci.yml'

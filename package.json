@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "node server.js --conf=./conf/config-local.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prod": "node server.js --conf=/run/secrets/sfl-engine-prod.js",
-    "stage1": "node server.js --conf=/run/secrets/sfl-engine-stage1.js"
+    "prod": "node server.js --conf=/run/secrets/sfl-engine.js",
+    "stage1": "node server.js --conf=/run/secrets/sfl-engine.js"
   },
   "author": "",
   "license": "ISC",
