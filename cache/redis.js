@@ -9,12 +9,10 @@ const redisClient = asyncRedis.createClient(config.redisLocal.port, config.redis
 const logger = require('bunyan-loader')(config.log).child({scope: 'redis.js'})
 
 redisClient.on('connect', () => {
-    // console.log(`\x1b[36m  Redis connected to host localhost port ${config.redisLocal.port} \x1b[0m`)
     logger.info(` *** Redis connected to host localhost port:${config.redisLocal.port} } `)
 })
 
 redisClient.on('error', (err) => {
-    // console.log('\x1b[41m Redis error: ' + err + '\x1b[0m')
     logger.error('Redis error:', err)
 })
 
@@ -33,7 +31,6 @@ const setDataCache = async (key, data) => {
 
     try {
         await setRedis(key, JSON.stringify(data))
-        // console.log(`*** Redis SET { ${key} } \n`)
 
     } catch (e) {
         metrics.influxdb(500, `setDataCacheError`)
@@ -45,7 +42,6 @@ const setDataCacheEx = async (key, data) => {
 
     try {
         await setRedisEx(key, JSON.stringify(data))
-        // console.log(`*** Redis SET { ${key} } \n`)
 
     } catch (e) {
         metrics.influxdb(500, `setDataCacheExError`)
@@ -57,7 +53,6 @@ const delDataCache = async (key) => {
 
     try {
         await deleteRedis(key)
-        // console.log(`*** Redis DEL { ${key} } \n`)
 
     } catch (e) {
         catchHandler(e, 'delDataCache')

@@ -41,7 +41,6 @@ const setAffiliateWebsites = async () => {
         }
 
         let affiliateWebsites = await getKeysCache('affiliateWebsites-*')
-        // console.log('affiliateWebsites count:',affiliateWebsites.length)
         for (const affiliateWebsite of affiliateWebsites) {
             await delDataCache(affiliateWebsite)
         }
@@ -59,7 +58,6 @@ const setAffiliateWebsites = async () => {
             }
             await setDataCache(`affiliateWebsites-${item.affiliateId}`, item)
             affiliateWebsitesWorker[item.affiliateId] = JSON.parse(item.sites)
-            // console.log('affiliateWebsitesWorker:', affiliateWebsitesWorker)
         })
 
     } catch (e) {

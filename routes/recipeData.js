@@ -10,7 +10,7 @@ const {
     getRandomSitesEvent,
     getAdvertisersByProdIdEvent,
 } = require('../cache/localCache')
-
+const logger = require('bunyan-loader')(config.log).child({scope: 'recipeData.js'})
 const {getDataCache} = require('../cache/redis')
 
 const {
@@ -51,6 +51,7 @@ const {
 
 // https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
 // https://sfl-engin.surge.systems/getRecipeData?affilaitesWebsitesLocal=affilaitesWebsitesLocal&debugging=debugging
+// https://sfl-engin.surge.systems/getRecipeData?awsComplaintsRefCodesCache=awsComplaintsRefCodesCache&debugging=debugging
 
 let recipeData = {
     getRecipeData: async (req, res, next) => {
@@ -162,7 +163,7 @@ let recipeData = {
 
         } catch (e) {
             catchHandler(e, 'getRecipeDataErr')
-            console.log('getRecipeDataError:', e)
+            logger.error('getRecipeDataError:', e)
             next(e)
         }
     }

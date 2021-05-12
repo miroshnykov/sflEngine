@@ -40,7 +40,6 @@ const setAffiliates = async () => {
         }
 
         let affiliates = await getKeysCache('affiliate-*')
-        // console.log('affiliates count:',affiliates.length)
         for (const affiliate of affiliates) {
             await delDataCache(affiliate)
         }
@@ -48,7 +47,6 @@ const setAffiliates = async () => {
         let gunzip = zlib.createGunzip();
 
         let stream = fs.createReadStream(file)
-        // console.log('file:', file)
         affiliatesWorker = {}
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)

@@ -50,21 +50,17 @@ const setOffers = async () => {
         }
 
         let offers = await getKeysCache('offer-*')
-        // console.log('offers count:',offers.length)
         for (const offer of offers) {
             await delDataCache(offer)
         }
 
-        // console.time('setOffersInsertSpeed')
         let gunzip = zlib.createGunzip();
         // let campaignsFile = config.recipe.offers
-        // console.log(`sflOffer config:${JSON.stringify(config.sflOffer)}`)
         if (!file) {
-            console.log(' no recipe file offer')
+            logger.info(' no recipe file offer')
             return
         }
         let stream = fs.createReadStream(file)
-        // console.log('file:', file)
         let jsonStream = JSONStream.parse('*')
         stream.pipe(gunzip).pipe(jsonStream)
         jsonStream.on('data', async (item) => {
@@ -75,10 +71,6 @@ const setOffers = async () => {
             await setDataCache(`offer-${item.offerId}`, item)
         })
 
-        // jsonStream.on('end', async () => {
-        //     console.log('offer end')
-        // })
-
     } catch (e) {
         catchHandler(e, 'setOffersError')
         metrics.influxdb(500, `setOffersError`)
@@ -88,7 +80,6 @@ const setOffers = async () => {
 const setData = async (key, body) => {
 
     try {
-        // console.log(`setData key:${key}:`, body)
         await setDataCache(key, JSON.parse(body))
 
     } catch (e) {
@@ -100,7 +91,6 @@ const setData = async (key, body) => {
 const getData = async (key) => {
 
     try {
-        // console.log('getData:', key)
         return await getDataCache(`${key}`)
 
     } catch (e) {
@@ -113,7 +103,6 @@ const delData = async (key) => {
 
     try {
 
-        // console.log('delData:', key)
         await delDataCache(`${key}`)
 
     } catch (e) {
@@ -144,18 +133,15 @@ const setCampaigns = async () => {
         }
 
         let campaigns = await getKeysCache('campaign-*')
-        // console.log('campaigns count:',campaigns.length)
 
         for (const campaign of campaigns) {
             await delDataCache(campaign)
         }
 
-        // console.time('setCampaignsInsertSpeed')
         let gunzip = zlib.createGunzip();
 
-        // console.log('sflOffer config:', config.sflOffer)
         if (!file) {
-            console.log('no recipe file campaign')
+            logger.info('no recipe file campaign')
             return
         }
         let stream = fs.createReadStream(file)
@@ -168,11 +154,6 @@ const setCampaigns = async () => {
             }
             await setDataCache(`campaign-${item.campaignId}`, item)
         })
-
-        // jsonStream.on('end', () => {
-        //     console.log('campaigns end')
-        // })
-
 
     } catch (e) {
         catchHandler(e, 'setCampaignsError')
