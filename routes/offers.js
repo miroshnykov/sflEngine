@@ -144,13 +144,6 @@ let offers = {
                     params.response.customLpRules = 'customLpRules not resolved'
                 }
                 //params.response.customLpRules = customLpRules
-                // console.log('resolveGeo:', resolveGeo)
-                // console.log('\nGeoRules:',geoRules)
-                // geoRules.geo.map(item=>{
-                //     console.log(item)
-                // } )
-
-
             } else {
                 params.response.customLpRules = 'There is no customLpRules  set up'
             }
@@ -254,7 +247,7 @@ let offers = {
 
         } catch (e) {
             catchHandler(e, 'offerError')
-            console.log(e)
+            logger.info(e)
             metrics.influxdb(500, `offerError`)
             next(e)
         }
@@ -316,12 +309,10 @@ const sqsConversionTypeCmp = async (params) => {
     obj.action = 'update'
     obj.body = `${JSON.stringify(conversionTypeCpmBody)}`
 
-    // console.log(obj)
     logger.info(`Added to SQS Conversion Type Cmp, Body:${JSON.stringify(obj)}`)
     let sqsData = await sendMessageToQueue(obj)
     params.sendTOSQS = sqsData
     params.sendTOSQSBody = obj
-    // console.log(`Added update to redis sqs:${JSON.stringify(sqsData)}`)
 
 }
 
@@ -329,7 +320,7 @@ const parseJson = (data) => {
     try {
         return JSON.parse(data)
     } catch (e) {
-        console.log('parseJsonError:', e)
+        logger.error('parseJsonError:', e)
         catchHandler(e, 'parseJsonError')
     }
 

@@ -434,8 +434,6 @@ if (cluster.isMaster) {
     const cronAwsComplaintsRefCodes = async () => {
         try {
             let awsComplaintsRefCodesInfo = await getDataCache('awsComplaintsRefCodes_') || []
-            console.log('awsComplaintsRefCodes_:', awsComplaintsRefCodesInfo)
-            // logger.info(` *** checking blockedIpInfo data`)
             socket.emit('awsComplaintsRefCodes', awsComplaintsRefCodesInfo)
         } catch (e) {
             logger.error(`awsComplaintsRefCodesError:`, e)
@@ -867,8 +865,6 @@ if (cluster.isMaster) {
     app.use(require('./middlewares/error'));
 
     app.listen({port: config.port}, () => {
-            // console.log(JSON.stringify(config))
-            // console.log(`\n🚀\x1b[35m Server ready at http://localhost:${config.port}, worker pid:${process.pid} , env:${config.env}\x1b[0m \n`)
             logger.info(`🚀 Server ready at http://localhost:${config.port}, worker pid:${process.pid}, env:${config.env}`)
             metrics.influxdb(200, `serverRunning`)
         }

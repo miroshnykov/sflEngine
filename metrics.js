@@ -44,14 +44,13 @@ exports.influxdb = (statusCode = 200, route = "/", method = "GET") => {
     if (clientInfluxdb.writeQueueLength >= config.influxdb.intervalRequest) {
         clientInfluxdb.syncWrite()
             .catch((error) => {
-                console.error(error)
+                logger.error(error)
             })
     }
 }
 
 
 exports.sendMetricsRequest = function (code) {
-    // console.log(`sendMetricsRequest code ${code}, project: ${project}`)
     clientInfluxdb.write(project + '_request')
         .tag({
             project: project,
